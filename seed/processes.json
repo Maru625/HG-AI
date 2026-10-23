@@ -1,0 +1,639 @@
+{
+  "company": "샘플테크(주)",
+  "title": "위임전결규정 (시연용 더미)",
+  "effective": "2026-01-01",
+  "grades": [
+    "사원",
+    "선임",
+    "책임",
+    "수석"
+  ],
+  "business_hours": {
+    "start": "09:00",
+    "end": "18:00"
+  },
+  "confidence_threshold": 0.8,
+  "evidence_categories": [
+    "교통비",
+    "숙박비",
+    "식비",
+    "회의비",
+    "소모품비",
+    "복리후생비",
+    "도서인쇄비",
+    "견적서"
+  ],
+  "articles": [
+    {
+      "id": "제1조",
+      "title": "목적",
+      "body": "이 규정은 업무 처리에 필요한 결재 권한을 직책별로 위임하여, 결재를 신속하고 일관되게 처리하는 것을 목적으로 한다."
+    },
+    {
+      "id": "제2조",
+      "title": "적용 범위",
+      "body": "이 규정은 전 임직원의 경비 정산, 출장 정산·보고, 물품 구매 요청, 회의실 사용 신청에 적용한다."
+    },
+    {
+      "id": "제3조",
+      "title": "결재선의 원칙",
+      "body": "결재는 기안자, 소속 팀장, 실장, 본부장 순으로 올린다. 전결 기준 금액에 따라 정해진 전결권자까지만 결재하며, 기안자가 팀장이면 팀장 단계는 생략한다. 합의가 필요한 업무는 결재선 끝에 합의 부서장을 둔다."
+    },
+    {
+      "id": "제4조",
+      "title": "결재 처리 기한",
+      "body": "결재자는 상신된 문서를 상신일로부터 3영업일 안에 처리한다. 처리할 수 없는 경우 기안자에게 사유를 알린다."
+    },
+    {
+      "id": "제10조",
+      "title": "일반경비 정산",
+      "body": "업무상 지출(회의비, 소모품비, 복리후생비, 도서인쇄비)은 사용 후 영수증을 첨부하여 정산한다. 전결권자는 30만 원 이하 팀장, 100만 원 이하 실장, 100만 원 초과 본부장으로 한다."
+    },
+    {
+      "id": "제10조의2",
+      "title": "회의비(식사·회식)",
+      "body": "회의비로 식사·회식을 정산할 때는 참석자 명단을 적고, 1인당 5만 원을 넘으면 사유를 적는다."
+    },
+    {
+      "id": "제11조",
+      "title": "국내 출장비 정산",
+      "body": "출장 종료 후 교통비, 숙박비, 식비를 영수증과 함께 정산한다. 전결권자는 합계 50만 원 이하 팀장, 50만 원 초과 실장으로 한다."
+    },
+    {
+      "id": "제11조의2",
+      "title": "출장비 한도",
+      "body": "숙박비는 1박당 사원·선임 10만 원, 책임·수석 12만 원을 상한으로 하고, 식비는 1일 3만 원을 상한으로 한다. 상한을 넘으면 사유를 적어야 하며, 사유가 없으면 정산할 수 없다."
+    },
+    {
+      "id": "제12조",
+      "title": "출장결과보고",
+      "body": "출장자는 출장 종료 후 5영업일 안에 출장결과보고를 올린다. 후속 조치에는 담당자와 기한을 명시한다. 전결권자는 팀장으로 한다."
+    },
+    {
+      "id": "제13조",
+      "title": "물품 구매 요청",
+      "body": "물품은 구매 전에 견적서를 첨부하여 요청한다. 전결권자는 50만 원 이하 팀장, 300만 원 이하 실장, 300만 원 초과 본부장으로 하며, 300만 원 초과 시 경영지원팀의 합의를 받는다."
+    },
+    {
+      "id": "제14조",
+      "title": "회의실 사용 신청",
+      "body": "회의실은 사용 신청 후 팀장의 결재를 받아 사용한다. 대회의실을 쓰거나, 외부인이 참석하거나, 업무시간(09:00~18:00) 밖에 쓰는 경우에는 경영지원팀의 합의를 받는다. 신청을 상신하면 가예약되고, 최종 승인되면 확정되며, 반려되면 가예약이 풀린다."
+    },
+    {
+      "id": "제20조",
+      "title": "증빙",
+      "body": "정산에는 영수증 원본 또는 사본을 첨부한다. 이미 정산한 증빙을 다시 정산할 수 없다."
+    },
+    {
+      "id": "제21조",
+      "title": "주말·공휴일 사용",
+      "body": "주말이나 공휴일에 사용한 경비는 사유를 적는다."
+    },
+    {
+      "id": "제22조",
+      "title": "판독이 불확실한 증빙",
+      "body": "영수증이 흐리거나 훼손되어 금액·날짜를 확실히 읽을 수 없으면 기안자가 원본을 확인하고, 결재자는 해당 값을 주의해서 확인한다."
+    }
+  ],
+  "processes": [
+    {
+      "id": "EXP-01",
+      "name": "일반경비 정산",
+      "when": "업무상 지출(회식, 소모품 등)을 사용한 뒤 정산할 때",
+      "approval_required": true,
+      "depth": "목록 수준",
+      "articles": [
+        "제10조",
+        "제10조의2",
+        "제20조",
+        "제21조"
+      ],
+      "amount_field": "amount",
+      "fields": [
+        {
+          "key": "use_date",
+          "label": "사용일",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "merchant",
+          "label": "사용처",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "label": "금액",
+          "type": "int",
+          "required": true,
+          "help": "증빙 금액의 합계와 같아야 한다"
+        },
+        {
+          "key": "account",
+          "label": "계정과목",
+          "type": "enum",
+          "required": true,
+          "options": [
+            "회의비",
+            "소모품비",
+            "복리후생비",
+            "도서인쇄비"
+          ]
+        },
+        {
+          "key": "purpose",
+          "label": "목적",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "attendees",
+          "label": "참석자",
+          "type": "list",
+          "required_if": {
+            "account": "회의비"
+          },
+          "help": "회의비일 때 참석자 이름 목록"
+        }
+      ],
+      "evidence": {
+        "required": true,
+        "label": "영수증"
+      },
+      "checks": [
+        "sum_matches_evidence",
+        "per_person_meal_limit"
+      ],
+      "limits": {
+        "per_person_meal": 50000
+      },
+      "approval": {
+        "bands": [
+          {
+            "max": 300000,
+            "level": "팀장"
+          },
+          {
+            "max": 1000000,
+            "level": "실장"
+          },
+          {
+            "max": null,
+            "level": "본부장"
+          }
+        ]
+      },
+      "example": {
+        "values": {
+          "use_date": "2026-11-10",
+          "merchant": "가상문구 판교점",
+          "amount": 42000,
+          "account": "소모품비",
+          "purpose": "프린터 토너 구매"
+        },
+        "evidence": [
+          {
+            "date": "2026-11-10",
+            "merchant": "가상문구 판교점",
+            "category": "소모품비",
+            "amount": 42000,
+            "filename": "receipt_toner.png",
+            "confidence": 0.98
+          }
+        ]
+      }
+    },
+    {
+      "id": "EXP-02",
+      "name": "국내 출장비 정산",
+      "when": "국내 출장을 마치고 교통비·숙박비·식비를 정산할 때",
+      "approval_required": true,
+      "depth": "상세 (시연)",
+      "articles": [
+        "제11조",
+        "제11조의2",
+        "제20조",
+        "제21조",
+        "제22조"
+      ],
+      "amount_field": "total_amount",
+      "fields": [
+        {
+          "key": "trip_start",
+          "label": "출장 시작일",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "trip_end",
+          "label": "출장 종료일",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "destination",
+          "label": "출장지",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "purpose",
+          "label": "출장 목적",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "total_amount",
+          "label": "합계",
+          "type": "int",
+          "required": true,
+          "help": "증빙 금액의 합계와 같아야 한다"
+        }
+      ],
+      "evidence": {
+        "required": true,
+        "label": "영수증",
+        "categories": [
+          "교통비",
+          "숙박비",
+          "식비"
+        ],
+        "help": "숙박비는 nights(박 수)를 함께 적는다"
+      },
+      "checks": [
+        "sum_matches_evidence",
+        "lodging_limit",
+        "meal_limit",
+        "trip_dates"
+      ],
+      "limits": {
+        "lodging_per_night": {
+          "사원": 100000,
+          "선임": 100000,
+          "책임": 120000,
+          "수석": 120000
+        },
+        "meal_per_day": 30000
+      },
+      "approval": {
+        "bands": [
+          {
+            "max": 500000,
+            "level": "팀장"
+          },
+          {
+            "max": null,
+            "level": "실장"
+          }
+        ]
+      },
+      "example": {
+        "values": {
+          "trip_start": "2026-11-04",
+          "trip_end": "2026-11-06",
+          "destination": "대전",
+          "purpose": "공동과제 착수회의",
+          "total_amount": 47400
+        },
+        "evidence": [
+          {
+            "date": "2026-11-04",
+            "merchant": "누리고속철도",
+            "category": "교통비",
+            "amount": 23700,
+            "filename": "receipt_01.png",
+            "confidence": 0.97
+          },
+          {
+            "date": "2026-11-06",
+            "merchant": "누리고속철도",
+            "category": "교통비",
+            "amount": 23700,
+            "filename": "receipt_02.png",
+            "confidence": 0.97
+          }
+        ]
+      }
+    },
+    {
+      "id": "RPT-01",
+      "name": "출장결과보고",
+      "when": "출장을 마친 뒤 결과와 후속 조치를 보고할 때 (출장 종료 후 5영업일 안)",
+      "approval_required": true,
+      "depth": "상세 (시연)",
+      "articles": [
+        "제12조"
+      ],
+      "amount_field": null,
+      "deadline": {
+        "from_field": "trip_end",
+        "business_days": 5
+      },
+      "fields": [
+        {
+          "key": "trip_start",
+          "label": "출장 시작일",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "trip_end",
+          "label": "출장 종료일",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "traveler",
+          "label": "출장자",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "visit",
+          "label": "방문처",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "schedule",
+          "label": "일정",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "result",
+          "label": "결과",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "follow_ups",
+          "label": "후속 조치",
+          "type": "items",
+          "required": true,
+          "item_fields": [
+            {
+              "key": "task",
+              "label": "내용",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "owner",
+              "label": "담당",
+              "type": "text",
+              "required": true
+            },
+            {
+              "key": "due",
+              "label": "기한",
+              "type": "date",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "evidence": {
+        "required": false,
+        "label": "회의 자료"
+      },
+      "checks": [
+        "trip_dates",
+        "report_deadline"
+      ],
+      "approval": {
+        "bands": [
+          {
+            "max": null,
+            "level": "팀장"
+          }
+        ]
+      },
+      "example": {
+        "values": {
+          "trip_start": "2026-11-04",
+          "trip_end": "2026-11-06",
+          "traveler": "김지훈 선임",
+          "visit": "한빛기술연구원",
+          "schedule": "11/4 착수회의, 11/5 시험장비 확인, 11/6 결과 정리",
+          "result": "공동과제 일정과 역할 분담을 확정했다.",
+          "follow_ups": [
+            {
+              "task": "시험 계획서 초안 송부",
+              "owner": "김지훈",
+              "due": "2026-11-20"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "PUR-01",
+      "name": "물품 구매 요청",
+      "when": "물품을 사기 전에 구매를 요청할 때",
+      "approval_required": true,
+      "depth": "목록 수준",
+      "articles": [
+        "제13조"
+      ],
+      "amount_field": "amount",
+      "fields": [
+        {
+          "key": "item",
+          "label": "품명",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "qty",
+          "label": "수량",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "unit_price",
+          "label": "단가",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "amount",
+          "label": "금액",
+          "type": "int",
+          "required": true,
+          "help": "수량 × 단가와 같아야 한다"
+        },
+        {
+          "key": "reason",
+          "label": "구매 사유",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "due_date",
+          "label": "희망 납기",
+          "type": "date",
+          "required": true
+        }
+      ],
+      "evidence": {
+        "required": true,
+        "label": "견적서",
+        "categories": [
+          "견적서"
+        ]
+      },
+      "checks": [
+        "qty_times_price"
+      ],
+      "approval": {
+        "bands": [
+          {
+            "max": 500000,
+            "level": "팀장"
+          },
+          {
+            "max": 3000000,
+            "level": "실장"
+          },
+          {
+            "max": null,
+            "level": "본부장",
+            "agreement": [
+              "경영지원팀"
+            ]
+          }
+        ]
+      },
+      "example": {
+        "values": {
+          "item": "24인치 모니터",
+          "qty": 2,
+          "unit_price": 199000,
+          "amount": 398000,
+          "reason": "시험 장비 모니터링용",
+          "due_date": "2026-11-20"
+        },
+        "evidence": [
+          {
+            "date": "2026-11-03",
+            "merchant": "가상전자상사",
+            "category": "견적서",
+            "amount": 398000,
+            "filename": "quote_monitor.pdf",
+            "confidence": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "id": "MTG-01",
+      "name": "회의실 사용 신청",
+      "when": "회의 일정이 정해져 회의실이 필요할 때",
+      "approval_required": true,
+      "depth": "상세 (시연)",
+      "articles": [
+        "제14조"
+      ],
+      "amount_field": null,
+      "fields": [
+        {
+          "key": "date",
+          "label": "날짜",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "start",
+          "label": "시작 시각",
+          "type": "time",
+          "required": true
+        },
+        {
+          "key": "end",
+          "label": "종료 시각",
+          "type": "time",
+          "required": true
+        },
+        {
+          "key": "room",
+          "label": "회의실",
+          "type": "room",
+          "required": true,
+          "help": "check_room_availability로 고른 회의실 ID"
+        },
+        {
+          "key": "people",
+          "label": "인원",
+          "type": "int",
+          "required": true
+        },
+        {
+          "key": "title",
+          "label": "회의명",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "purpose",
+          "label": "용도",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "external",
+          "label": "외부인 참석 여부",
+          "type": "bool",
+          "required": true
+        }
+      ],
+      "evidence": {
+        "required": false,
+        "label": "없음"
+      },
+      "checks": [
+        "room_capacity",
+        "room_conflict",
+        "time_order"
+      ],
+      "approval": {
+        "bands": [
+          {
+            "max": null,
+            "level": "팀장"
+          }
+        ],
+        "agreement_if": [
+          {
+            "condition": "large_room",
+            "label": "대회의실 사용",
+            "dept": "경영지원팀"
+          },
+          {
+            "condition": "external",
+            "label": "외부인 참석",
+            "dept": "경영지원팀"
+          },
+          {
+            "condition": "outside_hours",
+            "label": "업무시간 외 사용",
+            "dept": "경영지원팀"
+          }
+        ]
+      },
+      "example": {
+        "values": {
+          "date": "2026-11-17",
+          "start": "14:00",
+          "end": "15:00",
+          "room": "RM-B",
+          "people": 6,
+          "title": "대전 출장 결과 공유",
+          "purpose": "출장 결과와 후속 조치 공유",
+          "external": false
+        }
+      }
+    }
+  ]
+}

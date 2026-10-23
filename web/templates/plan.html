@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status, ai %}
+{% block title %}{{ plan.plan_id }} 작업 계획{% endblock %}
+{% block content %}
+<div class="pagehead">
+  <a class="backlink" href="/plans">← 작업 계획</a>
+  <h1><span class="mono">{{ plan.plan_id }}</span> {{ plan.title }} {{ status(plan.status, plan.status_label) }} {{ ai(plan.ai_written) }}</h1>
+  <p class="sub">{{ plan.summary }} · 만든 시각 {{ plan.created_at|hm }}{% if plan.approved_at %} · 승인 {{ plan.approved_at|hm }} ({{ '채팅' if plan.approved_via == 'MCP' else '화면' }}){% endif %}</p>
+</div>
+
+{% if plan.status != 'CANCELED' %}
+{% set approved = plan.status == 'APPROVED' %}
+<ol class="stepper" aria-label="진행 단계">
+  <li class="{{ 'done' if approved else 'now' }}"><span class="dot">{{ '✓' if approved else '1' }}</span><span>작업 계획 승인 <span class="by">확인 ①{% if not approved %} · 지금, 사람이 승인{% endif %}</span></span></li>
+  <li class="{{ 'now' if approved }}"><span class="dot">2</span><span>초안 확인 <span class="by">확인 ②{% if approved %} · AI가 초안을 쓰면 임시저장함에서{% endif %}</span></span></li>
+  <li><span class="dot">3</span><span>상신 <span class="by">확인 ③</span></span></li>
+</ol>
+{% endif %}
+
+{% if plan.status == 'PENDING' and plan.drafter.emp_no == user %}
+<div class="actionbar">
+  <span>AI가 제안한 처리 목록입니다. 맞으면 승인하세요 <b>(확인 ①)</b>.</span>
+  <form method="post" action="/plans/{{ plan.plan_id }}/approve"><button class="btn primary">목록 승인</button></form>
+  <form method="post" action="/plans/{{ plan.plan_id }}/cancel" onsubmit="return confirm('이 계획을 취소할까요?')"><input type="hidden" name="reason" value="화면에서 취소"><button class="btn">취소</button></form>
+</div>
+{% endif %}
+{% if plan.status == 'CANCELED' %}<div class="flash err">취소된 계획입니다. 사유: {{ plan.cancel_reason or '—' }}</div>{% endif %}
+
+<h2>처리 목록 {{ plan['items']|length }}건</h2>
+{% for it in plan['items'] %}
+<div class="card">
+  <div class="cardhead"><span class="num-badge">{{ it.item_no }}</span> <b>{{ it.process_name }}</b> <span class="mono muted">{{ it.process_id }}</span></div>
+  <p>{{ it.summary }}</p>
+  {% if it.sources %}<p class="muted">근거 자료: {{ it.sources }}</p>{% endif %}
+  {% set ck = it.evidence_check %}
+  {% if ck %}
+  <div class="evcheck">
+    <div class="evcheck-sum">증빙 확인: {{ ck.summary }}
+      {% if ck.exclude_suggested %} · <b class="warn-text">제외 제안: 증빙 {{ ck.exclude_suggested|join(', ') }}</b>{% endif %}
+      {% if ck.reasons_needed %} · 사유 필요: {{ ck.reasons_needed|map('rk')|join(', ') }}{% endif %}
+      · 제외 후 합계 {{ ck.total_without_excluded|won }}</div>
+    <div class="tablewrap"><table class="tbl small">
+      <thead><tr><th>#</th><th>날짜</th><th>상호</th><th>비목</th><th class="num">금액</th><th>확인 결과</th></tr></thead>
+      <tbody>{% for e in ck['items'] %}
+        {% set bad = e.results|selectattr('level', 'equalto', 'error')|list %}{% set warn = e.results|selectattr('level', 'equalto', 'warning')|list %}
+        <tr class="{{ 'row-bad' if bad else ('row-warn' if warn else '') }}">
+          <td>{{ e.seq }}</td><td>{{ e.date }}</td><td>{{ e.merchant }}</td><td>{{ e.category }}</td><td class="num">{{ e.amount|won }}</td>
+          <td>{% for r in e.results %}<div class="lv-{{ r.level }}">{% if r.level == 'error' %}✕ {% elif r.level == 'warning' %}⚠ {% else %}✓ {% endif %}{{ r.message }}</div>{% endfor %}</td>
+        </tr>{% endfor %}</tbody>
+    </table></div>
+  </div>
+  {% endif %}
+  {% set docs = plan.documents|selectattr('item_no', 'equalto', it.item_no)|list %}
+  {% if docs %}<div class="docs-of-item">초안: {% for d in docs %}<a href="{{ '/drafts/' if d.status in ('INVALID','VALID','CONFIRMED') else '/docs/' }}{{ d.doc_id }}">{{ d.doc_no or d.doc_id }} {{ status(d.status, d.status_label) }}</a>{% endfor %}</div>{% endif %}
+</div>
+{% endfor %}
+{% endblock %}

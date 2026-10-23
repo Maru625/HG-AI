@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}샘플테크 전결{% endblock %} · DEMO</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/vendor/htmx-2.0.4.min.js"></script>
+</head>
+<body>
+{% set me = (users|selectattr('emp_no', 'equalto', user)|list or [{'label': user}])[0] %}
+{% set is_approver = ('팀장' in me.label) or ('실장' in me.label) %}
+<header class="topbar">
+  <a class="brand" href="/"><span class="logo">샘플테크</span> 전결 시스템</a>
+  <span class="demo-tag" title="모든 데이터는 시연용 더미입니다">DEMO · 더미 데이터</span>
+  <nav class="nav" aria-label="주 메뉴">
+    {% set links = [('/', '홈'), ('/plans', '작업 계획'), ('/drafts', '임시저장함'), ('/inbox', '결재함'), ('/rooms', '회의실'), ('/rules', '규정'), ('/audit', '작업 기록')] %}
+    {% for href, label in links %}
+      <a href="{{ href }}" class="{{ 'on' if (href == '/' and path == '/') or (href != '/' and path.startswith(href)) or (href == '/inbox' and path.startswith('/review')) or (href == '/drafts' and path.startswith('/docs')) }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+  <div class="right">
+    <a class="clock" href="/demo" title="시연 시계 {{ demo.now|hm }} (누르면 시연 제어 패널)">
+      <svg class="ico-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <span class="lbl">시연</span> {{ (demo.now|hm)[5:] }}</a>
+    <div id="bell" hx-get="/partials/notifications" hx-trigger="every 4s" hx-select=".bellbar" hx-select-oob="#notice" hx-swap="innerHTML">{% with part = 'button' %}{% include "_bell.html" %}{% endwith %}</div>
+    <form method="post" action="/switch-user" class="switch who" title="사용자 전환">
+      <span class="role {{ 'approver' if is_approver else 'drafter' }}">{{ '결재자' if is_approver else '기안자' }}</span>
+      <input type="hidden" name="next" value="{{ path }}">
+      <label for="who" class="sr">사용자 전환</label>
+      <select id="who" name="emp_no" onchange="this.form.submit()">
+        {% for u in users %}<option value="{{ u.emp_no }}" {{ 'selected' if u.emp_no == user }}>{{ u.label }}</option>{% endfor %}
+      </select>
+    </form>
+  </div>
+</header>
+{% with part = 'notice' %}{% include "_bell.html" %}{% endwith %}
+{% if msg %}<div class="flash ok" role="status">✓ {{ msg }}</div>{% endif %}
+{% if err %}<div class="flash err" role="alert">! {{ err }}</div>{% endif %}
+<main id="live" class="wrap"
+  {% if live %}hx-get="{{ request.url.path }}{% if request.url.query %}?{{ request.url.query }}{% endif %}" hx-trigger="every 3s [window.liveOk()]" hx-select="#live" hx-swap="outerHTML"{% endif %}>
+  {% block content %}{% endblock %}
+</main>
+{% block after %}{% endblock %}
+<script src="/static/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

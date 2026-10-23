@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}전결 규정{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>전결 규정 <span class="muted small">샘플테크 전결 규정(가상)</span></h1>
+  <p class="sub">AI는 MCP의 search_rules, get_process_spec으로 이 규정을 읽습니다. 결재선과 검증은 서버가 이 규정으로 계산합니다.</p></div>
+
+<h2>처리 프로세스 {{ rules.processes|length }}종</h2>
+<div class="grid2">
+{% for p in rules.processes %}
+  <div class="card" id="{{ p.process_id }}">
+    <div class="cardhead"><b>{{ p.name }}</b> <span class="mono muted">{{ p.process_id }}</span></div>
+    <p class="muted">{{ p.when }}</p>
+    <table class="tbl kv small"><tbody>
+      <tr><th>전결 기준</th><td>{% for b in p.approval.bands %}{{ b.label }}{% if b.agreement %} + {{ b.agreement|join(', ') }} 합의{% endif %}{% if not loop.last %}<br>{% endif %}{% endfor %}</td></tr>
+      {% if p.approval.agreement_if %}<tr><th>합의 조건</th><td>{% for c in p.approval.agreement_if %}{{ c.label }} → {{ c.dept }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td></tr>{% endif %}
+      {% set LL = {'per_person_meal': '회의비 1인당', 'lodging_per_night': '숙박비 1박', 'meal_per_day': '식비 1일'} %}
+      {% if p.limits %}<tr><th>한도</th><td>{% for k, v in p.limits.items() %}<div>{{ LL.get(k, k) }} {% if v is mapping %}{% for g, x in v.items() %}{{ g }} {{ x|won }}{% if not loop.last %} · {% endif %}{% endfor %}{% else %}{{ v|won }}{% endif %}</div>{% endfor %}</td></tr>{% endif %}
+      {% if p.deadline %}{% set ff = p.fields|selectattr('key', 'equalto', p.deadline.from_field)|list %}<tr><th>기한</th><td>{{ ff[0].label if ff else p.deadline.from_field }} 후 {{ p.deadline.business_days }}영업일 이내</td></tr>{% endif %}
+      <tr><th>증빙</th><td>{{ p.evidence.label if p.evidence else '—' }}{% if p.evidence and p.evidence.categories %} ({{ p.evidence.categories|join(', ') }}){% endif %}{% if p.evidence and not p.evidence.required %} · 선택{% endif %}</td></tr>
+      <tr><th>입력 항목</th><td>{% for f in p.fields %}{{ f.label }}{% if f.required %}*{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+      <tr><th>근거</th><td>{% for a in p.articles %}{{ a.id }}{% if not loop.last %}, {% endif %}{% endfor %}</td></tr>
+    </tbody></table>
+  </div>
+{% endfor %}
+</div>
+
+<h2 class="mt">조항</h2>
+{% for a in rules.articles %}
+<div class="article" id="art-{{ a.id }}">
+  <h3>{{ a.id }} {{ a.title }} {% for pid in a.processes %}<a class="badge" href="#{{ pid }}">{{ pid }}</a>{% endfor %}</h3>
+  <p>{{ a.body }}</p>
+</div>
+{% endfor %}
+{% endblock %}

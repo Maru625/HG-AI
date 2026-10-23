@@ -1,0 +1,14 @@
+[
+  {
+    "token": "demo-drafter-kimjihoon-7f3a",
+    "emp_no": "E3001",
+    "mode": "drafter",
+    "label": "김지훈 선임 (기안자용)"
+  },
+  {
+    "token": "demo-approver-parkseoyeon-9c2e",
+    "emp_no": "E2001",
+    "mode": "approver",
+    "label": "박서연 팀장 (결재자용)"
+  }
+]

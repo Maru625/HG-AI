@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status, ai %}
+{% block title %}작업 계획{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>작업 계획</h1><p class="sub">AI가 만든 처리 목록입니다. 목록을 승인해야(확인 ①) AI가 초안을 쓸 수 있습니다.</p></div>
+{% if not plans %}
+<div class="empty">아직 작업 계획이 없습니다. AI 대화에서 "지난주 대전 출장 정리해 줘"처럼 지시하면 여기에 계획이 생깁니다.</div>
+{% endif %}
+{% for p in plans %}
+<a class="card rowcard" href="/plans/{{ p.plan_id }}">
+  <div class="rc-main"><span class="mono">{{ p.plan_id }}</span> <b>{{ p.title }}</b> {{ ai(p.ai_written) }}
+    <div class="muted">{{ p.summary }} · 항목 {{ p['items']|length }}건 · 만든 시각 {{ p.created_at|hm }}</div></div>
+  <div class="rc-side">{{ status(p.status, p.status_label) }}</div>
+</a>
+{% endfor %}
+{% endblock %}

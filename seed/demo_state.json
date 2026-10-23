@@ -1,0 +1,91 @@
+{
+  "start": "2026-11-12T10:00:00",
+  "confirm_mode": "A",
+  "digest_times": [
+    "09:00",
+    "14:00"
+  ],
+  "pending_docs": [
+    {
+      "key": "pending-urgent",
+      "expect": "긴급 (상신 후 3영업일 넘게 대기)",
+      "process": "PUR-01",
+      "drafter": "E3003",
+      "submitted": "2026-11-05T14:00:00",
+      "values": {
+        "item": "24인치 모니터",
+        "qty": 2,
+        "unit_price": 199000,
+        "amount": 398000,
+        "reason": "시험 장비 모니터링 화면 추가",
+        "due_date": "2026-11-20"
+      },
+      "evidence": [
+        {
+          "date": "2026-11-05",
+          "merchant": "가상전자상사",
+          "category": "견적서",
+          "amount": 398000,
+          "filename": "quote_monitor.pdf",
+          "confidence": 1.0
+        }
+      ]
+    },
+    {
+      "key": "pending-normal",
+      "expect": "보통 (전결 한도 근접 95%, 짧은 기간의 유사 정산)",
+      "process": "EXP-01",
+      "drafter": "E3002",
+      "submitted": "2026-11-11T09:30:00",
+      "values": {
+        "use_date": "2026-11-10",
+        "merchant": "판교 숲속식당",
+        "amount": 285000,
+        "account": "회의비",
+        "purpose": "과제 중간점검 후 팀 회식",
+        "attendees": [
+          "정하늘",
+          "김지훈",
+          "오세준",
+          "한유진",
+          "박서연",
+          "외부 자문위원"
+        ]
+      },
+      "evidence": [
+        {
+          "date": "2026-11-10",
+          "merchant": "판교 숲속식당",
+          "category": "회의비",
+          "amount": 285000,
+          "filename": "dinner_1110.png",
+          "confidence": 0.95
+        }
+      ]
+    },
+    {
+      "key": "pending-low",
+      "expect": "낮음 (주의 항목 없음)",
+      "process": "EXP-01",
+      "drafter": "E3004",
+      "submitted": "2026-11-11T16:00:00",
+      "values": {
+        "use_date": "2026-11-11",
+        "merchant": "가상문구 판교점",
+        "amount": 42000,
+        "account": "소모품비",
+        "purpose": "프린터 토너 구매"
+      },
+      "evidence": [
+        {
+          "date": "2026-11-11",
+          "merchant": "가상문구 판교점",
+          "category": "소모품비",
+          "amount": 42000,
+          "filename": "receipt_toner.png",
+          "confidence": 0.98
+        }
+      ]
+    }
+  ]
+}

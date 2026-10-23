@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status, ai, steps, imp %}
+{% block title %}{{ d.doc_no or d.doc_id }}{% endblock %}
+{% block content %}
+<div class="pagehead">
+  <a class="backlink" href="/inbox?view=drafter">← 결재함</a>
+  <h1><span class="mono">{{ d.doc_no or d.doc_id }}</span> {{ d.title }} {{ status(d.status, d.status_label) }} {{ ai(d.ai_written) }}</h1>
+  <p class="sub">{{ d.process_name }} · 기안자 {{ d.drafter.name }}{% if d.submitted_at %} · 상신 {{ d.submitted_at|hm }}{% endif %}{% if d.final_at %} · 완료 {{ d.final_at|hm }}{% endif %}
+    {% if d.reservation %} · 회의실 {{ status(d.reservation.status, d.reservation.status_label) }}{% endif %}</p>
+</div>
+
+{% if d.status == 'REJECTED' %}
+<div class="actionbar bad"><span><b>반려</b> · “{{ d.reject_comment }}”{% if d.drafter.emp_no == user %}<br>AI 대화에서 “반려된 문서 고쳐서 다시 올려 줘”라고 하면, 이 문서를 원본으로 잇는 새 문서로 다시 기안합니다.{% endif %}</span></div>
+{% elif d.status == 'APPROVED' %}
+<div class="actionbar ok"><span><b>최종 승인</b> {{ d.final_at|hm }}{% if d.reservation %} · 회의실 예약이 확정되었습니다{% endif %}</span></div>
+{% elif d.status == 'CANCELED' %}
+<div class="actionbar bad"><span>작업 계획이 취소되어 함께 취소된 문서입니다.</span></div>
+{% endif %}
+
+<div class="cols">
+  <div class="col-main">
+    {% include "_docbody.html" %}
+    {% if d.cautions %}<details class="card"><summary>결재자에게 보이는 주의 항목 {{ d.cautions|length }}개</summary>{% include "_cautions.html" %}</details>{% endif %}
+  </div>
+  <aside class="col-side">
+    <div class="card"><h3>결재선</h3>{{ steps(d.approval_line) if d.approval_line else '<p class="muted">상신 전입니다.</p>'|safe }}</div>
+  </aside>
+</div>
+{% endblock %}

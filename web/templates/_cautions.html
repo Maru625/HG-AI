@@ -1,0 +1,16 @@
+{% if d.cautions %}
+<div class="cautions" role="region" aria-label="주의 항목">
+  <h3><span class="ico-warn" aria-hidden="true">⚠</span> 주의해서 볼 항목 {{ d.cautions|length }}개 <span class="muted small">서버 판정 · AI 의견 아님</span></h3>
+  <ol>
+  {% for c in d.cautions %}
+    <li class="caution c-{{ c.code|lower }}">
+      <div class="c-head"><b>{{ c.label }}</b> <span class="code">{{ c.code }}</span>{% if c.article %} <span class="art">{{ c.article }}</span>{% endif %}
+        {% if c.evidence_seq %}<span class="muted small"> · 증빙 {{ c.evidence_seq }}번</span>{% endif %}{% if c.field %}<span class="muted small"> · 항목 {{ d.labels.get(c.field, c.field) }}</span>{% endif %}</div>
+      <div class="c-detail">{{ c.detail }}</div>
+      {% if c.reason %}<div class="c-reason">기안자 사유: “{{ c.reason }}”</div>{% endif %}
+      {% if c.value %}<div class="c-value muted small">판독값: {{ c.value.date }} · {{ c.value.merchant }} · {{ c.value.amount|won }}</div>{% endif %}
+    </li>
+  {% endfor %}
+  </ol>
+</div>
+{% endif %}

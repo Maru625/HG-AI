@@ -1,0 +1,52 @@
+{# 문서 본문: 입력값, 증빙, 사유. hl_fields / hl_seq가 있으면 해당 행을 강조한다(결재 검토). #}
+{% from "_macros.html" import val %}
+{% set hlf = hl_fields if hl_fields is defined else [] %}
+{% set hls = hl_seq if hl_seq is defined else [] %}
+<div class="card">
+  <h3>입력 내용 <span class="muted small">{{ d.process_name }} · v{{ d.version }}</span></h3>
+  <table class="tbl kv">
+    <tbody>
+    {% for f in d.spec.fields %}
+      {% set v = d['values'].get(f.key) if d['values'] else None %}
+      <tr class="{{ 'row-hl' if f.key in hlf }}">
+        <th>{{ f.label }}{% if f.required %}<span class="req" title="필수">*</span>{% endif %}</th>
+        <td>{% if f.key in hlf %}<span class="hl-tag">⚠ 주의</span> {% endif %}
+          {% if f.type == 'int' and v is number %}{{ v|won if f.key in ('amount', 'total_amount', 'unit_price') else '{:,}'.format(v) }}
+          {% elif f.type == 'room' %}{% set rm = d.spec.rooms|selectattr('id', 'equalto', v)|list if d.spec.rooms else [] %}{{ rm[0].name ~ ' (' ~ rm[0].capacity ~ '명)' if rm else val(v) }}
+          {% elif f.type == 'items' and v %}{% set il = {} %}{% for x in f.item_fields or [] %}{% set _ = il.update({x.key: x.label}) %}{% endfor %}
+            <ul class="items">{% for it in v %}<li>{% for k, x in it.items() %}<span class="k">{{ il.get(k, k) }}</span> {% if x %}{{ x }}{% else %}<span class="err-text">비어 있음</span>{% endif %}{% if not loop.last %} · {% endif %}{% endfor %}</li>{% endfor %}</ul>
+          {% else %}{{ val(v) }}{% endif %}</td>
+      </tr>
+    {% endfor %}
+    {% if d.memo %}<tr><th>메모</th><td>{{ d.memo }}</td></tr>{% endif %}
+    </tbody>
+  </table>
+</div>
+
+{% if d.evidence %}
+<div class="card">
+  <h3>증빙 {{ d.evidence|length }}건 <span class="muted small">합계 {{ d.evidence|sum(attribute='amount')|won }}</span></h3>
+  <div class="tablewrap"><table class="tbl">
+    <thead><tr><th>#</th><th>날짜</th><th>상호</th><th>비목</th><th class="num">금액</th><th>파일</th><th class="num">판독 신뢰도</th></tr></thead>
+    <tbody>
+    {% for e in d.evidence %}
+      <tr class="{{ 'row-hl' if e.seq in hls }}">
+        <td>{% if e.seq in hls %}<span class="hl-tag">⚠ 주의</span> {% endif %}{{ e.seq }}</td>
+        <td>{{ e.date }}</td><td>{{ e.merchant }}</td><td>{{ e.category }}{% if e.nights %} · {{ e.nights }}박{% endif %}</td>
+        <td class="num">{{ e.amount|won }}</td><td class="mono small">{{ e.filename or '—' }}</td>
+        <td class="num {{ 'warn-text' if e.confidence is number and e.confidence < 0.8 }}">{{ '%.2f'|format(e.confidence) if e.confidence is number else '—' }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endif %}
+
+{% if d.reasons %}
+<div class="card">
+  <h3>사유</h3>
+  <table class="tbl kv"><tbody>
+  {% for k, v in d.reasons.items() %}<tr><th>{{ k|rk }}</th><td>{{ v }}</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+{% endif %}

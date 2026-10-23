@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status, ai, steps, imp %}
+{% block title %}결재 검토 {{ d.doc_no }}{% endblock %}
+{% block content %}
+{% set vals = d['values'] or {} %}
+{% set amt = vals.get('total_amount', vals.get('amount')) %}
+{% set line = d.approval_line or [] %}
+{% set cur = namespace(i=0) %}{% for s in line %}{% if s.status == 'PENDING' and not cur.i %}{% set cur.i = loop.index %}{% endif %}{% endfor %}
+<div class="pagehead">
+  <a class="backlink" href="/inbox?view=approver">← 결재할 문서</a>
+  <h1>{{ imp(d.importance) }} {{ d.title }} {{ status(d.status, d.status_label) }} {{ ai(d.ai_written) }}</h1>
+  <p class="sub"><span class="mono">{{ d.doc_no }}</span> · {{ d.process_name }} · 기안자 {{ d.drafter.name }} · 상신 {{ d.submitted_at|hm }}
+    {% if d.importance_reasons %} · 중요도 근거: {{ d.importance_reasons|join(', ') }}{% endif %}</p>
+</div>
+
+{% if not d.can_decide and d.status == 'SUBMITTED' %}
+<div class="actionbar"><span>지금은 결재할 차례가 아닙니다. 결재선에서 진행 상황을 볼 수 있습니다.</span></div>
+{% endif %}
+
+<div class="judge">
+  <div><div class="k">금액</div><div class="v">{% if amt is number %}{{ '{:,}'.format(amt) }}<small>원</small>{% else %}—{% endif %}</div></div>
+  <div><div class="k">주의 항목</div><div class="v {{ 'warn' if d.cautions else 'ok' }}">{{ d.cautions|length }}<small>개</small></div></div>
+  <div><div class="k">결재 단계</div><div class="v">{% if cur.i %}{{ cur.i }}<small> / {{ line|length }}단계</small>{% else %}{{ line|length }}<small>단계</small>{% endif %}</div></div>
+  <div><div class="k">증빙</div><div class="v">{{ (d.evidence or [])|length }}<small>건</small></div></div>
+</div>
+
+<div class="cols">
+  <div class="col-main">
+    {% include "_cautions.html" %}
+    {% if not d.cautions %}<div class="nocaution">✓ 서버가 찾은 주의 항목이 없습니다.</div>{% endif %}
+    {% if d.original %}
+    {% set od = d.original %}
+    <div class="card changes">
+      <h3>재상신 변경점 <span class="muted small">반려된 원문서 {{ od.doc_no }} 대비</span></h3>
+      <p class="small">반려 사유 “{{ od.reject_comment }}”</p>
+      <table class="tbl kv"><tbody>{% for k, v in (od['values'] or {}).items() %}<tr class="{{ 'row-hl' if vals.get(k) != v }}"><th>{{ d.labels.get(k, k) }}</th><td>{{ v }}{% if vals.get(k) != v %} <span class="muted">→ {{ vals.get(k) }}</span>{% endif %}</td></tr>{% endfor %}</tbody></table>
+    </div>
+    {% endif %}
+    {% include "_docbody.html" %}
+  </div>
+  <aside class="col-side">
+    <div class="card"><h3>결재선</h3>{{ steps(d.approval_line) }}</div>
+    <div class="card"><h3>적용 규정</h3><ul class="arts">{% for a in d.spec.articles %}<li><b>{{ a.id }}</b> {{ a.title }}</li>{% endfor %}</ul></div>
+  </aside>
+</div>
+{% endblock %}
+{% block after %}
+{% if d.can_decide %}
+<form class="decidebar" method="post" action="/review/{{ d.doc_id }}/decide" onsubmit="return window.confirmDecision(event)">
+  <div class="wrap decide-inner">
+    <label for="comment" class="sr">의견</label>
+    <input id="comment" name="comment" type="text" placeholder="의견 (반려할 때는 필수)" autocomplete="off">
+    <button class="btn reject" name="decision" value="reject">반려</button>
+    <button class="btn primary" name="decision" value="approve">승인</button>
+  </div>
+  <p class="wrap decide-note">승인·반려는 이 화면에서만 할 수 있습니다. AI 연결로는 할 수 없습니다.</p>
+</form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,5714 @@
+[
+  {
+    "key": "hist-029",
+    "process": "RPT-01",
+    "drafter": "E4015",
+    "submitted": "2026-08-17T09:50:00",
+    "values": {
+      "trip_start": "2026-08-14",
+      "trip_end": "2026-08-15",
+      "traveler": "장예린",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "장예린",
+          "due": "2026-08-24"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.61,
+      0.92,
+      0.82,
+      0.59
+    ]
+  },
+  {
+    "key": "hist-005",
+    "process": "MTG-01",
+    "drafter": "E4001",
+    "submitted": "2026-08-18T13:40:00",
+    "values": {
+      "date": "2026-08-21",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 3,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.79,
+      2.08,
+      1.11,
+      0.52
+    ]
+  },
+  {
+    "key": "hist-082",
+    "process": "RPT-01",
+    "drafter": "E3001",
+    "submitted": "2026-08-18T13:50:00",
+    "values": {
+      "trip_start": "2026-08-13",
+      "trip_end": "2026-08-14",
+      "traveler": "김지훈",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "김지훈",
+          "due": "2026-08-25"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.4,
+      0.71,
+      1.24,
+      0.98
+    ]
+  },
+  {
+    "key": "hist-062",
+    "process": "RPT-01",
+    "drafter": "E3003",
+    "submitted": "2026-08-18T14:40:00",
+    "values": {
+      "trip_start": "2026-08-15",
+      "trip_end": "2026-08-16",
+      "traveler": "오세준",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "오세준",
+          "due": "2026-08-25"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.11,
+      1.27,
+      1.0,
+      0.97
+    ]
+  },
+  {
+    "key": "hist-138",
+    "process": "RPT-01",
+    "drafter": "E4013",
+    "submitted": "2026-08-19T12:50:00",
+    "values": {
+      "trip_start": "2026-08-14",
+      "trip_end": "2026-08-15",
+      "traveler": "서다인",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "서다인",
+          "due": "2026-08-26"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.06,
+      1.83,
+      1.96,
+      0.74
+    ]
+  },
+  {
+    "key": "hist-141",
+    "process": "EXP-01",
+    "drafter": "E4006",
+    "submitted": "2026-08-19T15:00:00",
+    "values": {
+      "use_date": "2026-08-19",
+      "merchant": "가상문구 판교점",
+      "amount": 24000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-08-19",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 24000,
+        "filename": "h_3525.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.03,
+      2.14,
+      0.88,
+      1.36
+    ]
+  },
+  {
+    "key": "hist-112",
+    "process": "EXP-01",
+    "drafter": "E4020",
+    "submitted": "2026-08-20T13:50:00",
+    "values": {
+      "use_date": "2026-08-20",
+      "merchant": "가상서점 판교",
+      "amount": 42000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-08-20",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 42000,
+        "filename": "h_9976.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "EVIDENCE_REQUIRED",
+      "label": "증빙 누락"
+    },
+    "delay_factors": [
+      1.96,
+      0.47,
+      1.18,
+      1.95
+    ]
+  },
+  {
+    "key": "hist-116",
+    "process": "EXP-02",
+    "drafter": "E4018",
+    "submitted": "2026-08-21T14:10:00",
+    "values": {
+      "trip_start": "2026-08-19",
+      "trip_end": "2026-08-20",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 219600
+    },
+    "evidence": [
+      {
+        "date": "2026-08-19",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-20",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-20",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 100000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.56,
+      0.68,
+      1.01,
+      0.33
+    ]
+  },
+  {
+    "key": "hist-127",
+    "process": "RPT-01",
+    "drafter": "E4016",
+    "submitted": "2026-08-21T14:40:00",
+    "values": {
+      "trip_start": "2026-08-18",
+      "trip_end": "2026-08-19",
+      "traveler": "박시우",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "박시우",
+          "due": "2026-08-28"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.54,
+      0.86,
+      1.06,
+      0.85
+    ]
+  },
+  {
+    "key": "hist-058",
+    "process": "EXP-02",
+    "drafter": "E4019",
+    "submitted": "2026-08-21T16:20:00",
+    "values": {
+      "trip_start": "2026-08-18",
+      "trip_end": "2026-08-20",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 240000
+    },
+    "evidence": [
+      {
+        "date": "2026-08-18",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-20",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-20",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      0.85,
+      0.53,
+      1.15,
+      0.78
+    ]
+  },
+  {
+    "key": "hist-042",
+    "process": "EXP-01",
+    "drafter": "E4005",
+    "submitted": "2026-08-25T12:30:00",
+    "values": {
+      "use_date": "2026-08-25",
+      "merchant": "정자동 국수집",
+      "amount": 24000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "황재원",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-08-25",
+        "merchant": "정자동 국수집",
+        "category": "회의비",
+        "amount": 24000,
+        "filename": "h_3080.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.09,
+      0.74,
+      0.73,
+      0.89
+    ]
+  },
+  {
+    "key": "hist-101",
+    "process": "EXP-01",
+    "drafter": "E4016",
+    "submitted": "2026-08-25T16:20:00",
+    "values": {
+      "use_date": "2026-08-25",
+      "merchant": "가상카페 판교",
+      "amount": 12000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-08-25",
+        "merchant": "가상카페 판교",
+        "category": "복리후생비",
+        "amount": 12000,
+        "filename": "h_2840.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.87,
+      1.59,
+      1.18,
+      1.9
+    ]
+  },
+  {
+    "key": "hist-079",
+    "process": "EXP-01",
+    "drafter": "E3001",
+    "submitted": "2026-08-25T17:20:00",
+    "values": {
+      "use_date": "2026-08-25",
+      "merchant": "판교 가상베이커리",
+      "amount": 96000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-08-25",
+        "merchant": "판교 가상베이커리",
+        "category": "복리후생비",
+        "amount": 96000,
+        "filename": "h_5466.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "EVIDENCE_REQUIRED",
+      "label": "증빙 누락"
+    },
+    "delay_factors": [
+      1.07,
+      1.0,
+      0.87,
+      1.09
+    ]
+  },
+  {
+    "key": "hist-121",
+    "process": "PUR-01",
+    "drafter": "E4004",
+    "submitted": "2026-08-27T10:20:00",
+    "values": {
+      "item": "시험용 지그",
+      "qty": 1,
+      "unit_price": 89000,
+      "amount": 89000,
+      "reason": "업무용",
+      "due_date": "2026-09-06"
+    },
+    "evidence": [
+      {
+        "date": "2026-08-27",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 89000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.51,
+      1.03,
+      0.77,
+      0.74
+    ]
+  },
+  {
+    "key": "hist-011",
+    "process": "EXP-02",
+    "drafter": "E4006",
+    "submitted": "2026-08-27T13:20:00",
+    "values": {
+      "trip_start": "2026-08-25",
+      "trip_end": "2026-08-26",
+      "destination": "구미",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 170000
+    },
+    "evidence": [
+      {
+        "date": "2026-08-25",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-26",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-26",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 100000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.08,
+      0.72,
+      0.98,
+      0.65
+    ]
+  },
+  {
+    "key": "hist-131",
+    "process": "RPT-01",
+    "drafter": "E4005",
+    "submitted": "2026-08-27T14:20:00",
+    "values": {
+      "trip_start": "2026-08-25",
+      "trip_end": "2026-08-26",
+      "traveler": "황재원",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "황재원",
+          "due": "2026-09-03"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.63,
+      1.27,
+      0.67,
+      0.86
+    ]
+  },
+  {
+    "key": "hist-152",
+    "process": "EXP-01",
+    "drafter": "E4011",
+    "submitted": "2026-08-27T15:50:00",
+    "values": {
+      "use_date": "2026-08-27",
+      "merchant": "한솥가상도시락",
+      "amount": 58000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "김하은",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-08-27",
+        "merchant": "한솥가상도시락",
+        "category": "회의비",
+        "amount": 58000,
+        "filename": "h_2944.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.41,
+      1.72,
+      1.32,
+      1.34
+    ]
+  },
+  {
+    "key": "hist-139",
+    "process": "RPT-01",
+    "drafter": "E4002",
+    "submitted": "2026-08-27T16:50:00",
+    "values": {
+      "trip_start": "2026-08-24",
+      "trip_end": "2026-08-25",
+      "traveler": "서윤호",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "서윤호",
+          "due": "2026-09-03"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.54,
+      1.2,
+      0.69,
+      1.02
+    ]
+  },
+  {
+    "key": "hist-103",
+    "process": "MTG-01",
+    "drafter": "E4014",
+    "submitted": "2026-08-28T09:20:00",
+    "values": {
+      "date": "2026-08-31",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 3,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.43,
+      1.5,
+      0.99,
+      0.63
+    ]
+  },
+  {
+    "key": "hist-099",
+    "process": "MTG-01",
+    "drafter": "E3002",
+    "submitted": "2026-08-28T11:00:00",
+    "values": {
+      "date": "2026-08-31",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-A",
+      "people": 6,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.27,
+      0.67,
+      1.02,
+      0.63
+    ]
+  },
+  {
+    "key": "hist-092",
+    "process": "EXP-02",
+    "drafter": "E4015",
+    "submitted": "2026-08-28T14:20:00",
+    "values": {
+      "trip_start": "2026-08-26",
+      "trip_end": "2026-08-27",
+      "destination": "구미",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 147400
+    },
+    "evidence": [
+      {
+        "date": "2026-08-26",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-27",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-08-27",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 100000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.37,
+      0.66,
+      0.98,
+      0.64
+    ]
+  },
+  {
+    "key": "hist-090",
+    "process": "EXP-01",
+    "drafter": "E4021",
+    "submitted": "2026-08-31T14:50:00",
+    "values": {
+      "use_date": "2026-08-31",
+      "merchant": "판교 숲속식당",
+      "amount": 132000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "최재원",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-08-31",
+        "merchant": "판교 숲속식당",
+        "category": "회의비",
+        "amount": 132000,
+        "filename": "h_9213.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.35,
+      0.93,
+      0.52,
+      0.93
+    ]
+  },
+  {
+    "key": "hist-009",
+    "process": "PUR-01",
+    "drafter": "E3002",
+    "submitted": "2026-09-01T10:00:00",
+    "values": {
+      "item": "외장 SSD",
+      "qty": 1,
+      "unit_price": 650000,
+      "amount": 650000,
+      "reason": "업무용",
+      "due_date": "2026-09-11"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-01",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 650000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.53,
+      1.41,
+      0.75,
+      1.09
+    ]
+  },
+  {
+    "key": "hist-057",
+    "process": "EXP-01",
+    "drafter": "E4013",
+    "submitted": "2026-09-01T10:20:00",
+    "values": {
+      "use_date": "2026-09-01",
+      "merchant": "한솥가상도시락",
+      "amount": 42000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "서다인",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-09-01",
+        "merchant": "한솥가상도시락",
+        "category": "회의비",
+        "amount": 42000,
+        "filename": "h_5800.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.95,
+      1.2,
+      0.86,
+      0.95
+    ]
+  },
+  {
+    "key": "hist-027",
+    "process": "RPT-01",
+    "drafter": "E4021",
+    "submitted": "2026-09-02T10:50:00",
+    "values": {
+      "trip_start": "2026-08-28",
+      "trip_end": "2026-08-29",
+      "traveler": "최재원",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "최재원",
+          "due": "2026-09-09"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.31,
+      0.53,
+      0.61,
+      0.71
+    ]
+  },
+  {
+    "key": "hist-048",
+    "process": "RPT-01",
+    "drafter": "E4011",
+    "submitted": "2026-09-02T12:20:00",
+    "values": {
+      "trip_start": "2026-08-29",
+      "trip_end": "2026-08-30",
+      "traveler": "김하은",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "김하은",
+          "due": "2026-09-09"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.29,
+      1.02,
+      2.04,
+      0.81
+    ]
+  },
+  {
+    "key": "hist-125",
+    "process": "EXP-01",
+    "drafter": "E4020",
+    "submitted": "2026-09-02T15:50:00",
+    "values": {
+      "use_date": "2026-09-02",
+      "merchant": "오피스가상마트",
+      "amount": 188000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-02",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 188000,
+        "filename": "h_1614.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "LIMIT_EXCEEDED",
+      "label": "한도 초과 사유 부족"
+    },
+    "delay_factors": [
+      0.64,
+      0.68,
+      0.71,
+      1.12
+    ]
+  },
+  {
+    "key": "hist-061",
+    "process": "EXP-01",
+    "drafter": "E4017",
+    "submitted": "2026-09-03T10:30:00",
+    "values": {
+      "use_date": "2026-09-03",
+      "merchant": "가상문구 판교점",
+      "amount": 132000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-03",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 132000,
+        "filename": "h_5409.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.03,
+      0.86,
+      0.65,
+      1.24
+    ]
+  },
+  {
+    "key": "hist-060",
+    "process": "EXP-01",
+    "drafter": "E3004",
+    "submitted": "2026-09-03T11:30:00",
+    "values": {
+      "use_date": "2026-09-03",
+      "merchant": "오피스가상마트",
+      "amount": 42000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-03",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 42000,
+        "filename": "h_7602.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.77,
+      1.36,
+      1.15,
+      0.9
+    ]
+  },
+  {
+    "key": "hist-070",
+    "process": "RPT-01",
+    "drafter": "E3001",
+    "submitted": "2026-09-04T09:10:00",
+    "values": {
+      "trip_start": "2026-08-30",
+      "trip_end": "2026-08-31",
+      "traveler": "김지훈",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "김지훈",
+          "due": "2026-09-11"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      2.01,
+      0.79,
+      0.53,
+      0.58
+    ]
+  },
+  {
+    "key": "hist-129",
+    "process": "RPT-01",
+    "drafter": "E4017",
+    "submitted": "2026-09-04T09:20:00",
+    "values": {
+      "trip_start": "2026-09-02",
+      "trip_end": "2026-09-03",
+      "traveler": "송서준",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "송서준",
+          "due": "2026-09-11"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.88,
+      0.52,
+      1.04,
+      0.94
+    ]
+  },
+  {
+    "key": "hist-153",
+    "process": "PUR-01",
+    "drafter": "E4006",
+    "submitted": "2026-09-04T11:40:00",
+    "values": {
+      "item": "시험용 지그",
+      "qty": 2,
+      "unit_price": 45000,
+      "amount": 90000,
+      "reason": "업무용",
+      "due_date": "2026-09-14"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-04",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 90000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "LIMIT_EXCEEDED",
+      "label": "한도 초과 사유 부족"
+    },
+    "delay_factors": [
+      1.7,
+      1.06,
+      0.92,
+      0.59
+    ]
+  },
+  {
+    "key": "hist-031",
+    "process": "EXP-01",
+    "drafter": "E4012",
+    "submitted": "2026-09-04T12:00:00",
+    "values": {
+      "use_date": "2026-09-04",
+      "merchant": "판교 숲속식당",
+      "amount": 96000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "한시우",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-09-04",
+        "merchant": "판교 숲속식당",
+        "category": "회의비",
+        "amount": 96000,
+        "filename": "h_9508.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.61,
+      1.42,
+      1.52,
+      1.62
+    ]
+  },
+  {
+    "key": "hist-100",
+    "process": "RPT-01",
+    "drafter": "E4019",
+    "submitted": "2026-09-04T15:40:00",
+    "values": {
+      "trip_start": "2026-08-31",
+      "trip_end": "2026-09-01",
+      "traveler": "윤다인",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "윤다인",
+          "due": "2026-09-11"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "EVIDENCE_REQUIRED",
+      "label": "증빙 누락"
+    },
+    "delay_factors": [
+      1.5,
+      0.97,
+      1.07,
+      1.13
+    ]
+  },
+  {
+    "key": "hist-137",
+    "process": "EXP-02",
+    "drafter": "E4009",
+    "submitted": "2026-09-07T10:40:00",
+    "values": {
+      "trip_start": "2026-09-05",
+      "trip_end": "2026-09-06",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 214600
+    },
+    "evidence": [
+      {
+        "date": "2026-09-05",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-06",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-06",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      0.79,
+      0.57,
+      0.8,
+      0.6
+    ]
+  },
+  {
+    "key": "hist-094",
+    "process": "RPT-01",
+    "drafter": "E4007",
+    "submitted": "2026-09-07T12:50:00",
+    "values": {
+      "trip_start": "2026-09-03",
+      "trip_end": "2026-09-04",
+      "traveler": "신민서",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "신민서",
+          "due": "2026-09-14"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.71,
+      1.18,
+      0.55,
+      1.45
+    ]
+  },
+  {
+    "key": "hist-156",
+    "process": "MTG-01",
+    "drafter": "E4007",
+    "submitted": "2026-09-07T17:30:00",
+    "values": {
+      "date": "2026-09-14",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-A",
+      "people": 5,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.4,
+      0.51,
+      1.2,
+      0.4
+    ]
+  },
+  {
+    "key": "hist-017",
+    "process": "EXP-01",
+    "drafter": "E4017",
+    "submitted": "2026-09-09T09:10:00",
+    "values": {
+      "use_date": "2026-09-09",
+      "merchant": "판교 인쇄소",
+      "amount": 18000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-09",
+        "merchant": "판교 인쇄소",
+        "category": "도서인쇄비",
+        "amount": 18000,
+        "filename": "h_4676.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.4,
+      0.67,
+      0.45,
+      2.5
+    ]
+  },
+  {
+    "key": "hist-089",
+    "process": "RPT-01",
+    "drafter": "E4009",
+    "submitted": "2026-09-09T15:00:00",
+    "values": {
+      "trip_start": "2026-09-06",
+      "trip_end": "2026-09-07",
+      "traveler": "윤건우",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "윤건우",
+          "due": "2026-09-16"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.05,
+      0.9,
+      0.6,
+      1.01
+    ]
+  },
+  {
+    "key": "hist-136",
+    "process": "EXP-02",
+    "drafter": "E4021",
+    "submitted": "2026-09-10T09:30:00",
+    "values": {
+      "trip_start": "2026-09-07",
+      "trip_end": "2026-09-09",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 217400
+    },
+    "evidence": [
+      {
+        "date": "2026-09-07",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-09",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-09",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.81,
+      1.55,
+      0.41,
+      1.09
+    ]
+  },
+  {
+    "key": "hist-024",
+    "process": "RPT-01",
+    "drafter": "E4014",
+    "submitted": "2026-09-10T12:00:00",
+    "values": {
+      "trip_start": "2026-09-08",
+      "trip_end": "2026-09-09",
+      "traveler": "이가은",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "이가은",
+          "due": "2026-09-17"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "DUPLICATE_EVIDENCE",
+      "label": "중복 증빙"
+    },
+    "delay_factors": [
+      1.51,
+      0.49,
+      1.53,
+      0.96
+    ]
+  },
+  {
+    "key": "hist-064",
+    "process": "EXP-02",
+    "drafter": "E4010",
+    "submitted": "2026-09-10T15:40:00",
+    "values": {
+      "trip_start": "2026-09-08",
+      "trip_end": "2026-09-09",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 165000
+    },
+    "evidence": [
+      {
+        "date": "2026-09-08",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-09",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-09",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.04,
+      0.71,
+      0.78,
+      0.87
+    ]
+  },
+  {
+    "key": "hist-069",
+    "process": "EXP-01",
+    "drafter": "E4008",
+    "submitted": "2026-09-10T16:10:00",
+    "values": {
+      "use_date": "2026-09-10",
+      "merchant": "오피스가상마트",
+      "amount": 58000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-10",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 58000,
+        "filename": "h_2960.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.92,
+      0.48,
+      1.95,
+      1.49
+    ]
+  },
+  {
+    "key": "hist-106",
+    "process": "RPT-01",
+    "drafter": "E4021",
+    "submitted": "2026-09-14T09:00:00",
+    "values": {
+      "trip_start": "2026-09-10",
+      "trip_end": "2026-09-11",
+      "traveler": "최재원",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "최재원",
+          "due": "2026-09-21"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.25,
+      1.54,
+      0.56,
+      1.16
+    ]
+  },
+  {
+    "key": "hist-074",
+    "process": "EXP-01",
+    "drafter": "E4002",
+    "submitted": "2026-09-14T10:00:00",
+    "values": {
+      "use_date": "2026-09-14",
+      "merchant": "판교 인쇄소",
+      "amount": 132000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-14",
+        "merchant": "판교 인쇄소",
+        "category": "도서인쇄비",
+        "amount": 132000,
+        "filename": "h_2206.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.58,
+      2.16,
+      2.5,
+      1.12
+    ]
+  },
+  {
+    "key": "hist-032",
+    "process": "RPT-01",
+    "drafter": "E3002",
+    "submitted": "2026-09-14T15:10:00",
+    "values": {
+      "trip_start": "2026-09-11",
+      "trip_end": "2026-09-12",
+      "traveler": "정하늘",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "정하늘",
+          "due": "2026-09-21"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.06,
+      1.17,
+      1.8,
+      0.38
+    ]
+  },
+  {
+    "key": "hist-020",
+    "process": "EXP-02",
+    "drafter": "E3004",
+    "submitted": "2026-09-14T15:50:00",
+    "values": {
+      "trip_start": "2026-09-11",
+      "trip_end": "2026-09-13",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 260000
+    },
+    "evidence": [
+      {
+        "date": "2026-09-11",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-13",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-13",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 190000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.98,
+      0.56,
+      0.94,
+      1.74
+    ]
+  },
+  {
+    "key": "hist-035",
+    "process": "EXP-01",
+    "drafter": "E4011",
+    "submitted": "2026-09-15T13:50:00",
+    "values": {
+      "use_date": "2026-09-15",
+      "merchant": "가상서점 판교",
+      "amount": 24000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-15",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 24000,
+        "filename": "h_7841.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.78,
+      0.59,
+      0.71,
+      1.08
+    ]
+  },
+  {
+    "key": "hist-010",
+    "process": "EXP-02",
+    "drafter": "E3004",
+    "submitted": "2026-09-15T15:50:00",
+    "values": {
+      "trip_start": "2026-09-13",
+      "trip_end": "2026-09-14",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 155000
+    },
+    "evidence": [
+      {
+        "date": "2026-09-13",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-14",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-14",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 85000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.6,
+      0.73,
+      1.45,
+      0.62
+    ]
+  },
+  {
+    "key": "hist-034",
+    "process": "EXP-01",
+    "drafter": "E4021",
+    "submitted": "2026-09-16T09:50:00",
+    "values": {
+      "use_date": "2026-09-16",
+      "merchant": "가상서점 판교",
+      "amount": 18000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-16",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 18000,
+        "filename": "h_8728.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "LIMIT_EXCEEDED",
+      "label": "한도 초과 사유 부족"
+    },
+    "delay_factors": [
+      0.65,
+      1.25,
+      1.34,
+      0.98
+    ]
+  },
+  {
+    "key": "hist-041",
+    "process": "PUR-01",
+    "drafter": "E4006",
+    "submitted": "2026-09-16T09:50:00",
+    "values": {
+      "item": "외장 SSD",
+      "qty": 1,
+      "unit_price": 89000,
+      "amount": 89000,
+      "reason": "업무용",
+      "due_date": "2026-09-26"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-16",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 89000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "EVIDENCE_REQUIRED",
+      "label": "증빙 누락"
+    },
+    "delay_factors": [
+      0.67,
+      1.22,
+      1.14,
+      0.52
+    ]
+  },
+  {
+    "key": "hist-105",
+    "process": "EXP-01",
+    "drafter": "E4009",
+    "submitted": "2026-09-16T11:20:00",
+    "values": {
+      "use_date": "2026-09-16",
+      "merchant": "한솥가상도시락",
+      "amount": 24000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "윤건우",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-09-16",
+        "merchant": "한솥가상도시락",
+        "category": "회의비",
+        "amount": 24000,
+        "filename": "h_1329.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.12,
+      0.3,
+      1.34,
+      0.78
+    ]
+  },
+  {
+    "key": "hist-120",
+    "process": "EXP-01",
+    "drafter": "E3003",
+    "submitted": "2026-09-17T09:00:00",
+    "values": {
+      "use_date": "2026-09-17",
+      "merchant": "판교 가상베이커리",
+      "amount": 96000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-17",
+        "merchant": "판교 가상베이커리",
+        "category": "복리후생비",
+        "amount": 96000,
+        "filename": "h_7715.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.66,
+      1.53,
+      1.09,
+      0.44
+    ]
+  },
+  {
+    "key": "hist-019",
+    "process": "EXP-02",
+    "drafter": "E4001",
+    "submitted": "2026-09-17T12:20:00",
+    "values": {
+      "trip_start": "2026-09-15",
+      "trip_end": "2026-09-16",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 165000
+    },
+    "evidence": [
+      {
+        "date": "2026-09-15",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-16",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-16",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.88,
+      0.45,
+      0.87,
+      0.89
+    ]
+  },
+  {
+    "key": "hist-160",
+    "process": "RPT-01",
+    "drafter": "E4009",
+    "submitted": "2026-09-17T13:50:00",
+    "values": {
+      "trip_start": "2026-09-15",
+      "trip_end": "2026-09-16",
+      "traveler": "윤건우",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "윤건우",
+          "due": "2026-09-24"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.12,
+      0.63,
+      1.62,
+      0.61
+    ]
+  },
+  {
+    "key": "hist-071",
+    "process": "EXP-01",
+    "drafter": "E4008",
+    "submitted": "2026-09-18T11:10:00",
+    "values": {
+      "use_date": "2026-09-18",
+      "merchant": "가상카페 판교",
+      "amount": 18000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-18",
+        "merchant": "가상카페 판교",
+        "category": "복리후생비",
+        "amount": 18000,
+        "filename": "h_6795.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.88,
+      1.29,
+      1.02,
+      2.5
+    ]
+  },
+  {
+    "key": "hist-130",
+    "process": "EXP-02",
+    "drafter": "E4008",
+    "submitted": "2026-09-18T12:10:00",
+    "values": {
+      "trip_start": "2026-09-16",
+      "trip_end": "2026-09-17",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 204600
+    },
+    "evidence": [
+      {
+        "date": "2026-09-16",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-17",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-17",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 85000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.09,
+      1.06,
+      2.28,
+      0.95
+    ]
+  },
+  {
+    "key": "hist-155",
+    "process": "EXP-01",
+    "drafter": "E3001",
+    "submitted": "2026-09-18T13:40:00",
+    "values": {
+      "use_date": "2026-09-18",
+      "merchant": "오피스가상마트",
+      "amount": 18000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-18",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 18000,
+        "filename": "h_2309.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.86,
+      1.38,
+      0.67,
+      1.38
+    ]
+  },
+  {
+    "key": "hist-119",
+    "process": "RPT-01",
+    "drafter": "E4010",
+    "submitted": "2026-09-18T13:50:00",
+    "values": {
+      "trip_start": "2026-09-15",
+      "trip_end": "2026-09-16",
+      "traveler": "한윤호",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "한윤호",
+          "due": "2026-09-25"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.61,
+      0.75,
+      0.97,
+      0.4
+    ]
+  },
+  {
+    "key": "hist-022",
+    "process": "EXP-01",
+    "drafter": "E4019",
+    "submitted": "2026-09-18T17:20:00",
+    "values": {
+      "use_date": "2026-09-18",
+      "merchant": "판교 가상베이커리",
+      "amount": 132000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-18",
+        "merchant": "판교 가상베이커리",
+        "category": "복리후생비",
+        "amount": 132000,
+        "filename": "h_7767.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.3,
+      2.5,
+      1.84,
+      1.67
+    ]
+  },
+  {
+    "key": "hist-159",
+    "process": "EXP-02",
+    "drafter": "E3001",
+    "submitted": "2026-09-21T14:20:00",
+    "values": {
+      "trip_start": "2026-09-19",
+      "trip_end": "2026-09-20",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 214600
+    },
+    "evidence": [
+      {
+        "date": "2026-09-19",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-20",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-20",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.2,
+      0.37,
+      0.93,
+      0.91
+    ]
+  },
+  {
+    "key": "hist-066",
+    "process": "EXP-01",
+    "drafter": "E4013",
+    "submitted": "2026-09-22T12:20:00",
+    "values": {
+      "use_date": "2026-09-22",
+      "merchant": "오피스가상마트",
+      "amount": 24000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-22",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 24000,
+        "filename": "h_7266.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.5,
+      1.14,
+      0.37,
+      1.52
+    ]
+  },
+  {
+    "key": "hist-044",
+    "process": "EXP-01",
+    "drafter": "E4003",
+    "submitted": "2026-09-23T11:50:00",
+    "values": {
+      "use_date": "2026-09-23",
+      "merchant": "가상문구 판교점",
+      "amount": 24000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-23",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 24000,
+        "filename": "h_9468.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.31,
+      1.37,
+      0.5,
+      1.1
+    ]
+  },
+  {
+    "key": "hist-087",
+    "process": "EXP-02",
+    "drafter": "E3003",
+    "submitted": "2026-09-23T17:10:00",
+    "values": {
+      "trip_start": "2026-09-20",
+      "trip_end": "2026-09-22",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 240000
+    },
+    "evidence": [
+      {
+        "date": "2026-09-20",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-22",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-22",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.7,
+      0.72,
+      0.82,
+      0.65
+    ]
+  },
+  {
+    "key": "hist-124",
+    "process": "EXP-01",
+    "drafter": "E4006",
+    "submitted": "2026-09-24T10:40:00",
+    "values": {
+      "use_date": "2026-09-24",
+      "merchant": "판교 가상베이커리",
+      "amount": 24000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-24",
+        "merchant": "판교 가상베이커리",
+        "category": "복리후생비",
+        "amount": 24000,
+        "filename": "h_4201.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.99,
+      0.57,
+      0.77,
+      0.76
+    ]
+  },
+  {
+    "key": "hist-030",
+    "process": "EXP-01",
+    "drafter": "E4017",
+    "submitted": "2026-09-24T11:00:00",
+    "values": {
+      "use_date": "2026-09-24",
+      "merchant": "정자동 국수집",
+      "amount": 24000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "송서준",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-09-24",
+        "merchant": "정자동 국수집",
+        "category": "회의비",
+        "amount": 24000,
+        "filename": "h_6252.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      0.91,
+      0.95,
+      0.53,
+      0.6
+    ]
+  },
+  {
+    "key": "hist-114",
+    "process": "EXP-01",
+    "drafter": "E4011",
+    "submitted": "2026-09-24T15:50:00",
+    "values": {
+      "use_date": "2026-09-24",
+      "merchant": "가상문구 판교점",
+      "amount": 96000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-24",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 96000,
+        "filename": "h_7219.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.38,
+      0.73,
+      1.59,
+      1.71
+    ]
+  },
+  {
+    "key": "hist-107",
+    "process": "EXP-02",
+    "drafter": "E4021",
+    "submitted": "2026-09-24T17:20:00",
+    "values": {
+      "trip_start": "2026-09-21",
+      "trip_end": "2026-09-23",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 319600
+    },
+    "evidence": [
+      {
+        "date": "2026-09-21",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-23",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-23",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 200000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.64,
+      0.85,
+      0.9,
+      0.84
+    ]
+  },
+  {
+    "key": "hist-018",
+    "process": "RPT-01",
+    "drafter": "E3003",
+    "submitted": "2026-09-25T09:50:00",
+    "values": {
+      "trip_start": "2026-09-20",
+      "trip_end": "2026-09-21",
+      "traveler": "오세준",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "오세준",
+          "due": "2026-10-02"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.01,
+      1.56,
+      0.71,
+      0.75
+    ]
+  },
+  {
+    "key": "hist-053",
+    "process": "PUR-01",
+    "drafter": "E4016",
+    "submitted": "2026-09-25T16:30:00",
+    "values": {
+      "item": "모니터 암",
+      "qty": 1,
+      "unit_price": 89000,
+      "amount": 89000,
+      "reason": "업무용",
+      "due_date": "2026-10-05"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-25",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 89000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.74,
+      0.85,
+      0.93,
+      0.8
+    ]
+  },
+  {
+    "key": "hist-059",
+    "process": "EXP-01",
+    "drafter": "E3003",
+    "submitted": "2026-09-25T17:30:00",
+    "values": {
+      "use_date": "2026-09-25",
+      "merchant": "오피스가상마트",
+      "amount": 96000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-25",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 96000,
+        "filename": "h_1574.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "EVIDENCE_REQUIRED",
+      "label": "증빙 누락"
+    },
+    "delay_factors": [
+      1.44,
+      1.08,
+      0.57,
+      0.82
+    ]
+  },
+  {
+    "key": "hist-068",
+    "process": "RPT-01",
+    "drafter": "E4004",
+    "submitted": "2026-09-28T12:30:00",
+    "values": {
+      "trip_start": "2026-09-26",
+      "trip_end": "2026-09-27",
+      "traveler": "신수아",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "신수아",
+          "due": "2026-10-05"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.73,
+      0.99,
+      2.22,
+      0.92
+    ]
+  },
+  {
+    "key": "hist-098",
+    "process": "EXP-01",
+    "drafter": "E4006",
+    "submitted": "2026-09-28T12:40:00",
+    "values": {
+      "use_date": "2026-09-28",
+      "merchant": "가상카페 판교",
+      "amount": 245000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-28",
+        "merchant": "가상카페 판교",
+        "category": "복리후생비",
+        "amount": 245000,
+        "filename": "h_6353.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.71,
+      2.5,
+      1.13,
+      0.94
+    ]
+  },
+  {
+    "key": "hist-047",
+    "process": "EXP-01",
+    "drafter": "E4015",
+    "submitted": "2026-09-28T14:20:00",
+    "values": {
+      "use_date": "2026-09-28",
+      "merchant": "가상서점 판교",
+      "amount": 132000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-28",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 132000,
+        "filename": "h_9774.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "DEADLINE_PASSED",
+      "label": "기한 경과"
+    },
+    "delay_factors": [
+      0.7,
+      1.02,
+      1.44,
+      1.23
+    ]
+  },
+  {
+    "key": "hist-102",
+    "process": "MTG-01",
+    "drafter": "E4016",
+    "submitted": "2026-09-28T15:10:00",
+    "values": {
+      "date": "2026-09-30",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 4,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.44,
+      2.26,
+      1.47,
+      1.18
+    ]
+  },
+  {
+    "key": "hist-049",
+    "process": "EXP-01",
+    "drafter": "E3002",
+    "submitted": "2026-09-29T13:40:00",
+    "values": {
+      "use_date": "2026-09-29",
+      "merchant": "가상카페 판교",
+      "amount": 18000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-29",
+        "merchant": "가상카페 판교",
+        "category": "복리후생비",
+        "amount": 18000,
+        "filename": "h_5605.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.47,
+      1.12,
+      1.26,
+      0.54
+    ]
+  },
+  {
+    "key": "hist-091",
+    "process": "RPT-01",
+    "drafter": "E4004",
+    "submitted": "2026-09-30T11:50:00",
+    "values": {
+      "trip_start": "2026-09-25",
+      "trip_end": "2026-09-26",
+      "traveler": "신수아",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "신수아",
+          "due": "2026-10-07"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.53,
+      0.56,
+      1.21,
+      2.0
+    ]
+  },
+  {
+    "key": "hist-126",
+    "process": "EXP-01",
+    "drafter": "E4004",
+    "submitted": "2026-09-30T13:10:00",
+    "values": {
+      "use_date": "2026-09-30",
+      "merchant": "가상분식 판교",
+      "amount": 24000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "신수아",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-09-30",
+        "merchant": "가상분식 판교",
+        "category": "회의비",
+        "amount": 24000,
+        "filename": "h_9460.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "DEADLINE_PASSED",
+      "label": "기한 경과"
+    },
+    "delay_factors": [
+      0.68,
+      0.4,
+      0.79,
+      1.29
+    ]
+  },
+  {
+    "key": "hist-025",
+    "process": "PUR-01",
+    "drafter": "E4008",
+    "submitted": "2026-09-30T14:50:00",
+    "values": {
+      "item": "측정용 케이블",
+      "qty": 3,
+      "unit_price": 120000,
+      "amount": 360000,
+      "reason": "업무용",
+      "due_date": "2026-10-10"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-30",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 360000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.52,
+      1.2,
+      0.74,
+      1.11
+    ]
+  },
+  {
+    "key": "hist-078",
+    "process": "EXP-01",
+    "drafter": "E4016",
+    "submitted": "2026-09-30T15:50:00",
+    "values": {
+      "use_date": "2026-09-30",
+      "merchant": "오피스가상마트",
+      "amount": 36000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-30",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 36000,
+        "filename": "h_2116.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.56,
+      1.67,
+      1.73,
+      0.39
+    ]
+  },
+  {
+    "key": "hist-033",
+    "process": "EXP-02",
+    "drafter": "E4015",
+    "submitted": "2026-09-30T17:00:00",
+    "values": {
+      "trip_start": "2026-09-28",
+      "trip_end": "2026-09-29",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 204600
+    },
+    "evidence": [
+      {
+        "date": "2026-09-28",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-29",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-29",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 85000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.84,
+      1.35,
+      1.05,
+      0.81
+    ]
+  },
+  {
+    "key": "hist-004",
+    "process": "EXP-01",
+    "drafter": "E3004",
+    "submitted": "2026-09-30T17:30:00",
+    "values": {
+      "use_date": "2026-09-30",
+      "merchant": "가상서점 판교",
+      "amount": 188000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-09-30",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 188000,
+        "filename": "h_7395.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.93,
+      0.91,
+      0.43,
+      0.71
+    ]
+  },
+  {
+    "key": "hist-115",
+    "process": "MTG-01",
+    "drafter": "E4014",
+    "submitted": "2026-10-01T12:10:00",
+    "values": {
+      "date": "2026-10-06",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 4,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.75,
+      0.65,
+      0.86,
+      0.77
+    ]
+  },
+  {
+    "key": "hist-028",
+    "process": "EXP-01",
+    "drafter": "E4006",
+    "submitted": "2026-10-01T13:20:00",
+    "values": {
+      "use_date": "2026-10-01",
+      "merchant": "가상문구 판교점",
+      "amount": 12000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-01",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 12000,
+        "filename": "h_5085.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.9,
+      1.54,
+      0.64,
+      1.06
+    ]
+  },
+  {
+    "key": "hist-117",
+    "process": "RPT-01",
+    "drafter": "E4021",
+    "submitted": "2026-10-01T14:30:00",
+    "values": {
+      "trip_start": "2026-09-27",
+      "trip_end": "2026-09-28",
+      "traveler": "최재원",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "최재원",
+          "due": "2026-10-08"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.19,
+      2.18,
+      0.91,
+      0.35
+    ]
+  },
+  {
+    "key": "hist-140",
+    "process": "EXP-02",
+    "drafter": "E4009",
+    "submitted": "2026-10-01T15:20:00",
+    "values": {
+      "trip_start": "2026-09-28",
+      "trip_end": "2026-09-30",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 319600
+    },
+    "evidence": [
+      {
+        "date": "2026-09-28",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-30",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-09-30",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 200000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.48,
+      1.91,
+      2.5,
+      1.2
+    ]
+  },
+  {
+    "key": "hist-111",
+    "process": "PUR-01",
+    "drafter": "E4012",
+    "submitted": "2026-10-02T16:30:00",
+    "values": {
+      "item": "시험용 지그",
+      "qty": 1,
+      "unit_price": 650000,
+      "amount": 650000,
+      "reason": "업무용",
+      "due_date": "2026-10-12"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-02",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 650000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.47,
+      1.37,
+      1.28,
+      0.79
+    ]
+  },
+  {
+    "key": "hist-015",
+    "process": "PUR-01",
+    "drafter": "E4003",
+    "submitted": "2026-10-02T16:50:00",
+    "values": {
+      "item": "측정용 케이블",
+      "qty": 3,
+      "unit_price": 120000,
+      "amount": 360000,
+      "reason": "업무용",
+      "due_date": "2026-10-12"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-02",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 360000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.31,
+      1.87,
+      0.82,
+      0.61
+    ]
+  },
+  {
+    "key": "hist-077",
+    "process": "PUR-01",
+    "drafter": "E4008",
+    "submitted": "2026-10-02T16:50:00",
+    "values": {
+      "item": "모니터 암",
+      "qty": 5,
+      "unit_price": 30000,
+      "amount": 150000,
+      "reason": "업무용",
+      "due_date": "2026-10-12"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-02",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 150000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.12,
+      1.28,
+      1.33,
+      0.99
+    ]
+  },
+  {
+    "key": "hist-013",
+    "process": "EXP-01",
+    "drafter": "E4013",
+    "submitted": "2026-10-07T10:50:00",
+    "values": {
+      "use_date": "2026-10-07",
+      "merchant": "가상서점 판교",
+      "amount": 36000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-07",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 36000,
+        "filename": "h_4254.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "EVIDENCE_REQUIRED",
+      "label": "증빙 누락"
+    },
+    "delay_factors": [
+      0.45,
+      1.18,
+      0.99,
+      1.31
+    ]
+  },
+  {
+    "key": "hist-054",
+    "process": "EXP-01",
+    "drafter": "E4011",
+    "submitted": "2026-10-07T10:50:00",
+    "values": {
+      "use_date": "2026-10-07",
+      "merchant": "판교 숲속식당",
+      "amount": 42000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "김하은",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-10-07",
+        "merchant": "판교 숲속식당",
+        "category": "회의비",
+        "amount": 42000,
+        "filename": "h_5810.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.61,
+      0.74,
+      0.61,
+      2.14
+    ]
+  },
+  {
+    "key": "hist-113",
+    "process": "EXP-02",
+    "drafter": "E4013",
+    "submitted": "2026-10-07T17:20:00",
+    "values": {
+      "trip_start": "2026-10-04",
+      "trip_end": "2026-10-06",
+      "destination": "구미",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 260000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-04",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-06",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-06",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 190000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.5,
+      0.88,
+      1.74,
+      0.95
+    ]
+  },
+  {
+    "key": "hist-072",
+    "process": "RPT-01",
+    "drafter": "E4013",
+    "submitted": "2026-10-08T11:10:00",
+    "values": {
+      "trip_start": "2026-10-03",
+      "trip_end": "2026-10-04",
+      "traveler": "서다인",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "서다인",
+          "due": "2026-10-15"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "EVIDENCE_REQUIRED",
+      "label": "증빙 누락"
+    },
+    "delay_factors": [
+      0.73,
+      1.38,
+      0.7,
+      0.38
+    ]
+  },
+  {
+    "key": "hist-008",
+    "process": "EXP-01",
+    "drafter": "E4016",
+    "submitted": "2026-10-08T13:40:00",
+    "values": {
+      "use_date": "2026-10-08",
+      "merchant": "정자동 국수집",
+      "amount": 18000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "박시우",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-10-08",
+        "merchant": "정자동 국수집",
+        "category": "회의비",
+        "amount": 18000,
+        "filename": "h_7178.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.71,
+      0.69,
+      1.65,
+      1.96
+    ]
+  },
+  {
+    "key": "hist-109",
+    "process": "PUR-01",
+    "drafter": "E3002",
+    "submitted": "2026-10-08T16:10:00",
+    "values": {
+      "item": "키보드",
+      "qty": 3,
+      "unit_price": 120000,
+      "amount": 360000,
+      "reason": "업무용",
+      "due_date": "2026-10-18"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-08",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 360000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.45,
+      1.84,
+      0.92,
+      1.0
+    ]
+  },
+  {
+    "key": "hist-051",
+    "process": "EXP-01",
+    "drafter": "E4010",
+    "submitted": "2026-10-08T16:20:00",
+    "values": {
+      "use_date": "2026-10-08",
+      "merchant": "판교 숲속식당",
+      "amount": 245000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "한윤호",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-10-08",
+        "merchant": "판교 숲속식당",
+        "category": "회의비",
+        "amount": 245000,
+        "filename": "h_1017.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      1.29,
+      0.89,
+      0.85,
+      1.45
+    ]
+  },
+  {
+    "key": "hist-076",
+    "process": "EXP-01",
+    "drafter": "E4021",
+    "submitted": "2026-10-09T12:00:00",
+    "values": {
+      "use_date": "2026-10-09",
+      "merchant": "가상문구 판교점",
+      "amount": 36000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-09",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 36000,
+        "filename": "h_6876.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.72,
+      1.0,
+      1.73,
+      2.5
+    ]
+  },
+  {
+    "key": "hist-154",
+    "process": "EXP-01",
+    "drafter": "E4008",
+    "submitted": "2026-10-09T16:00:00",
+    "values": {
+      "use_date": "2026-10-09",
+      "merchant": "판교 인쇄소",
+      "amount": 24000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-09",
+        "merchant": "판교 인쇄소",
+        "category": "도서인쇄비",
+        "amount": 24000,
+        "filename": "h_8682.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.56,
+      1.3,
+      1.49,
+      1.69
+    ]
+  },
+  {
+    "key": "hist-122",
+    "process": "MTG-01",
+    "drafter": "E3003",
+    "submitted": "2026-10-09T16:50:00",
+    "values": {
+      "date": "2026-10-12",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-A",
+      "people": 6,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.71,
+      0.76,
+      0.66,
+      0.89
+    ]
+  },
+  {
+    "key": "hist-093",
+    "process": "MTG-01",
+    "drafter": "E3002",
+    "submitted": "2026-10-09T17:40:00",
+    "values": {
+      "date": "2026-10-13",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 5,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.41,
+      1.48,
+      0.46,
+      0.71
+    ]
+  },
+  {
+    "key": "hist-151",
+    "process": "PUR-01",
+    "drafter": "E4006",
+    "submitted": "2026-10-13T15:10:00",
+    "values": {
+      "item": "모니터 암",
+      "qty": 5,
+      "unit_price": 30000,
+      "amount": 150000,
+      "reason": "업무용",
+      "due_date": "2026-10-23"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-13",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 150000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.5,
+      0.82,
+      0.66,
+      1.67
+    ]
+  },
+  {
+    "key": "hist-038",
+    "process": "EXP-02",
+    "drafter": "E4010",
+    "submitted": "2026-10-13T15:20:00",
+    "values": {
+      "trip_start": "2026-10-11",
+      "trip_end": "2026-10-12",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 147400
+    },
+    "evidence": [
+      {
+        "date": "2026-10-11",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-12",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-12",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 100000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.92,
+      1.46,
+      0.76,
+      1.0
+    ]
+  },
+  {
+    "key": "hist-143",
+    "process": "EXP-01",
+    "drafter": "E4017",
+    "submitted": "2026-10-14T11:50:00",
+    "values": {
+      "use_date": "2026-10-14",
+      "merchant": "가상문구 판교점",
+      "amount": 58000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-14",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 58000,
+        "filename": "h_2001.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.81,
+      2.16,
+      1.08,
+      1.62
+    ]
+  },
+  {
+    "key": "hist-144",
+    "process": "EXP-02",
+    "drafter": "E3002",
+    "submitted": "2026-10-14T17:50:00",
+    "values": {
+      "trip_start": "2026-10-11",
+      "trip_end": "2026-10-13",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 240000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-11",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-13",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-13",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.87,
+      0.75,
+      1.02,
+      1.04
+    ]
+  },
+  {
+    "key": "hist-157",
+    "process": "EXP-01",
+    "drafter": "E4013",
+    "submitted": "2026-10-15T10:30:00",
+    "values": {
+      "use_date": "2026-10-15",
+      "merchant": "가상카페 판교",
+      "amount": 96000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-15",
+        "merchant": "가상카페 판교",
+        "category": "복리후생비",
+        "amount": 96000,
+        "filename": "h_5179.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.19,
+      0.47,
+      0.52,
+      1.46
+    ]
+  },
+  {
+    "key": "hist-148",
+    "process": "EXP-02",
+    "drafter": "E3004",
+    "submitted": "2026-10-16T09:30:00",
+    "values": {
+      "trip_start": "2026-10-13",
+      "trip_end": "2026-10-15",
+      "destination": "광주",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 217400
+    },
+    "evidence": [
+      {
+        "date": "2026-10-13",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-15",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-15",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.6,
+      0.99,
+      0.73,
+      0.74
+    ]
+  },
+  {
+    "key": "hist-021",
+    "process": "RPT-01",
+    "drafter": "E4010",
+    "submitted": "2026-10-16T11:30:00",
+    "values": {
+      "trip_start": "2026-10-11",
+      "trip_end": "2026-10-12",
+      "traveler": "한윤호",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "한윤호",
+          "due": "2026-10-23"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.87,
+      0.88,
+      1.04,
+      0.66
+    ]
+  },
+  {
+    "key": "hist-080",
+    "process": "RPT-01",
+    "drafter": "E3004",
+    "submitted": "2026-10-16T13:20:00",
+    "values": {
+      "trip_start": "2026-10-11",
+      "trip_end": "2026-10-12",
+      "traveler": "한유진",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "한유진",
+          "due": "2026-10-23"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.85,
+      1.2,
+      0.87,
+      1.13
+    ]
+  },
+  {
+    "key": "hist-043",
+    "process": "PUR-01",
+    "drafter": "E4010",
+    "submitted": "2026-10-16T14:20:00",
+    "values": {
+      "item": "측정용 케이블",
+      "qty": 3,
+      "unit_price": 120000,
+      "amount": 360000,
+      "reason": "업무용",
+      "due_date": "2026-10-26"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-16",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 360000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.84,
+      0.7,
+      0.67,
+      0.62
+    ]
+  },
+  {
+    "key": "hist-086",
+    "process": "EXP-01",
+    "drafter": "E3003",
+    "submitted": "2026-10-16T16:40:00",
+    "values": {
+      "use_date": "2026-10-16",
+      "merchant": "오피스가상마트",
+      "amount": 132000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-16",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 132000,
+        "filename": "h_9146.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.26,
+      0.97,
+      1.03,
+      0.78
+    ]
+  },
+  {
+    "key": "hist-001",
+    "process": "EXP-02",
+    "drafter": "E4019",
+    "submitted": "2026-10-19T09:30:00",
+    "values": {
+      "trip_start": "2026-10-16",
+      "trip_end": "2026-10-18",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 217400
+    },
+    "evidence": [
+      {
+        "date": "2026-10-16",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-18",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-18",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.5,
+      0.82,
+      1.16,
+      0.79
+    ]
+  },
+  {
+    "key": "hist-063",
+    "process": "EXP-01",
+    "drafter": "E4009",
+    "submitted": "2026-10-19T09:30:00",
+    "values": {
+      "use_date": "2026-10-19",
+      "merchant": "판교 인쇄소",
+      "amount": 132000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-19",
+        "merchant": "판교 인쇄소",
+        "category": "도서인쇄비",
+        "amount": 132000,
+        "filename": "h_4186.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "SUM_MISMATCH",
+      "label": "합계 불일치"
+    },
+    "delay_factors": [
+      0.72,
+      0.72,
+      0.63,
+      0.95
+    ]
+  },
+  {
+    "key": "hist-040",
+    "process": "EXP-01",
+    "drafter": "E4011",
+    "submitted": "2026-10-20T10:00:00",
+    "values": {
+      "use_date": "2026-10-20",
+      "merchant": "오피스가상마트",
+      "amount": 245000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-20",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 245000,
+        "filename": "h_8912.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.97,
+      1.27,
+      1.73,
+      1.54
+    ]
+  },
+  {
+    "key": "hist-014",
+    "process": "EXP-01",
+    "drafter": "E4017",
+    "submitted": "2026-10-20T10:10:00",
+    "values": {
+      "use_date": "2026-10-20",
+      "merchant": "가상카페 판교",
+      "amount": 245000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-20",
+        "merchant": "가상카페 판교",
+        "category": "복리후생비",
+        "amount": 245000,
+        "filename": "h_3349.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      0.87,
+      1.73,
+      1.25,
+      1.03
+    ]
+  },
+  {
+    "key": "hist-002",
+    "process": "EXP-01",
+    "drafter": "E4006",
+    "submitted": "2026-10-20T12:30:00",
+    "values": {
+      "use_date": "2026-10-20",
+      "merchant": "오피스가상마트",
+      "amount": 18000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-20",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 18000,
+        "filename": "h_1473.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.65,
+      1.47,
+      1.87,
+      0.8
+    ]
+  },
+  {
+    "key": "hist-132",
+    "process": "PUR-01",
+    "drafter": "E4013",
+    "submitted": "2026-10-20T14:00:00",
+    "values": {
+      "item": "측정용 케이블",
+      "qty": 3,
+      "unit_price": 120000,
+      "amount": 360000,
+      "reason": "업무용",
+      "due_date": "2026-10-30"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-20",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 360000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "LIMIT_EXCEEDED",
+      "label": "한도 초과 사유 부족"
+    },
+    "delay_factors": [
+      0.78,
+      0.93,
+      0.94,
+      0.73
+    ]
+  },
+  {
+    "key": "hist-056",
+    "process": "EXP-02",
+    "drafter": "E4012",
+    "submitted": "2026-10-21T13:30:00",
+    "values": {
+      "trip_start": "2026-10-19",
+      "trip_end": "2026-10-20",
+      "destination": "광주",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 170000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-19",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-20",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-20",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 100000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.55,
+      0.49,
+      0.94,
+      1.01
+    ]
+  },
+  {
+    "key": "hist-108",
+    "process": "EXP-01",
+    "drafter": "E4014",
+    "submitted": "2026-10-21T14:50:00",
+    "values": {
+      "use_date": "2026-10-21",
+      "merchant": "한솥가상도시락",
+      "amount": 188000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "이가은",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-10-21",
+        "merchant": "한솥가상도시락",
+        "category": "회의비",
+        "amount": 188000,
+        "filename": "h_3042.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "LIMIT_EXCEEDED",
+      "label": "한도 초과 사유 부족"
+    },
+    "delay_factors": [
+      1.43,
+      0.87,
+      0.57,
+      1.12
+    ]
+  },
+  {
+    "key": "hist-123",
+    "process": "MTG-01",
+    "drafter": "E4020",
+    "submitted": "2026-10-21T17:50:00",
+    "values": {
+      "date": "2026-10-26",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-A",
+      "people": 5,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.94,
+      0.59,
+      0.51,
+      1.27
+    ]
+  },
+  {
+    "key": "hist-097",
+    "process": "EXP-02",
+    "drafter": "E4019",
+    "submitted": "2026-10-22T13:20:00",
+    "values": {
+      "trip_start": "2026-10-20",
+      "trip_end": "2026-10-21",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 142400
+    },
+    "evidence": [
+      {
+        "date": "2026-10-20",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-21",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-21",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.14,
+      0.82,
+      1.4,
+      2.22
+    ]
+  },
+  {
+    "key": "hist-055",
+    "process": "PUR-01",
+    "drafter": "E4019",
+    "submitted": "2026-10-22T14:00:00",
+    "values": {
+      "item": "모니터 암",
+      "qty": 1,
+      "unit_price": 650000,
+      "amount": 650000,
+      "reason": "업무용",
+      "due_date": "2026-11-01"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-22",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 650000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.65,
+      2.05,
+      1.03,
+      1.72
+    ]
+  },
+  {
+    "key": "hist-147",
+    "process": "EXP-02",
+    "drafter": "E4007",
+    "submitted": "2026-10-23T12:30:00",
+    "values": {
+      "trip_start": "2026-10-20",
+      "trip_end": "2026-10-22",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 309600
+    },
+    "evidence": [
+      {
+        "date": "2026-10-20",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-22",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-22",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 190000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.85,
+      0.97,
+      0.96,
+      0.98
+    ]
+  },
+  {
+    "key": "hist-037",
+    "process": "EXP-01",
+    "drafter": "E4017",
+    "submitted": "2026-10-23T13:40:00",
+    "values": {
+      "use_date": "2026-10-23",
+      "merchant": "가상문구 판교점",
+      "amount": 58000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-23",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 58000,
+        "filename": "h_2893.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.18,
+      1.5,
+      1.99,
+      0.66
+    ]
+  },
+  {
+    "key": "hist-023",
+    "process": "EXP-02",
+    "drafter": "E4002",
+    "submitted": "2026-10-26T10:10:00",
+    "values": {
+      "trip_start": "2026-10-23",
+      "trip_end": "2026-10-25",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 237400
+    },
+    "evidence": [
+      {
+        "date": "2026-10-23",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-25",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-25",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 190000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.29,
+      1.08,
+      0.91,
+      1.27
+    ]
+  },
+  {
+    "key": "hist-095",
+    "process": "EXP-01",
+    "drafter": "E4013",
+    "submitted": "2026-10-26T11:40:00",
+    "values": {
+      "use_date": "2026-10-26",
+      "merchant": "가상서점 판교",
+      "amount": 42000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-26",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 42000,
+        "filename": "h_1154.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.69,
+      1.27,
+      0.62,
+      1.71
+    ]
+  },
+  {
+    "key": "hist-012",
+    "process": "EXP-02",
+    "drafter": "E3002",
+    "submitted": "2026-10-26T12:40:00",
+    "values": {
+      "trip_start": "2026-10-24",
+      "trip_end": "2026-10-25",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 147400
+    },
+    "evidence": [
+      {
+        "date": "2026-10-24",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-25",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-25",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 100000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.52,
+      2.38,
+      1.93,
+      1.19
+    ]
+  },
+  {
+    "key": "hist-085",
+    "process": "RPT-01",
+    "drafter": "E4002",
+    "submitted": "2026-10-27T09:30:00",
+    "values": {
+      "trip_start": "2026-10-22",
+      "trip_end": "2026-10-23",
+      "traveler": "서윤호",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "서윤호",
+          "due": "2026-11-03"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.25,
+      0.86,
+      0.87,
+      0.87
+    ]
+  },
+  {
+    "key": "hist-145",
+    "process": "EXP-02",
+    "drafter": "E4019",
+    "submitted": "2026-10-27T10:10:00",
+    "values": {
+      "trip_start": "2026-10-24",
+      "trip_end": "2026-10-26",
+      "destination": "광주",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 260000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-24",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-26",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-26",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 190000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "SUM_MISMATCH",
+      "label": "합계 불일치"
+    },
+    "delay_factors": [
+      1.37,
+      0.74,
+      0.78,
+      0.84
+    ]
+  },
+  {
+    "key": "hist-081",
+    "process": "EXP-02",
+    "drafter": "E4011",
+    "submitted": "2026-10-27T10:20:00",
+    "values": {
+      "trip_start": "2026-10-24",
+      "trip_end": "2026-10-26",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 260000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-24",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-26",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-26",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 190000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      1.01,
+      1.49,
+      0.62,
+      1.69
+    ]
+  },
+  {
+    "key": "hist-142",
+    "process": "MTG-01",
+    "drafter": "E4017",
+    "submitted": "2026-10-27T10:40:00",
+    "values": {
+      "date": "2026-10-30",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 6,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.56,
+      0.52,
+      0.89,
+      0.58
+    ]
+  },
+  {
+    "key": "hist-039",
+    "process": "EXP-01",
+    "drafter": "E4012",
+    "submitted": "2026-10-27T14:30:00",
+    "values": {
+      "use_date": "2026-10-27",
+      "merchant": "정자동 국수집",
+      "amount": 245000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "한시우",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-10-27",
+        "merchant": "정자동 국수집",
+        "category": "회의비",
+        "amount": 245000,
+        "filename": "h_2712.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.24,
+      1.74,
+      0.96,
+      1.18
+    ]
+  },
+  {
+    "key": "hist-045",
+    "process": "EXP-01",
+    "drafter": "E4005",
+    "submitted": "2026-10-29T10:10:00",
+    "values": {
+      "use_date": "2026-10-29",
+      "merchant": "가상문구 판교점",
+      "amount": 12000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-29",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 12000,
+        "filename": "h_2563.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "REQUIRED_MISSING",
+      "label": "필수 항목 누락"
+    },
+    "delay_factors": [
+      0.95,
+      0.55,
+      2.5,
+      1.09
+    ]
+  },
+  {
+    "key": "hist-084",
+    "process": "MTG-01",
+    "drafter": "E4010",
+    "submitted": "2026-10-29T13:00:00",
+    "values": {
+      "date": "2026-11-02",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 3,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.38,
+      0.75,
+      1.84,
+      0.75
+    ]
+  },
+  {
+    "key": "hist-149",
+    "process": "EXP-01",
+    "drafter": "E4017",
+    "submitted": "2026-10-29T13:40:00",
+    "values": {
+      "use_date": "2026-10-29",
+      "merchant": "판교 가상베이커리",
+      "amount": 18000,
+      "account": "복리후생비",
+      "purpose": "팀 간식"
+    },
+    "evidence": [
+      {
+        "date": "2026-10-29",
+        "merchant": "판교 가상베이커리",
+        "category": "복리후생비",
+        "amount": 18000,
+        "filename": "h_1427.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.6,
+      0.52,
+      2.5,
+      1.27
+    ]
+  },
+  {
+    "key": "hist-036",
+    "process": "EXP-02",
+    "drafter": "E4001",
+    "submitted": "2026-10-29T14:50:00",
+    "values": {
+      "trip_start": "2026-10-26",
+      "trip_end": "2026-10-28",
+      "destination": "구미",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 217400
+    },
+    "evidence": [
+      {
+        "date": "2026-10-26",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-28",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-28",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.75,
+      0.87,
+      1.0,
+      0.98
+    ]
+  },
+  {
+    "key": "hist-128",
+    "process": "MTG-01",
+    "drafter": "E4010",
+    "submitted": "2026-10-30T09:50:00",
+    "values": {
+      "date": "2026-11-02",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 6,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.88,
+      0.83,
+      1.41,
+      0.76
+    ]
+  },
+  {
+    "key": "hist-110",
+    "process": "EXP-02",
+    "drafter": "E3002",
+    "submitted": "2026-10-30T10:20:00",
+    "values": {
+      "trip_start": "2026-10-27",
+      "trip_end": "2026-10-29",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 309600
+    },
+    "evidence": [
+      {
+        "date": "2026-10-27",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-29",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-10-29",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 190000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.86,
+      1.38,
+      0.69,
+      1.25
+    ]
+  },
+  {
+    "key": "hist-088",
+    "process": "RPT-01",
+    "drafter": "E4010",
+    "submitted": "2026-10-30T14:00:00",
+    "values": {
+      "trip_start": "2026-10-28",
+      "trip_end": "2026-10-29",
+      "traveler": "한윤호",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "한윤호",
+          "due": "2026-11-06"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.13,
+      0.59,
+      1.84,
+      0.95
+    ]
+  },
+  {
+    "key": "hist-135",
+    "process": "MTG-01",
+    "drafter": "E4009",
+    "submitted": "2026-10-30T17:30:00",
+    "values": {
+      "date": "2026-11-02",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 4,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.16,
+      1.59,
+      0.8,
+      1.24
+    ]
+  },
+  {
+    "key": "hist-046",
+    "process": "EXP-02",
+    "drafter": "E4004",
+    "submitted": "2026-11-02T10:50:00",
+    "values": {
+      "trip_start": "2026-10-30",
+      "trip_end": "2026-11-01",
+      "destination": "구미",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 270000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-30",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-01",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-01",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 200000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.74,
+      0.58,
+      1.31,
+      0.72
+    ]
+  },
+  {
+    "key": "hist-052",
+    "process": "MTG-01",
+    "drafter": "E4005",
+    "submitted": "2026-11-02T10:50:00",
+    "values": {
+      "date": "2026-11-05",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 6,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.16,
+      0.94,
+      1.43,
+      1.58
+    ]
+  },
+  {
+    "key": "hist-146",
+    "process": "EXP-02",
+    "drafter": "E4007",
+    "submitted": "2026-11-02T12:30:00",
+    "values": {
+      "trip_start": "2026-10-31",
+      "trip_end": "2026-11-01",
+      "destination": "대전",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 155000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-31",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-01",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-01",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 85000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.11,
+      1.24,
+      0.83,
+      0.74
+    ]
+  },
+  {
+    "key": "hist-134",
+    "process": "EXP-01",
+    "drafter": "E4014",
+    "submitted": "2026-11-02T13:30:00",
+    "values": {
+      "use_date": "2026-11-02",
+      "merchant": "가상문구 판교점",
+      "amount": 24000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-02",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 24000,
+        "filename": "h_6695.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.45,
+      0.9,
+      0.74,
+      1.06
+    ]
+  },
+  {
+    "key": "hist-118",
+    "process": "EXP-02",
+    "drafter": "E4002",
+    "submitted": "2026-11-02T15:30:00",
+    "values": {
+      "trip_start": "2026-10-30",
+      "trip_end": "2026-11-01",
+      "destination": "구미",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 240000
+    },
+    "evidence": [
+      {
+        "date": "2026-10-30",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-01",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-01",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.07,
+      0.51,
+      0.74,
+      0.55
+    ]
+  },
+  {
+    "key": "hist-150",
+    "process": "EXP-01",
+    "drafter": "E4014",
+    "submitted": "2026-11-02T16:40:00",
+    "values": {
+      "use_date": "2026-11-02",
+      "merchant": "판교 숲속식당",
+      "amount": 245000,
+      "account": "회의비",
+      "purpose": "업무 협의 식사",
+      "attendees": [
+        "이가은",
+        "팀원"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-11-02",
+        "merchant": "판교 숲속식당",
+        "category": "회의비",
+        "amount": 245000,
+        "filename": "h_1465.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.63,
+      0.49,
+      1.07,
+      1.26
+    ]
+  },
+  {
+    "key": "hist-065",
+    "process": "EXP-01",
+    "drafter": "E3002",
+    "submitted": "2026-11-03T11:40:00",
+    "values": {
+      "use_date": "2026-11-03",
+      "merchant": "가상서점 판교",
+      "amount": 96000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-03",
+        "merchant": "가상서점 판교",
+        "category": "도서인쇄비",
+        "amount": 96000,
+        "filename": "h_1926.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.5,
+      1.56,
+      1.15,
+      0.94
+    ]
+  },
+  {
+    "key": "hist-003",
+    "process": "EXP-01",
+    "drafter": "E4020",
+    "submitted": "2026-11-03T12:30:00",
+    "values": {
+      "use_date": "2026-11-03",
+      "merchant": "판교 인쇄소",
+      "amount": 245000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-03",
+        "merchant": "판교 인쇄소",
+        "category": "도서인쇄비",
+        "amount": 245000,
+        "filename": "h_4032.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.86,
+      0.89,
+      0.66,
+      1.26
+    ]
+  },
+  {
+    "key": "hist-133",
+    "process": "EXP-02",
+    "drafter": "E3002",
+    "submitted": "2026-11-04T12:50:00",
+    "values": {
+      "trip_start": "2026-11-02",
+      "trip_end": "2026-11-03",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 165000
+    },
+    "evidence": [
+      {
+        "date": "2026-11-02",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-03",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 35000,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-03",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.46,
+      0.7,
+      0.42,
+      1.01
+    ]
+  },
+  {
+    "key": "hist-067",
+    "process": "EXP-01",
+    "drafter": "E4021",
+    "submitted": "2026-11-05T09:40:00",
+    "values": {
+      "use_date": "2026-11-05",
+      "merchant": "판교 인쇄소",
+      "amount": 12000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-05",
+        "merchant": "판교 인쇄소",
+        "category": "도서인쇄비",
+        "amount": 12000,
+        "filename": "h_4079.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.68,
+      1.02,
+      1.09,
+      0.68
+    ]
+  },
+  {
+    "key": "similar-basis",
+    "process": "EXP-01",
+    "drafter": "E3002",
+    "submitted": "2026-11-05T10:00:00",
+    "final": "2026-11-05T15:00:00",
+    "values": {
+      "use_date": "2026-11-04",
+      "merchant": "판교 숲속식당",
+      "amount": 96000,
+      "account": "회의비",
+      "purpose": "과제 준비 회의 후 식사",
+      "attendees": [
+        "정하늘",
+        "오세준",
+        "한유진"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-11-04",
+        "merchant": "판교 숲속식당",
+        "category": "회의비",
+        "amount": 96000,
+        "filename": "dinner_1104.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "key": "hist-104",
+    "process": "EXP-02",
+    "drafter": "E4015",
+    "submitted": "2026-11-05T10:30:00",
+    "values": {
+      "trip_start": "2026-11-02",
+      "trip_end": "2026-11-04",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 217400
+    },
+    "evidence": [
+      {
+        "date": "2026-11-02",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-04",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-04",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.57,
+      1.81,
+      1.63,
+      1.1
+    ]
+  },
+  {
+    "key": "hist-075",
+    "process": "EXP-01",
+    "drafter": "E4013",
+    "submitted": "2026-11-05T11:00:00",
+    "values": {
+      "use_date": "2026-11-05",
+      "merchant": "가상문구 판교점",
+      "amount": 188000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-05",
+        "merchant": "가상문구 판교점",
+        "category": "소모품비",
+        "amount": 188000,
+        "filename": "h_5117.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.91,
+      2.04,
+      1.18,
+      0.66
+    ]
+  },
+  {
+    "key": "hist-158",
+    "process": "EXP-02",
+    "drafter": "E4021",
+    "submitted": "2026-11-05T11:20:00",
+    "values": {
+      "trip_start": "2026-11-03",
+      "trip_end": "2026-11-04",
+      "destination": "구미",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 142400
+    },
+    "evidence": [
+      {
+        "date": "2026-11-03",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-04",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-04",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.68,
+      1.32,
+      1.1,
+      0.62
+    ]
+  },
+  {
+    "key": "hist-096",
+    "process": "RPT-01",
+    "drafter": "E4008",
+    "submitted": "2026-11-05T14:30:00",
+    "values": {
+      "trip_start": "2026-11-01",
+      "trip_end": "2026-11-02",
+      "traveler": "임서준",
+      "visit": "협력사",
+      "schedule": "기술 협의",
+      "result": "협의 완료",
+      "follow_ups": [
+        {
+          "task": "회의록 공유",
+          "owner": "임서준",
+          "due": "2026-11-12"
+        }
+      ]
+    },
+    "evidence": [],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "LIMIT_EXCEEDED",
+      "label": "한도 초과 사유 부족"
+    },
+    "delay_factors": [
+      1.29,
+      1.04,
+      1.11,
+      0.78
+    ]
+  },
+  {
+    "key": "hist-073",
+    "process": "EXP-01",
+    "drafter": "E3002",
+    "submitted": "2026-11-06T14:30:00",
+    "values": {
+      "use_date": "2026-11-06",
+      "merchant": "오피스가상마트",
+      "amount": 12000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-06",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 12000,
+        "filename": "h_5614.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.85,
+      2.36,
+      1.74,
+      0.99
+    ]
+  },
+  {
+    "key": "hist-083",
+    "process": "EXP-02",
+    "drafter": "E4008",
+    "submitted": "2026-11-06T16:20:00",
+    "values": {
+      "trip_start": "2026-11-04",
+      "trip_end": "2026-11-05",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 142400
+    },
+    "evidence": [
+      {
+        "date": "2026-11-04",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-05",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 23700,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-05",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 95000,
+        "nights": 1,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.12,
+      2.49,
+      0.98,
+      1.61
+    ]
+  },
+  {
+    "key": "dup-basis",
+    "process": "EXP-01",
+    "drafter": "E3001",
+    "submitted": "2026-11-09T11:00:00",
+    "final": "2026-11-09T16:30:00",
+    "values": {
+      "use_date": "2026-11-04",
+      "merchant": "한밭골 국밥",
+      "amount": 18000,
+      "account": "회의비",
+      "purpose": "한빛기술연구원 담당자와 업무 협의 점심",
+      "attendees": [
+        "김지훈",
+        "한빛기술연구원 담당자"
+      ]
+    },
+    "evidence": [
+      {
+        "date": "2026-11-04",
+        "merchant": "한밭골 국밥",
+        "category": "회의비",
+        "amount": 18000,
+        "filename": "lunch_1104.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  {
+    "key": "hist-026",
+    "process": "MTG-01",
+    "drafter": "E4006",
+    "submitted": "2026-11-09T12:50:00",
+    "values": {
+      "date": "2026-11-16",
+      "start": "10:00",
+      "end": "11:00",
+      "room": "RM-B",
+      "people": 6,
+      "title": "업무 회의",
+      "purpose": "업무 협의",
+      "external": false
+    },
+    "evidence": [],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      2.5,
+      0.81,
+      1.22,
+      1.62
+    ]
+  },
+  {
+    "key": "hist-050",
+    "process": "EXP-02",
+    "drafter": "E4017",
+    "submitted": "2026-11-09T13:10:00",
+    "values": {
+      "trip_start": "2026-11-06",
+      "trip_end": "2026-11-08",
+      "destination": "부산",
+      "purpose": "협력사 기술 협의",
+      "total_amount": 289600
+    },
+    "evidence": [
+      {
+        "date": "2026-11-06",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t1.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-08",
+        "merchant": "누리고속철도",
+        "category": "교통비",
+        "amount": 59800,
+        "filename": "h_t2.png",
+        "confidence": 0.97
+      },
+      {
+        "date": "2026-11-08",
+        "merchant": "가상호텔",
+        "category": "숙박비",
+        "amount": 170000,
+        "nights": 2,
+        "filename": "h_h.png",
+        "confidence": 0.96
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      0.81,
+      0.98,
+      0.72,
+      0.56
+    ]
+  },
+  {
+    "key": "hist-007",
+    "process": "EXP-01",
+    "drafter": "E4019",
+    "submitted": "2026-11-09T16:40:00",
+    "values": {
+      "use_date": "2026-11-09",
+      "merchant": "판교 인쇄소",
+      "amount": 132000,
+      "account": "도서인쇄비",
+      "purpose": "기술 도서 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-09",
+        "merchant": "판교 인쇄소",
+        "category": "도서인쇄비",
+        "amount": 132000,
+        "filename": "h_8122.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "REJECTED",
+    "reject_reason": {
+      "code": "LIMIT_EXCEEDED",
+      "label": "한도 초과 사유 부족"
+    },
+    "delay_factors": [
+      1.61,
+      2.31,
+      1.14,
+      2.5
+    ]
+  },
+  {
+    "key": "hist-016",
+    "process": "EXP-01",
+    "drafter": "E4007",
+    "submitted": "2026-11-10T10:50:00",
+    "values": {
+      "use_date": "2026-11-10",
+      "merchant": "오피스가상마트",
+      "amount": 24000,
+      "account": "소모품비",
+      "purpose": "사무용품 구매"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-10",
+        "merchant": "오피스가상마트",
+        "category": "소모품비",
+        "amount": 24000,
+        "filename": "h_7127.png",
+        "confidence": 0.97
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.03,
+      1.34,
+      1.88,
+      0.6
+    ]
+  },
+  {
+    "key": "hist-006",
+    "process": "PUR-01",
+    "drafter": "E4002",
+    "submitted": "2026-11-10T15:20:00",
+    "values": {
+      "item": "모니터 암",
+      "qty": 2,
+      "unit_price": 45000,
+      "amount": 90000,
+      "reason": "업무용",
+      "due_date": "2026-11-20"
+    },
+    "evidence": [
+      {
+        "date": "2026-11-10",
+        "merchant": "가상전자상사",
+        "category": "견적서",
+        "amount": 90000,
+        "filename": "h_q.pdf",
+        "confidence": 1.0
+      }
+    ],
+    "outcome": "APPROVED",
+    "reject_reason": null,
+    "delay_factors": [
+      1.18,
+      1.74,
+      0.81,
+      1.35
+    ]
+  }
+]

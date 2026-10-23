@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}업무 비효율 대시보드{% endblock %}
+{% block content %}
+{% set ot = dash.overtime %}{% set sv = dash.savings %}{% set rj = dash.rejection %}
+<div class="pagehead">
+  <span class="eyebrow">홈 · 모두 더미 데이터</span>
+  <h1>업무 비효율 대시보드</h1>
+  <p class="sub">전결 처리에서 시간이 새는 곳 · 최근 {{ ot.weeks }}주 야근 기록, 직급별 업무 시간 할당량, 하기 싫은 업무 설문(응답 {{ dash.survey.n }}명), 결재 이력</p>
+</div>
+
+{% set ji = ot.categories.index('전결 처리') %}
+{% set tot = namespace(all=0, jy=0, max=0.1, top='', topv=0) %}
+{% for d in ot.depts %}{% set s = ot.hours[d]|sum %}{% set tot.all = tot.all + s %}{% set tot.jy = tot.jy + ot.hours[d][ji] %}{% if s > tot.max %}{% set tot.max = s %}{% endif %}
+  {% if ot.jeongyeol_share[d] > tot.topv %}{% set tot.topv = ot.jeongyeol_share[d] %}{% set tot.top = d %}{% endif %}{% endfor %}
+{% set waiting = dash.approvers|sum(attribute='pending') %}
+{% set waiting_people = dash.approvers|selectattr('pending')|list|length %}
+<section class="tiles">
+  <div class="tile">
+    <div class="tile-top"><span class="tile-label">야근 시간 중 전결 처리 비중</span>
+      <span class="tile-ico blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span></div>
+    <div class="tile-mid"><span class="tile-value blue">{{ '%.0f'|format(tot.jy / tot.all * 100) }}%</span>
+      <span class="tile-chip blue">최고 {{ tot.top }} {{ '%.0f'|format(tot.topv * 100) }}%</span></div>
+    <div class="tile-note">{{ ot.weeks }}주 야근 {{ '%.0f'|format(tot.all) }}시간 중 <b>{{ '%.0f'|format(tot.jy) }}시간</b> · 부서별은 아래 그래프</div>
+  </div>
+  <div class="tile">
+    <div class="tile-top"><span class="tile-label">결재 반려율</span>
+      <span class="tile-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg></span></div>
+    <div class="tile-mid"><span class="tile-value red">{{ '%.0f'|format(rj.rate * 100) }}%</span>
+      {% if rj.reasons %}<span class="tile-chip red">1위 {{ rj.reasons[0].label }}</span>{% endif %}</div>
+    <div class="tile-note">완료 {{ rj.total }}건 중 <b>반려 {{ rj.rejected }}건</b></div>
+  </div>
+  <div class="tile">
+    <div class="tile-top"><span class="tile-label">지금 결재 대기</span>
+      <span class="tile-ico gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M5 5h14l1 8v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5z"/></svg></span></div>
+    <div class="tile-mid"><span class="tile-value">{{ waiting }}<span class="unit">건</span></span>
+      {% set ta = dash.approvers|sort(attribute='pending', reverse=True)|first %}{% if ta and ta.pending %}<span class="tile-chip gray">{{ ta.name }} {{ ta.title }} {{ ta.pending }}건</span>{% endif %}</div>
+    <div class="tile-note">결재자 <b>{{ waiting_people }}명</b>에게 쌓여 있음</div>
+  </div>
+  <div class="tile assume">
+    <div class="tile-top"><span class="tile-label">예상 절감 (가정)</span>
+      <span class="tile-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/></svg></span></div>
+    <div class="tile-mid"><span class="tile-value green">{{ '%.0f'|format(sv.avg_minutes_day) }}<span class="unit">분 /일·인</span></span>
+      <span class="tile-chip green">가정값</span></div>
+    <div class="tile-note">전결 단계별 시간 × 가정 절감률. 목표치와 비교하지 않음</div>
+  </div>
+</section>
+
+<section class="grid2">
+  <div class="card">
+    <h2>부서별 야근 시간과 원인</h2>
+    <p class="sub">최근 {{ ot.weeks }}주 누적 시간 · 막대 길이는 가장 긴 부서 대비</p>
+    {% set CI = {'전결 처리': 0, '본업': 1, '회의': 2, '기타 사무': 3} %}
+    {% set CATS = (['전결 처리', '본업', '회의', '기타 사무']|select('in', ot.categories)|list) + (ot.categories|reject('in', ['전결 처리', '본업', '회의', '기타 사무'])|list) %}
+    <div class="legend" aria-hidden="true">{% for c in CATS %}<span><i class="c{{ CI.get(c, 3) }}"></i>{{ c }}</span>{% endfor %}</div>
+    <div class="hbars" role="img" aria-label="부서별 야근 시간과 원인 쌓은 막대. 같은 값이 아래 '표로 보기'에 있습니다.">
+      {% for d in ot.depts %}{% set s = ot.hours[d]|sum %}
+      <div class="hbar">
+        <div class="hbar-head"><b>{{ d }}</b><span class="v"><strong>전결 {{ '%.0f'|format(ot.hours[d][ji]) }}시간 ({{ '%.0f'|format(ot.jeongyeol_share[d]*100) }}%)</strong> / 총 {{ '%.0f'|format(s) }}시간</span></div>
+        <div class="hbar-track" style="width: {{ '%.1f'|format(s / tot.max * 100) }}%">
+          {% for c in CATS %}{% set v = ot.hours[d][ot.categories.index(c)] %}{% if v %}<span class="seg seg-{{ CI.get(c, 3) }}" style="flex: {{ v }} 1 0" title="{{ c }} {{ v }}시간"></span>{% endif %}{% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <details class="tableview"><summary>표로 보기</summary>
+      <table class="tbl"><thead><tr><th>부서</th>{% for c in ot.categories %}<th class="num">{{ c }}</th>{% endfor %}<th class="num">전결 비중</th></tr></thead>
+      <tbody>{% for d in ot.depts %}<tr><td>{{ d }}</td>{% for v in ot.hours[d] %}<td class="num">{{ v }}</td>{% endfor %}<td class="num">{{ '%.0f'|format(ot.jeongyeol_share[d]*100) }}%</td></tr>{% endfor %}</tbody></table>
+    </details>
+  </div>
+  <div class="card">
+    <h2>직급별 전결 단계 시간</h2>
+    <p class="sub">주당 시간 · 진할수록 많이 씀 · 직급별 업무 시간 할당량(더미)</p>
+    {% set al = dash.allocation %}
+    {% set mx = namespace(v=0.1) %}{% for g in al.grades %}{% for v in al.hours[g] %}{% if v > mx.v %}{% set mx.v = v %}{% endif %}{% endfor %}{% endfor %}
+    <div class="tablewrap"><table class="tbl heat">
+      <thead><tr><th>직급군</th>{% for s in al.stages %}<th>{{ s }}</th>{% endfor %}<th class="num">합계</th></tr></thead>
+      <tbody>
+      {% for g in al.grades %}
+        <tr><td>{{ g }}</td>
+        {% for v in al.hours[g] %}{% set lv = ((v / mx.v) * 6)|round(0, 'ceil')|int %}<td class="num heat-{{ lv }}">{{ '%.1f'|format(v) }}</td>{% endfor %}
+        <td class="num total"><b>{{ al.jeongyeol_total[g] }}</b><span class="muted"> / {{ al.week_total[g] }}</span></td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+    <p class="note">합계 칸: 전결 처리 시간 / 주당 전체 시간</p>
+  </div>
+</section>
+
+<section class="grid3">
+  <div class="card">
+    <h2>가장 하기 싫은 업무</h2>
+    <p class="sub">설문 가중 점수 (1순위 3점, 2순위 2점, 3순위 1점)</p>
+    <div class="chartbox h-240"><canvas id="ch-survey" role="img" aria-label="하기 싫은 업무 순위"></canvas></div>
+    <details class="tableview"><summary>표로 보기</summary>
+      <table class="tbl small"><thead><tr><th>업무</th><th class="num">점수</th><th class="num">1순위</th></tr></thead>
+      <tbody>{% for r in dash.survey.ranking %}<tr><td>{{ r.option }}</td><td class="num">{{ r.score }}</td><td class="num">{{ r.first }}명</td></tr>{% endfor %}</tbody></table>
+    </details>
+  </div>
+  <div class="card">
+    <h2>반려 사유</h2>
+    <p class="sub">반려 {{ rj.rejected }}건 · 상신 전 검증으로 미리 잡을 수 있는 사유</p>
+    <div class="chartbox h-240"><canvas id="ch-reject" role="img" aria-label="반려 사유"></canvas></div>
+    <details class="tableview"><summary>표로 보기</summary>
+      <table class="tbl small"><thead><tr><th>사유</th><th class="num">건수</th></tr></thead>
+      <tbody>{% for r in rj.reasons %}<tr><td>{{ r.label }}</td><td class="num">{{ r.count }}</td></tr>{% endfor %}</tbody></table>
+    </details>
+  </div>
+  <div class="card">
+    <h2>결재자별 대기</h2>
+    <p class="sub">지금 대기 건수 · 과거 평균 처리 시간(업무 시간)</p>
+    <table class="tbl">
+      <thead><tr><th>결재자</th><th class="num">대기</th><th class="num">평균 처리</th></tr></thead>
+      <tbody>{% for a in dash.approvers[:8] %}
+        <tr><td><b>{{ a.name }}</b> <span class="muted">{{ a.title }}</span></td><td class="num">{% if a.pending %}<b class="err-text">{{ a.pending }}</b>{% else %}0{% endif %}</td><td class="num">{{ a.avg_hours if a.avg_hours is not none else '—' }}시간</td></tr>
+      {% endfor %}</tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <h2>단계별 예상 절감 (가정)</h2>
+  <p class="sub">{{ sv.note }} · 1인 하루 평균 {{ '%.0f'|format(sv.avg_minutes_day) }}분</p>
+  <div class="grid2 inner">
+    <div class="chartbox h-220"><canvas id="ch-savings" role="img" aria-label="단계별 예상 절감 시간"></canvas></div>
+    <table class="tbl">
+      <thead><tr><th>전결 단계</th><th class="num">가정 절감률</th><th>줄이는 기능</th></tr></thead>
+      <tbody>{% for s in sv.by_stage %}<tr><td><b>{{ s.stage }}</b></td><td class="num">{{ '%.0f'|format(s.rate * 100) }}%</td><td class="muted">{{ s.feature }}</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+</section>
+<script type="application/json" id="dash-data">{{ dash|tojson_ko|safe }}</script>
+{% endblock %}
+{% block scripts %}
+<script src="/static/vendor/chart-4.4.7.umd.js"></script>
+<script src="/static/dashboard.js"></script>
+{% endblock %}

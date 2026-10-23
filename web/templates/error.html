@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}오류{% endblock %}
+{% block content %}
+<div class="card errorcard">
+  <h1>! {{ error.message }}</h1>
+  <p class="mono muted">{{ error.code }}</p>
+  {% if error.fix_hint %}<p>→ {{ error.fix_hint }}</p>{% endif %}
+  {% if error.code == 'FORBIDDEN' %}<p class="muted">상단의 사용자 전환에서 문서의 기안자나 결재자로 바꿔 보세요.</p>{% endif %}
+  <p><a class="btn" href="/">홈으로</a></p>
+</div>
+{% endblock %}

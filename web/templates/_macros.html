@@ -1,0 +1,57 @@
+{% macro imp(level) -%}
+{%- if level == '긴급' -%}<span class="chip imp-urgent" title="긴급"><span class="ico" aria-hidden="true">!</span>긴급</span>
+{%- elif level == '보통' -%}<span class="chip imp-normal" title="보통"><span class="ico" aria-hidden="true">◆</span>보통</span>
+{%- elif level == '낮음' -%}<span class="chip imp-low" title="낮음"><span class="ico" aria-hidden="true">·</span>낮음</span>
+{%- endif -%}
+{%- endmacro %}
+
+{% macro status(code, label) -%}
+<span class="badge st-{{ code|lower }}">{{ label }}</span>
+{%- endmacro %}
+
+{% macro ai(flag) -%}
+{%- if flag %}<span class="badge ai" title="AI 서비스가 MCP로 만들거나 고친 항목">AI 작성</span>{% endif -%}
+{%- endmacro %}
+
+{% macro val(v) -%}
+{%- if v is mapping -%}{{ v|tojson_ko }}
+{%- elif v is iterable and v is not string -%}
+  {%- if v and v[0] is mapping -%}
+  <ul class="items">{% for it in v %}<li>{% for k, x in it.items() %}<span class="k">{{ k }}</span> {{ x if x else '—' }}{% if not loop.last %} · {% endif %}{% endfor %}</li>{% endfor %}</ul>
+  {%- else -%}{{ v|join(', ') }}{%- endif -%}
+{%- elif v is sameas true -%}예{%- elif v is sameas false -%}아니오
+{%- elif v is number -%}{{ '{:,}'.format(v) }}
+{%- else -%}{{ v if v not in (None, '') else '—' }}{%- endif -%}
+{%- endmacro %}
+
+{% macro steps(line) -%}
+{% if line %}
+<ol class="steps">
+  {% for s in line %}
+  <li class="step step-{{ s.status|lower }}">
+    <span class="step-who">{{ s.name }}</span>
+    <span class="step-kind">{{ s.kind }}{% if s.level != '합의' %} · {{ s.level }}{% endif %}</span>
+    <span class="step-st">{{ s.status_label }}{% if s.acted_at %} · {{ s.acted_at|hm }}{% endif %}</span>
+    {% if s.comment %}<span class="step-comment">“{{ s.comment }}”</span>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% endif %}
+{%- endmacro %}
+
+{% macro issues(list, title) -%}
+{% if list %}
+<div class="issues">
+  <h4>{{ title }} {{ list|length }}건</h4>
+  <ul>
+  {% for x in list %}
+    <li class="issue lv-{{ x.level }}"><div class="msg">{{ x.message }}</div>
+      {% if x.reason %}<div class="reason">사유: {{ x.reason }}</div>{% endif %}
+      {% if x.fix_hint %}<div class="hint">→ {{ x.fix_hint }}</div>{% endif %}
+      <div class="meta">{% if x.article %}<span class="art">{{ x.article }}</span>{% endif %}<span class="code">{{ x.code }}</span></div>
+    </li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{%- endmacro %}

@@ -1,0 +1,125 @@
+# 시연 시나리오 원본 (설계서 10장, 8.3)
+# - 등장 인물, 시연 날짜, 시연 초기 상태, 시연 입력 자료의 '일부러 넣는 문제'를 정한다.
+# - 나머지 직원·대시보드 데이터·과거 결재 이력은 seed 값으로 무작위 생성한다(seedgen/generate.py).
+
+seed: 20261112
+demo:
+  start: "2026-11-12T10:00:00"   # 목요일. 회의일(11/17 화)까지 3영업일, 결과보고 기한(11/13 금)까지 1영업일 → 둘 다 긴급
+  confirm_mode: A
+  digest_times: ["09:00", "14:00"]
+
+holidays: []    # 시연 기간에는 공휴일이 없다. 주말만 비영업일.
+
+org:
+  divisions:
+    - {code: D-TECH, name: 기술본부, head: E1001}
+    - {code: D-MGMT, name: 경영본부, head: E1002}
+  offices:
+    - {code: O-RND, name: 연구개발실, division: D-TECH, head: E1101}
+    - {code: O-MSP, name: 경영지원실, division: D-MGMT, head: E1102}
+  teams:
+    - {code: T-R1, name: 연구1팀, office: O-RND, head: E2001}
+    - {code: T-R2, name: 연구2팀, office: O-RND, head: E2002}
+    - {code: T-QA, name: 시험평가팀, office: O-RND, head: E2003}
+    - {code: T-MS, name: 경영지원팀, office: O-MSP, head: E2004}
+  named_people:
+    - {emp_no: E1001, name: 최민준, grade: 수석, title: 본부장, dept: D-TECH}
+    - {emp_no: E1002, name: 임동욱, grade: 수석, title: 본부장, dept: D-MGMT}
+    - {emp_no: E1101, name: 이도현, grade: 수석, title: 실장, dept: O-RND}
+    - {emp_no: E1102, name: 서지원, grade: 수석, title: 실장, dept: O-MSP}
+    - {emp_no: E2001, name: 박서연, grade: 책임, title: 팀장, dept: T-R1}
+    - {emp_no: E2002, name: 강민호, grade: 수석, title: 팀장, dept: T-R2}
+    - {emp_no: E2003, name: 문채원, grade: 책임, title: 팀장, dept: T-QA}
+    - {emp_no: E2004, name: 윤재민, grade: 책임, title: 팀장, dept: T-MS}
+    - {emp_no: E3001, name: 김지훈, grade: 선임, title: "", dept: T-R1}
+    - {emp_no: E3002, name: 정하늘, grade: 책임, title: "", dept: T-R1}
+    - {emp_no: E3003, name: 오세준, grade: 사원, title: "", dept: T-R1}
+    - {emp_no: E3004, name: 한유진, grade: 선임, title: "", dept: T-R1}
+  generated_per_team: {T-R1: 3, T-R2: 7, T-QA: 6, T-MS: 5}
+
+connections:
+  - {token: demo-drafter-kimjihoon-7f3a, emp_no: E3001, mode: drafter, label: 김지훈 선임 (기안자용)}
+  - {token: demo-approver-parkseoyeon-9c2e, emp_no: E2001, mode: approver, label: 박서연 팀장 (결재자용)}
+
+rooms:
+  - {id: RM-A, name: 소회의실 A, capacity: 6, kind: small}
+  - {id: RM-B, name: 소회의실 B, capacity: 8, kind: small}
+  - {id: RM-L, name: 대회의실, capacity: 20, kind: large}
+
+room_reservations:   # 시연 초기 확정 예약
+  - {room: RM-A, date: "2026-11-17", start: "13:00", end: "15:00", title: 연구2팀 주간회의, emp_no: E2002}
+  - {room: RM-L, date: "2026-11-17", start: "10:00", end: "12:00", title: 기술본부 월간회의, emp_no: E1001}
+  - {room: RM-B, date: "2026-11-13", start: "15:00", end: "16:00", title: 시험평가팀 점검, emp_no: E2003}
+  - {room: RM-A, date: "2026-11-16", start: "09:30", end: "10:30", title: 연구1팀 주간회의, emp_no: E2001}
+
+# 중복 영수증의 근거가 되는 기존 정산 (과거 결재 이력에 승인으로 들어간다)
+history_fixed:
+  - key: dup-basis
+    process: EXP-01
+    drafter: E3001
+    submitted: "2026-11-09T11:00:00"
+    final: "2026-11-09T16:30:00"
+    status: APPROVED
+    values: {use_date: "2026-11-04", merchant: 한밭골 국밥, amount: 18000, account: 회의비, purpose: 한빛기술연구원 담당자와 업무 협의 점심, attendees: [김지훈, 한빛기술연구원 담당자]}
+    evidence: [{date: "2026-11-04", merchant: 한밭골 국밥, category: 회의비, amount: 18000, filename: lunch_1104.png, confidence: 0.96}]
+  - key: similar-basis
+    process: EXP-01
+    drafter: E3002
+    submitted: "2026-11-05T10:00:00"
+    final: "2026-11-05T15:00:00"
+    status: APPROVED
+    values: {use_date: "2026-11-04", merchant: 판교 숲속식당, amount: 96000, account: 회의비, purpose: 과제 준비 회의 후 식사, attendees: [정하늘, 오세준, 한유진]}
+    evidence: [{date: "2026-11-04", merchant: 판교 숲속식당, category: 회의비, amount: 96000, filename: dinner_1104.png, confidence: 0.97}]
+
+# 박서연 팀장의 결재함에 이미 있는 결재 대기 문서 (중요도 3단계가 하나씩 보이게)
+pending_docs:
+  - key: pending-urgent
+    expect: 긴급 (상신 후 3영업일 넘게 대기)
+    process: PUR-01
+    drafter: E3003
+    submitted: "2026-11-05T14:00:00"
+    values: {item: 24인치 모니터, qty: 2, unit_price: 199000, amount: 398000, reason: 시험 장비 모니터링 화면 추가, due_date: "2026-11-20"}
+    evidence: [{date: "2026-11-05", merchant: 가상전자상사, category: 견적서, amount: 398000, filename: quote_monitor.pdf, confidence: 1.0}]
+  - key: pending-normal
+    expect: 보통 (전결 한도 근접 95%, 짧은 기간의 유사 정산)
+    process: EXP-01
+    drafter: E3002
+    submitted: "2026-11-11T09:30:00"
+    values: {use_date: "2026-11-10", merchant: 판교 숲속식당, amount: 285000, account: 회의비, purpose: 과제 중간점검 후 팀 회식, attendees: [정하늘, 김지훈, 오세준, 한유진, 박서연, 외부 자문위원]}
+    evidence: [{date: "2026-11-10", merchant: 판교 숲속식당, category: 회의비, amount: 285000, filename: dinner_1110.png, confidence: 0.95}]
+  - key: pending-low
+    expect: 낮음 (주의 항목 없음)
+    process: EXP-01
+    drafter: E3004
+    submitted: "2026-11-11T16:00:00"
+    values: {use_date: "2026-11-11", merchant: 가상문구 판교점, amount: 42000, account: 소모품비, purpose: 프린터 토너 구매}
+    evidence: [{date: "2026-11-11", merchant: 가상문구 판교점, category: 소모품비, amount: 42000, filename: receipt_toner.png, confidence: 0.98}]
+
+# 시연 입력 자료: 김지훈 선임이 AI 서비스에 올리는 자료
+trip:
+  traveler: E3001
+  start: "2026-11-04"
+  end: "2026-11-06"
+  destination: 대전
+  visit: 한빛기술연구원
+  purpose: 공동과제 착수회의 및 시험장비 확인
+  meeting_request: {date: "2026-11-17", start: "14:00", end: "15:00", people: 6, title: 대전 출장 결과 공유}
+  receipts:
+    - {file: receipt_01_train_go.png, date: "2026-11-04", time: "07:42", merchant: 누리고속철도, category: 교통비, amount: 23700, lines: ["승차권 서울 → 대전", "일반실 1매"], problem: 없음}
+    - {file: receipt_02_train_back.png, date: "2026-11-06", time: "18:15", merchant: 누리고속철도, category: 교통비, amount: 23700, lines: ["승차권 대전 → 서울", "일반실 1매"], problem: 없음}
+    - {file: receipt_03_hotel.png, date: "2026-11-06", time: "11:02", merchant: 대전 별빛호텔, category: 숙박비, amount: 260000, nights: 2, lines: ["스탠다드 더블 2박", "11/04 ~ 11/06"], problem: "숙박비 1박 13만 원 → 선임 상한 10만 원 초과"}
+    - {file: receipt_04_dinner_blur.png, date: "2026-11-05", time: "19:48", merchant: 은행동 칼국수, category: 식비, amount: 28000, lines: ["칼국수 2", "수육(소) 1"], problem: "흐린 영수증 → 판독 신뢰도 낮음", blur: 3.2}
+    - {file: receipt_05_lunch_dup.png, date: "2026-11-04", time: "12:31", merchant: 한밭골 국밥, category: 식비, amount: 18000, lines: ["돼지국밥 2"], problem: "이미 일반경비 정산(dup-basis)으로 승인된 영수증 → 중복"}
+  memo: |
+    [대전 출장 메모 - 김지훈]
+    - 기간: 11/4(수) ~ 11/6(금), 2박 3일
+    - 방문: 한빛기술연구원 (공동과제 착수회의, 시험장비 확인)
+    - 11/4: 착수회의. 과제 범위와 역할 분담 확정. 점심은 연구원 담당자와 업무 협의하며 먹음
+    - 11/5: 시험장비 확인. 장비 2종 사양이 우리 요구와 일부 다름
+    - 11/6: 결과 정리 후 복귀
+    - 숙소: 행사장 근처 숙소가 거의 만실이라 별빛호텔 이용 (가격 좀 높았음)
+    - 결과: 공동과제 일정(12월 착수)과 역할 분담 확정, 장비 사양 차이 확인
+    - 후속 조치
+      1) 시험 계획서 초안 송부 - 김지훈, 11/20까지
+      2) 장비 사양 비교표 작성 - (담당 미정), 기한 미정
+    - 결과 공유 회의: 다음 주 화요일 오후 2시, 팀원 6명

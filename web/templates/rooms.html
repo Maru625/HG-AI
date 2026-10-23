@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status %}
+{% block title %}회의실{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>회의실 예약 현황</h1>
+  <p class="sub">{{ sch.dates[0] }} ~ {{ sch.dates[-1] }} · 회의실 사용 신청(MTG-01)을 상신하면 가예약, 최종 승인되면 확정, 반려되면 해제됩니다.</p></div>
+<div class="legend-inline"><span class="badge st-hold">가예약</span> 결재 진행 중 <span class="badge st-confirmed">확정</span> 승인 완료 또는 기존 예약</div>
+<div class="tablewrap">
+<table class="tbl rooms">
+  <thead><tr><th>회의실</th>{% for d in sch.dates %}<th class="{{ 'today' if d == sch.today }} {{ 'off' if d in sch.offdays }}">{{ d[5:] }} ({{ sch.weekday[d] }}){% if d == sch.today %} 오늘{% endif %}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for r in sch.rooms %}
+    <tr><th>{{ r.name }}<div class="muted small">{{ r.capacity }}명{% if r.kind == 'large' %} · 경영지원팀 합의{% endif %}</div></th>
+    {% for d in sch.dates %}
+      <td class="{{ 'today' if d == sch.today }} {{ 'off' if d in sch.offdays }}">
+      {% for x in sch.reservations if x.room == r.id and x.date == d %}
+        <div class="slot slot-{{ x.status|lower }}"><b>{{ x.start }}~{{ x.end }}</b> {{ x.title }}<div class="small">{{ x.who }} · {{ x.status_label }}{% if x.doc %} · <a href="/docs/{{ x.doc.doc_id }}">{{ x.doc.doc_no }}</a>{% endif %}</div></div>
+      {% endfor %}
+      </td>
+    {% endfor %}</tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% if sch.released %}
+<h2 class="mt">해제된 가예약</h2>
+<ul class="plain">{% for x in sch.released %}<li>{{ x.date }} {{ x.start }}~{{ x.end }} {{ x.title }} · {{ x.who }}{% if x.doc %} · <a href="/docs/{{ x.doc.doc_id }}">{{ x.doc.doc_no }}</a> 반려{% endif %}</li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

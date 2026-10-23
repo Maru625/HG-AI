@@ -1,0 +1,56 @@
+{
+  "rooms": [
+    {
+      "id": "RM-A",
+      "name": "소회의실 A",
+      "capacity": 6,
+      "kind": "small"
+    },
+    {
+      "id": "RM-B",
+      "name": "소회의실 B",
+      "capacity": 8,
+      "kind": "small"
+    },
+    {
+      "id": "RM-L",
+      "name": "대회의실",
+      "capacity": 20,
+      "kind": "large"
+    }
+  ],
+  "reservations": [
+    {
+      "room": "RM-A",
+      "date": "2026-11-17",
+      "start": "13:00",
+      "end": "15:00",
+      "title": "연구2팀 주간회의",
+      "emp_no": "E2002"
+    },
+    {
+      "room": "RM-L",
+      "date": "2026-11-17",
+      "start": "10:00",
+      "end": "12:00",
+      "title": "기술본부 월간회의",
+      "emp_no": "E1001"
+    },
+    {
+      "room": "RM-B",
+      "date": "2026-11-13",
+      "start": "15:00",
+      "end": "16:00",
+      "title": "시험평가팀 점검",
+      "emp_no": "E2003"
+    },
+    {
+      "room": "RM-A",
+      "date": "2026-11-16",
+      "start": "09:30",
+      "end": "10:30",
+      "title": "연구1팀 주간회의",
+      "emp_no": "E2001"
+    }
+  ]
+}

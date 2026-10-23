@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}작업 기록{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>작업 기록</h1>
+  <p class="sub">모든 쓰기 작업을 남깁니다. 주체로 AI(MCP 연결)와 사람(웹 화면)을 구분합니다. 최근 {{ rows|length }}건.</p></div>
+<div class="tablewrap">
+<div class="card flush"><table class="tbl list small">
+  <thead><tr><th>시연 시각</th><th>주체</th><th>사용자</th><th>작업</th><th>대상</th><th>내용</th><th>결과</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr class="{{ 'row-bad' if r.result != 'ok' }}">
+      <td class="mono nowrap">{{ r.at|hm }}</td>
+      <td><span class="badge who-{{ r.channel|lower }}">{{ r.who }}</span></td>
+      <td class="nowrap">{{ r.actor }}</td>
+      <td class="mono nowrap">{{ r.action }}</td>
+      <td class="mono nowrap">{% if r.target and r.target.startswith('DOC-') %}<a href="/docs/{{ r.target }}">{{ r.target }}</a>{% elif r.target and r.target.startswith('PLAN-') %}<a href="/plans/{{ r.target }}">{{ r.target }}</a>{% else %}{{ r.target or '' }}{% endif %}</td>
+      <td>{{ r.summary }}</td>
+      <td class="nowrap {{ 'err-text' if r.result != 'ok' else 'muted' }}">{% if r.result != 'ok' %}<b>{{ r.result }}</b>{% else %}{{ r.result }}{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+</div>
+{% endblock %}

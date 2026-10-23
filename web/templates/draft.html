@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status, ai, issues %}
+{% block title %}{{ d.doc_id }} 초안{% endblock %}
+{% block content %}
+<div class="pagehead">
+  <a class="backlink" href="/drafts">← 임시저장함</a>
+  <h1><span class="mono">{{ d.doc_id }}</span> {{ d.title }} {{ status(d.status, d.status_label) }} {{ ai(d.ai_written) }}</h1>
+  <p class="sub">{{ d.process_name }} · 기안자 {{ d.drafter.name }}{% if d.plan_id %} · <a href="/plans/{{ d.plan_id }}">{{ d.plan_id }} {{ d.item_no }}번 항목</a>{% endif %}{% if d.original_doc_id %} · 반려된 {{ d.original.doc_no if d.original else d.original_doc_id }}을 고친 재기안{% endif %}</p>
+</div>
+
+{% set confirmed = d.status == 'CONFIRMED' %}
+<ol class="stepper" aria-label="진행 단계">
+  <li class="done"><span class="dot">✓</span><span>작업 계획 승인 <span class="by">확인 ①</span></span></li>
+  <li class="{{ 'done' if confirmed else 'now' }}"><span class="dot">{{ '✓' if confirmed else '2' }}</span><span>초안 확인 <span class="by">확인 ②{% if not confirmed %} · 지금, 사람이 확인{% endif %}</span></span></li>
+  <li class="{{ 'now' if confirmed }}"><span class="dot">3</span><span>상신 <span class="by">확인 ③{% if confirmed %} · 지금, AI가 대화에서 허락받아 올림{% endif %}</span></span></li>
+</ol>
+
+{% if d.status == 'INVALID' %}
+<div class="actionbar bad"><span><b>검증 오류가 있어 확인할 수 없습니다.</b> AI가 고쳐 다시 저장하면 이 화면이 바로 바뀝니다.</span></div>
+{% elif d.missing_reasons %}
+<div class="actionbar warn"><span><b>사유가 필요합니다:</b> {{ d.missing_reasons|map('rk')|join(', ') }}. 사람이 정해야 하는 값이라 AI가 묻습니다. 대화에서 답하면 AI가 저장합니다.</span></div>
+{% elif d.can_confirm %}
+<div class="actionbar">
+  <span>내용이 맞으면 확인하세요 <b>(확인 ②)</b>. 확인해야 AI가 상신할 수 있습니다{% if demo.confirm_mode == 'B' %} · 지금은 화면 확인형(B)이라 여기서만 확인됩니다{% endif %}.</span>
+  <form method="post" action="/drafts/{{ d.doc_id }}/confirm"><button class="btn primary">내용 확인</button></form>
+</div>
+{% elif d.status == 'CONFIRMED' %}
+<div class="actionbar ok"><span><b>확인완료</b> {{ d.confirmed_at|hm }} · AI가 상신할 수 있습니다(확인 ③은 대화에서). 내용을 고치면 확인이 풀립니다.</span></div>
+{% endif %}
+
+<div class="cols">
+  <div class="col-main">
+    {{ issues(d.errors, '오류') }}
+    {{ issues(d.warnings, '경고') }}
+    {% include "_docbody.html" %}
+  </div>
+  <aside class="col-side">
+    <div class="card">
+      <h3>결재선 미리보기</h3>
+      {% if d.line_preview %}
+        <p class="muted small">{{ d.line_preview.band }}</p>
+        <ol class="steps">{% for s in d.line_preview.steps %}<li class="step step-waiting"><span class="step-who">{{ s.name }} {{ s.title }}</span><span class="step-kind">{{ s.kind }}{% if s.level != '합의' %} · {{ s.level }}{% endif %}</span><span class="step-basis">{{ s.basis }}</span></li>{% endfor %}</ol>
+      {% else %}<p class="muted">오류를 고치면 결재선이 계산됩니다.</p>{% endif %}
+    </div>
+    <div class="card">
+      <h3>적용 규정</h3>
+      <ul class="arts">{% for a in d.spec.articles %}<li><b>{{ a.id }}</b> {{ a.title }}</li>{% endfor %}</ul>
+      <a href="/rules#{{ d.process_id }}">규정 보기 →</a>
+    </div>
+  </aside>
+</div>
+{% endblock %}

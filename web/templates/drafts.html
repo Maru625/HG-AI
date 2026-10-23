@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status, ai %}
+{% block title %}임시저장함{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>임시저장함</h1><p class="sub">AI가 저장한 초안입니다. 내용을 확인하고 '확인'을 누르면(확인 ②) AI가 상신할 수 있습니다.</p></div>
+{% if not docs %}<div class="empty">임시저장된 초안이 없습니다.</div>{% endif %}
+{% for d in docs %}
+<a class="card rowcard" href="/drafts/{{ d.doc_id }}">
+  <div class="rc-main"><span class="mono">{{ d.doc_id }}</span> <b>{{ d.title }}</b> {{ ai(d.ai_written) }}
+    <div class="muted">{{ d.process_name }} · v{{ d.version }}
+      {% if d.errors %} · <span class="err-text">오류 {{ d.errors|length }}</span>{% endif %}
+      {% if d.warnings %} · <span class="warn-text">경고 {{ d.warnings|length }}</span>{% endif %}
+      {% if d.missing_reasons %} · <span class="err-text">사유 필요 {{ d.missing_reasons|length }}</span>{% endif %}</div></div>
+  <div class="rc-side">{{ status(d.status, d.status_label) }}</div>
+</a>
+{% endfor %}
+{% endblock %}

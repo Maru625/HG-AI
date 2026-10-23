@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}시연 제어 패널{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>시연 제어 패널</h1>
+  <p class="sub">발표자용입니다. 시연 시계, 정기 알림, 확인 방식, 초기화를 다룹니다. 시연 시계는 실제 시간과 함께 흐릅니다.</p></div>
+
+<div class="grid2">
+  <div class="card">
+    <h2>시연 시계</h2>
+    <p class="bignum mono">{{ demo.now|hm }}</p>
+    <form method="post" action="/demo/clock" class="row">
+      <label for="when">시각 맞추기</label>
+      <input id="when" name="when" type="text" value="{{ demo.now|hm }}" pattern="\d{4}-\d{2}-\d{2} \d{2}:\d{2}" title="YYYY-MM-DD HH:MM">
+      <button class="btn">맞추기</button>
+    </form>
+    <div class="row">
+      {% for m, label in [(30, '+30분'), (60, '+1시간'), (240, '+4시간'), (1440, '+1일')] %}
+      <form method="post" action="/demo/advance"><input type="hidden" name="minutes" value="{{ m }}"><button class="btn">{{ label }}</button></form>
+      {% endfor %}
+    </div>
+    <p class="note">시계를 앞으로 옮기면 그 사이에 걸친 정기 알림(09:00·14:00)과 새로 긴급이 된 문서의 즉시 알림이 만들어집니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>알림</h2>
+    <p>정기 알림 시각: {{ (demo.digest.times if demo.digest and demo.digest.times else ['09:00', '14:00'])|join(', ') }}
+      {% if demo.digest and demo.digest.last_check %} · 마지막 확인 {{ demo.digest.last_check|hm }}{% endif %}</p>
+    <form method="post" action="/demo/digest"><button class="btn">정기 알림 지금 보내기</button></form>
+    <p class="note">결재 대기가 있는 결재자 모두에게 대기 결재 전체를 중요도순으로 묶어 보냅니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>확인 방식</h2>
+    <p>지금: <b>{{ '채팅 확인형(A)' if demo.confirm_mode == 'A' else '화면 확인형(B)' }}</b></p>
+    <div class="row">
+      <form method="post" action="/demo/mode"><input type="hidden" name="mode" value="A"><button class="btn {{ 'primary' if demo.confirm_mode == 'A' }}">A · 채팅에서 확인</button></form>
+      <form method="post" action="/demo/mode"><input type="hidden" name="mode" value="B"><button class="btn {{ 'primary' if demo.confirm_mode == 'B' }}">B · 화면에서만 확인</button></form>
+    </div>
+    <p class="note">B로 두면 AI가 계획 승인(①)과 초안 확인(②)을 대신 할 수 없고, CONFIRM_IN_UI_REQUIRED를 받아 화면 링크를 안내합니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>초기화</h2>
+    <p>DB를 비우고 시드를 다시 적재합니다. 시연 시계는 {{ demo.start|hm if demo.start else '시작 시각' }}으로 돌아갑니다.</p>
+    <form method="post" action="/demo/reset" onsubmit="return confirm('시연 데이터를 모두 지우고 처음 상태로 되돌릴까요?')"><button class="btn reject">처음 상태로 초기화</button></form>
+  </div>
+</div>
+
+<div class="card">
+  <h2>AI 연결 (MCP)</h2>
+  <p class="sub">연결마다 사용자가 고정됩니다. 기안자용 연결에는 쓰기 툴이, 결재자용 연결에는 읽기 툴만 있습니다.</p>
+  <table class="tbl"><thead><tr><th>연결</th><th>역할</th><th>토큰</th></tr></thead>
+    <tbody>{% for c in conns %}<tr><td>{{ c.label }}</td><td>{{ '기안자용 · 툴 14개' if c.mode == 'drafter' else '결재자용 · 읽기 툴 8개' }}</td><td class="mono">{{ c.token }}</td></tr>{% endfor %}</tbody></table>
+  {% if gpt %}
+  <div class="actionbar {{ 'ok' if gpt.public else 'warn' }} mt"><span><b>ChatGPT 연결 주소</b> ({{ gpt.tunnel or '터널 없음' }}, {{ gpt.created }})
+    {% for c in gpt.connections %}<br>{{ c.label }}: <span class="mono">{{ c.url }}</span>{% endfor %}
+    {% if not gpt.public %}<br>공개 주소가 아니라 ChatGPT에서 연결할 수 없습니다. 터널을 설치하고 다시 실행하세요.{% endif %}</span></div>
+  {% else %}
+  <p class="note mt">ChatGPT로 시연하려면 <span class="mono">uv run approval-server gpt</span>로 실행하세요. 등록할 주소가 여기에 보입니다.</p>
+  {% endif %}
+  <details class="mt"><summary>Claude Desktop 설정 예 (claude_desktop_config.json)</summary>
+<pre class="code">{
+  "mcpServers": {
+{% for c in conns %}    "{{ 'approval-drafter' if c.mode == 'drafter' else 'approval-approver' }}": {
+      "command": "uv",
+      "args": ["--directory", "{{ settings.home|string|replace('\\', '\\\\') }}", "run", "approval-mcp"],
+      "env": {"APPROVAL_TOKEN": "{{ c.token }}", "APPROVAL_SERVER": "{{ settings.base_url }}", "APPROVAL_ROLE": "{{ c.mode }}"}
+    }{{ ',' if not loop.last }}
+{% endfor %}  }
+}</pre>
+    <p class="note">같은 내용을 <span class="mono">uv run approval-server connections</span>로도 볼 수 있습니다.</p>
+  </details>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status, ai, imp %}
+{% block title %}결재함{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>결재함</h1>
+  <p class="sub">{{ '결재할 차례인 문서를 중요도순으로 묶었습니다. 문서를 열어 검토 화면에서 승인·반려합니다.' if view == 'approver' else '내가 올린 문서의 결재 진행 상황입니다.' }}</p></div>
+<div class="tabs" role="tablist">
+  <a role="tab" href="/inbox?view=approver" class="{{ 'on' if view == 'approver' }}">결재할 문서 <span class="count">{{ data.briefing|length }}</span></a>
+  <a role="tab" href="/inbox?view=drafter" class="{{ 'on' if view == 'drafter' }}">올린 문서 <span class="count">{{ data.sent|length }}</span></a>
+</div>
+
+{% if view == 'approver' %}
+  {% if data.briefing %}
+  <div class="briefsum">
+    <span>결재할 차례인 문서 <b>{{ data.briefing|length }}건</b>, 중요도순</span>
+    <span>{{ imp('긴급') }} {{ data.counts['긴급'] }}</span><span>{{ imp('보통') }} {{ data.counts['보통'] }}</span><span>{{ imp('낮음') }} {{ data.counts['낮음'] }}</span>
+  </div>
+  {% set GUIDE = {'긴급': '먼저 보세요', '보통': '주의 항목을 확인하세요', '낮음': '주의 항목 없음'} %}
+  {% for level in ['긴급', '보통', '낮음'] %}
+    {% set rows = data.briefing|selectattr('importance', 'equalto', level)|list %}
+    {% if rows %}
+    <section class="qgroup {{ {'긴급':'urgent','보통':'normal','낮음':'low'}[level] }}" aria-label="{{ level }} {{ rows|length }}건">
+      <div class="qgroup-head">{{ imp(level) }} <b>{{ rows|length }}건</b> <span>· {{ GUIDE[level] }}</span></div>
+      {% for r in rows %}
+      <a class="qrow imp-row-{{ {'긴급':'urgent','보통':'normal','낮음':'low'}[r.importance] }}" href="/review/{{ r.doc_id }}">
+        <div class="q-main">
+          <div class="q-title">{{ r.title }} {{ ai(r.ai_written) }}</div>
+          <div class="q-meta"><span class="mono">{{ r.doc_no }}</span> · {{ r.process_name }}</div>
+          {% if r.importance_reasons %}<div class="q-why">근거: <b>{{ r.importance_reasons|join(', ') }}</b></div>{% endif %}
+        </div>
+        <div class="q-col"><span class="k">기안자</span>{{ r.drafter.name }}</div>
+        <div class="q-amt">{{ r.amount|won if r.amount is number else '—' }}</div>
+        <div class="q-col opt"><span class="k">대기</span>{{ r.waiting_bdays }}영업일</div>
+        <div class="q-col opt"><span class="k">주의</span>{% if r.caution_count %}<span class="q-warn">⚠ {{ r.caution_count }}개</span>{% else %}없음{% endif %}</div>
+        <div class="q-go" aria-hidden="true">›</div>
+      </a>
+      {% endfor %}
+    </section>
+    {% endif %}
+  {% endfor %}
+  <p class="note">중요도: 긴급 = 회의일 3영업일 이내·처리 기한 2영업일 이내·상신 후 3영업일 넘게 대기 중 하나 / 보통 = 주의 항목 있음 / 낮음 = 그 밖 (설계서 7.6)</p>
+  {% else %}
+  <div class="empty">지금 결재할 차례인 문서가 없습니다.</div>
+  {% endif %}
+
+{% else %}
+  {% if data.sent %}
+  <div class="card flush">
+  <div class="tablewrap"><table class="tbl list">
+    <thead><tr><th>문서</th><th>상태와 결재선</th><th>상신</th><th>완료</th></tr></thead>
+    <tbody>{% for d in data.sent %}
+      <tr class="clickrow" onclick="location.href='/docs/{{ d.doc_id }}'">
+        <td><a href="/docs/{{ d.doc_id }}"><b>{{ d.title }}</b></a> {{ ai(d.ai_written) }}<div class="muted small"><span class="mono">{{ d.doc_no }}</span> · {{ d.process_name }}</div></td>
+        <td>{{ status(d.status, d.status_label) }}{% if d.approval_line %}<div class="muted small line-mini">{% for s in d.approval_line %}{{ s.name }} {{ s.status_label }}{% if not loop.last %} → {% endif %}{% endfor %}</div>{% endif %}</td>
+        <td class="small nowrap">{{ d.submitted_at|hm }}</td><td class="small nowrap">{{ d.final_at|hm or '—' }}</td>
+      </tr>{% endfor %}</tbody>
+  </table></div>
+  </div>
+  {% else %}<div class="empty">이번 시연에서 올린 문서가 아직 없습니다.</div>{% endif %}
+  {% if data.history %}
+  <h2 class="mt">지난 결재 이력 <span class="muted small">최근 {{ data.history|length }}건 · 시드 데이터</span></h2>
+  <div class="card flush">
+  <div class="tablewrap"><table class="tbl list small"><tbody>{% for d in data.history %}<tr><td class="mono">{{ d.doc_no }}</td><td>{{ d.title }}</td><td>{{ status(d.status, d.status_label) }}</td><td class="nowrap">{{ d.submitted_at|hm }}</td></tr>{% endfor %}</tbody></table></div>
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}
