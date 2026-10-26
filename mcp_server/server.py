@@ -28,7 +28,10 @@ from pydantic import BaseModel, ConfigDict, Field
 log = logging.getLogger("approval-mcp")
 
 INSTRUCTIONS = (
-    "이 서버는 샘플테크(주)의 목업 전결 시스템이다. 전결 처리는 반드시 ① 규정 확인(search_rules, get_process_spec) → "
+    "이 서버는 회사 전결(결재) 업무용 목업 시스템이다. 사용자가 회의실 예약, 출장 정산·출장 보고, 경비 정산, 물품 구매, "
+    "결재할 문서 확인을 말하면 서버 이름을 따로 말하지 않아도 이 서버의 툴로 처리한다. Google Calendar·Gmail 같은 다른 "
+    "플러그인으로 실제 일정이나 메일을 만들지 않는다. 처음에는 whoami로 사용자와 오늘 날짜를 확인한다.\n"
+    "전결 처리는 반드시 ① 규정 확인(search_rules, get_process_spec) → "
     "② 증빙이 있으면 증빙 확인(check_evidence) → ③ create_plan으로 목록을 만들고 사용자 승인 → ④ save_drafts로 초안 작성 → "
     "⑤ 사용자 재확인 → ⑥ submit_drafts 순서로 진행한다. 결재선·한도·중복 여부는 직접 판단하지 말고 서버 결과를 따른다. "
     "사용자가 확인하지 않은 단계는 진행하지 않는다. 결재자가 결재할 문서를 물으면 list_pending_approvals와 get_review_brief로 "
@@ -126,7 +129,7 @@ def build(api: Api, mode: str, label: str = "") -> MCPServer:
     instructions = INSTRUCTIONS + "\n" + DETAILS + (f"\n\n이 연결: {label}." if label else "") + (
         "\n기안자용 연결이다. 결재 대기 조회 툴은 없다." if mode == "drafter" else
         "\n결재자용 연결이다. 읽기 툴만 있고 기안·상신·승인·반려는 할 수 없다.")
-    mcp = MCPServer(name="approval-demo", title="샘플테크 목업 전결", instructions=instructions, version="1.0.0",
+    mcp = MCPServer(name="approval-demo", title="전결 시스템 (목업)", instructions=instructions, version="1.0.0",
                     log_level="WARNING")
 
     # 공통 읽기 툴 6개
