@@ -1,7 +1,10 @@
 ﻿# 시연 화면 배치: 왼쪽 2/3 = 전결 사이트(브라우저 앱 창), 오른쪽 1/3 = ChatGPT 데스크톱 앱
 #   팀장 PC: start_lead_pc.bat  → 서버를 켜고(이미 켜져 있으면 그대로) 박서연 팀장(E2001)으로 연다
 #   사원 PC: start_staff_pc.bat → 팀장 PC 주소를 물어(한 번 넣으면 server_ip.txt에 기억) 김지훈 선임(E3001)으로 연다
-# 옵션: -User E2003(다른 사용자) -WebShare 0.6(사이트 폭 비율) -Server 172.x.x.x -NoServer
+# 서버가 Render 같은 공개 주소에 있으면: 이 폴더의 server_url.txt에 https 주소 한 줄을 넣는다 → 두 PC 모두 서버를 켜지 않고 그 주소로 연다
+#   (한 번만: start_lead_pc.bat -Server https://hg-approval-demo.onrender.com)
+#   사원 PC는 질문에 IP 대신 https 주소를 넣으면 된다. 한 번 넣은 값은 server_ip.txt에 기억
+# 옵션: -User E2003(다른 사용자) -WebShare 0.6(사이트 폭 비율) -Server 172.x.x.x 또는 https://… -NoServer
 param(
   [ValidateSet('lead', 'staff')][string]$Role = 'lead',
   [string]$Server = '',
@@ -14,17 +17,20 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 if (-not $User) { $User = if ($Role -eq 'lead') { 'E2001' } else { 'E3001' } }
 $ipFile = Join-Path $root 'server_ip.txt'
+$urlFile = Join-Path $root 'server_url.txt'      # 공개 서버(Render 등) 주소 한 줄. 있으면 두 PC 모두 이 주소로 연다
+if (-not $Server -and (Test-Path $urlFile)) { $Server = (Get-Content $urlFile -Raw).Trim() }
 if (-not $Server) {
   if ($Role -eq 'lead') { $Server = 'localhost' }
   else {
     $saved = if (Test-Path $ipFile) { (Get-Content $ipFile -Raw).Trim() } else { '' }
-    $ans = Read-Host "팀장 PC(서버) IP를 넣으세요$(if ($saved) { " [Enter = $saved]" } else { ' (예: 172.26.37.141)' })"
+    $ans = Read-Host "서버 주소를 넣으세요 - 팀장 PC IP 또는 https 주소$(if ($saved) { " [Enter = $saved]" } else { ' (예: 172.26.37.141 / https://hg-approval-demo.onrender.com)' })"
     $Server = if ($ans) { $ans.Trim() } else { $saved }
     if (-not $Server) { Write-Host '주소가 없어 끝냅니다.'; Read-Host '닫으려면 Enter'; exit 1 }
     Set-Content -Path $ipFile -Value $Server -Encoding UTF8
   }
 }
-$base = "http://${Server}:8000"
+$remote = $Server -match '^https?://'
+$base = if ($remote) { $Server.TrimEnd('/') } else { "http://${Server}:8000" }
 
 Add-Type @"
 using System;
@@ -39,7 +45,7 @@ $wa = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea   # 작업 표시
 $webW = [int]($wa.Width * $WebShare)
 
 function Test-Up([string]$u) {
-  try { return (Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 "$u/healthz").StatusCode -eq 200 } catch { return $false }
+  try { return (Invoke-WebRequest -UseBasicParsing -TimeoutSec 5 "$u/healthz").StatusCode -eq 200 } catch { return $false }
 }
 function Place([IntPtr]$h, [int]$x, [int]$w) {
   [void][DemoWin]::ShowWindow($h, 9)                                   # 최대화·최소화 풀기
@@ -47,16 +53,16 @@ function Place([IntPtr]$h, [int]$x, [int]$w) {
 }
 
 # 1. 서버 (팀장 PC만)
-if ($Role -eq 'lead' -and -not $NoServer) {
+if ($Role -eq 'lead' -and -not $NoServer -and -not $remote) {
   if (Test-Up $base) { Write-Host '이미 켜져 있는 서버를 그대로 씁니다. (새로 시작하려면 서버 창을 닫고 다시 실행)' }
   else {
     Write-Host '서버를 켭니다 (작업 표시줄에 최소화된 창). 방화벽 창이 뜨면 "개인 네트워크" 허용.'
     Start-Process -FilePath (Join-Path $root 'start_lan_demo.bat') -WorkingDirectory $root -WindowStyle Minimized
   }
 }
-Write-Host "서버 확인: $base"
+Write-Host "서버 확인: $base $(if ($remote) { '(무료 Render는 잠들어 있으면 깨우는 데 1분쯤 걸립니다)' })"
 $ok = $false
-for ($i = 0; $i -lt 120; $i++) { if (Test-Up $base) { $ok = $true; break }; Start-Sleep -Seconds 1 }
+for ($i = 0; $i -lt 90; $i++) { if (Test-Up $base) { $ok = $true; break }; Start-Sleep -Seconds 1 }
 if (-not $ok) {
   Write-Host "서버에 닿지 않습니다: $base  (팀장 PC 서버가 켜져 있는지, 같은 와이파이인지, 방화벽 허용을 확인)"
   Read-Host '닫으려면 Enter'; exit 1

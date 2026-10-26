@@ -8,3 +8,4 @@ data/
 *.db-wal
 *.db-shm
 server_ip.txt
+server_url.txt
