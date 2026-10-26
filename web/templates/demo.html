@@ -64,7 +64,7 @@
   <h2>기기 세팅 링크 <span class="muted small">참가자 기기를 미리 맞춰 둘 때</span></h2>
   <p class="sub">기기마다 아래 링크 하나를 열고 북마크해 두면, 그 기기는 그 사용자로 고정됩니다(1년 기억). 같은 와이파이 모드라면 주소의 IP가 이 PC의 IP여야 합니다.</p>
   <div class="tablewrap"><table class="tbl small"><thead><tr><th>사용자</th><th>역할</th><th>링크</th></tr></thead><tbody>
-  {% for u in devices %}<tr><td>{{ u.label }}</td><td class="nowrap">{{ '결재자' if u.role == 'approver' else '기안자' }}</td>
+  {% for u in devices %}<tr class="{{ 'is-me' if u.gpt }}"><td>{{ u.label }}{% if u.gpt %} <span class="gpt-chip sm">GPT {{ u.gpt }}</span>{% endif %}</td><td class="nowrap">{{ '결재자' if u.role == 'approver' else '기안자' }}</td>
     <td><code class="copyval" id="as-{{ u.emp_no }}">{{ base }}/as/{{ u.emp_no }}</code> <button type="button" class="btn sm copy" data-copy="#as-{{ u.emp_no }}">복사</button></td></tr>{% endfor %}
   </tbody></table></div>
 </div>

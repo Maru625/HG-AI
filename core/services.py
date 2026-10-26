@@ -1026,7 +1026,7 @@ def mark_notifications_read(ctx: Ctx, nid: int | None = None) -> None:
 # ───────────────────────── 화면용 조회 ─────────────────────────
 # 사용자 전환 목록은 시연에 실제로 쓰는 사람만 둔다. 나머지 직원은 데이터(결재선·이력·대시보드)에만 있다.
 SWITCH_GROUPS = (
-    ("시연", ["E3001", "E2001"]),                         # 김지훈 선임(기안, GPT 연결) · 박서연 팀장(결재, GPT 연결)
+    ("GPT 시연", ["E3001", "E2001"]),                     # 김지훈 선임(기안, GPT 연결) · 박서연 팀장(결재, GPT 연결)
     ("회의실 예약자", ["E2003", "E2002", "E1001"]),         # 시연 전부터 회의실을 잡아 둔 사람: 가위바위보 상대
 )
 
@@ -1034,6 +1034,9 @@ SWITCH_GROUPS = (
 def employees_for_switch() -> list[dict]:
     """화면 상단 사용자 전환 목록. 시연 두 사람과 회의실을 먼저 잡아 둔 사람(가위바위보 상대)만 보인다."""
     with db.session() as s:
+        gpt: dict[str, list[str]] = {}
+        for c in s.scalars(select(Connection)):
+            gpt.setdefault(c.emp_no, []).append("결재 검토" if c.mode == "approver" else "기안")
         out = []
         for group, people in SWITCH_GROUPS:
             for e in people:
@@ -1042,7 +1045,8 @@ def employees_for_switch() -> list[dict]:
                     continue
                 dept = s.get(Department, emp.dept)
                 out.append({"emp_no": e, "label": _name(s, e), "group": group, "dept": dept.name if dept else emp.dept,
-                            "role": "approver" if emp.title in APPROVER_TITLES else "drafter", "title": emp.title})
+                            "role": "approver" if emp.title in APPROVER_TITLES else "drafter", "title": emp.title,
+                            "gpt": " · ".join(gpt.get(e, []))})          # GPT(MCP) 연결이 있는 사람은 화면에서 강조한다
         return out
 
 

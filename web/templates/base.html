@@ -26,12 +26,13 @@
       <span class="lbl">시연</span> {{ (demo.now|hm)[5:] }}</a>
     <div id="bell" hx-get="/partials/notifications" hx-trigger="every 4s" hx-select=".bellbar" hx-select-oob="#notice" hx-swap="innerHTML">{% with part = 'button' %}{% include "_bell.html" %}{% endwith %}</div>
     <form method="post" action="/switch-user" class="switch who" title="사용자 전환">
+      {% if me.gpt %}<a class="gpt-chip" href="/connect" title="이 사용자는 ChatGPT 데스크톱 앱에 MCP로 연결해 시연합니다 ({{ me.gpt }})">GPT</a>{% endif %}
       <span class="role {{ 'approver' if is_approver else 'drafter' }}">{{ '결재자' if is_approver else '기안자' }}</span>
       <input type="hidden" name="next" value="{{ path }}">
       <label for="who" class="sr">사용자 전환</label>
       <select id="who" name="emp_no" onchange="this.form.submit()">
         {% for g in users|map(attribute='group')|unique %}<optgroup label="{{ g }}">
-        {% for u in users if u.group == g %}<option value="{{ u.emp_no }}" {{ 'selected' if u.emp_no == user }}>{{ u.label }} · {{ u.dept }}</option>{% endfor %}
+        {% for u in users if u.group == g %}<option value="{{ u.emp_no }}" {{ 'selected' if u.emp_no == user }}>{% if u.gpt %}★ {% endif %}{{ u.label }} · {{ u.dept }}{% if u.gpt %} · GPT {{ u.gpt }}{% endif %}</option>{% endfor %}
         </optgroup>{% endfor %}
       </select>
     </form>

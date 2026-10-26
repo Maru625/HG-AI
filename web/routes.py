@@ -142,6 +142,12 @@ def home(request: Request):
     return page(request, "home.html", dash=S.home_dashboard())
 
 
+@router.get("/dashboard", response_class=HTMLResponse)
+def dashboard_page(request: Request):
+    """홈에서 이야기로 보여 준 숫자를 도표·표로 자세히 본다."""
+    return page(request, "dashboard.html", dash=S.home_dashboard())
+
+
 # ───────── 작업 계획 ─────────
 @router.get("/plans", response_class=HTMLResponse)
 def plans(request: Request):

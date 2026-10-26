@@ -230,9 +230,10 @@ def test_web_redraft_after_reject(fresh):
 
 def test_switch_users_grouped(fresh):
     users = S.employees_for_switch()
-    groups = {g: [u["emp_no"] for u in users if u["group"] == g] for g in ("시연", "회의실 예약자")}
-    assert groups["시연"] == ["E3001", "E2001"]                            # 기안(김지훈)·결재(박서연) 두 사람만 기본
+    groups = {g: [u["emp_no"] for u in users if u["group"] == g] for g in ("GPT 시연", "회의실 예약자")}
+    assert groups["GPT 시연"] == ["E3001", "E2001"]                            # 기안(김지훈)·결재(박서연) 두 사람만 기본
     assert groups["회의실 예약자"] == ["E2003", "E2002", "E1001"]          # 시드 회의실 예약을 가진 사람 = 가위바위보 상대
+    assert {u["emp_no"]: u["gpt"] for u in users if u["gpt"]} == {"E3001": "기안", "E2001": "결재 검토"}
     import json
     from core.config import get_settings
     seeded = json.loads((get_settings().seed_dir / "rooms.json").read_text(encoding="utf-8"))["reservations"]

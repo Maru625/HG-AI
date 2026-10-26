@@ -245,3 +245,18 @@ def test_device_setup_link(fresh):
         assert "문채원" in c.get("/").text
         assert "err=" in c.get("/as/E9999", follow_redirects=False).headers["location"]
         assert "/as/E2003" in c.get("/demo").text
+
+
+def test_home_story_and_gpt_marks(fresh):
+    """홈은 이야기형(문제 → 단계 → 해결), 자세한 도표는 /dashboard. GPT로 시연하는 두 사람은 화면에서 표시된다."""
+    from fastapi.testclient import TestClient
+    from core.app import create_app
+    client = TestClient(create_app(start_ticker=False))
+    client.cookies.set("demo_user", "E3001")
+    home = client.get("/").text
+    assert 'id="hx-strip"' in home and 'id="jr"' in home and "GPT로 시연하는 두 사람" in home
+    assert home.count('class="duo-card') == 2 and 'class="gpt-chip"' in home          # 상단 칩 + 두 사람 카드
+    assert "★ 김지훈 선임" in home and "★ 박서연 팀장" in home and "★ 문채원" not in home
+    assert "ch-survey" in client.get("/dashboard").text
+    client.cookies.set("demo_user", "E2003")
+    assert 'href="/connect" title="이 사용자는' not in client.get("/inbox").text            # GPT 연결 없는 사람은 칩 없음
