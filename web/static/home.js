@@ -76,7 +76,7 @@
 
   /* 2. 단계: 직급별 주당 시간, 단계를 누르면 설명 */
   var al = D.allocation, sv = D.savings, rank = D.survey.ranking;
-  var grade = '선임', stageI = 1;
+  var grade = '선임', stageI = 2;   // 처음엔 가장 큰 단계(문서 작성)를 보여 준다
   var maxH = 0;
   al.grades.forEach(function (g) { al.hours[g].forEach(function (v) { if (v > maxH) maxH = v; }); });
   var stepBtns = $$('.jr-btn'), gradeBtns = $$('.pick');
