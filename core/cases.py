@@ -27,9 +27,9 @@ ARTICLE_FEATURES: dict[str, list[dict]] = {
          "cases": ["exp01-normal", "exp01-office", "exp01-division"]},
         {"text": "기안자가 팀장이면 팀장 단계를 건너뛴다", "how": "결재선(서버)", "cases": ["exp01-team-head"]},
         {"text": "기안자가 전결권자 본인이라 결재할 사람이 없으면 바로 위 직책자가 결재한다(실장이 기안하면 본부장)", "how": "결재선(서버)",
-         "cases": ["rpt01-team-head", "exp01-team-head-small", "exp01-office-head"]},
+         "cases": ["rpt01-team-head", "exp01-team-head-small"]},
         {"text": "합의가 필요한 업무는 결재선 끝에 합의 부서장을 둔다(기안자·앞 결재자와 같은 사람이면 생략)", "how": "결재선(서버)",
-         "cases": ["pur01-division", "mtg01-large", "mtg01-mgmt-self"]},
+         "cases": ["pur01-division", "mtg01-large"]},
     ],
     "제4조": [
         {"text": "단계별 처리 기한: 결재 차례가 온 날부터 3영업일. 결재함·결재 검토·기안자 화면에 기한과 경과를 표시", "how": "결재선(서버) · 화면",
@@ -55,7 +55,7 @@ ARTICLE_FEATURES: dict[str, list[dict]] = {
     ],
     "제11조의2": [
         {"text": "숙박비 1박 상한(사원·선임 10만 원, 책임·수석 12만 원) 초과 → 사유 없으면 정산 불가", "how": "서버 검증(기안자 직급 기준)",
-         "cases": ["exp02-lodging", "exp02-lodging-senior"]},
+         "cases": ["exp02-lodging"]},
         {"text": "식비 1일 3만 원 초과 → 사유 없으면 정산 불가", "how": "서버 검증", "cases": ["exp02-meal"]},
     ],
     "제12조": [
@@ -186,8 +186,6 @@ def presets(s: Session) -> list[dict]:
         evidence=[_ev(d1, "가상한정식 판교점", "회의비", 450000, "dinner_kickoff.png")], line=["실장"], user="E2001")
     add("EXP-01", "exp01-team-head-small", "팀장이 올린 3만 6천 원 정산 → 실장 결재", ["제3조"],
         "결재선 실장 (전결권자인 팀장 본인이 기안해 바로 위 직책자가 결재)", values=sup, evidence=sup_ev, line=["실장"], user="E2001")
-    add("EXP-01", "exp01-office-head", "실장이 올린 경비 → 본부장 결재", ["제3조"], "결재선 본부장 (기안자가 실장)",
-        values=sup, evidence=sup_ev, line=["본부장"], user="E1101")
     add("EXP-01", "exp01-per-person", "회의비 1인당 6만 원(5만 원 초과)", ["제10조의2"], "한도 초과 오류 → 사유를 넣으면 경고로 바뀜",
         values={"use_date": str(d1), "merchant": "가상스시 판교점", "amount": 180000, "account": "회의비",
                 "purpose": "외부 자문 회의 식사", "attendees": ["김지훈", "정하늘", "외부 자문위원"]},
@@ -230,10 +228,8 @@ def presets(s: Session) -> list[dict]:
         values=trip(ev_ok), evidence=ev_ok, line=["팀장"])
     ev_lodge = ev_ok[:2] + [_ev(t0, "가상호텔 세종점", "숙박비", 115000, "hotel_115.png", 0.96, nights=1)]
     add("EXP-02", "exp02-lodging", "숙박비 1박 11만 5천 원(선임 상한 10만 원)", ["제11조의2"],
-        "한도 초과 오류 → 사유를 넣으면 경고. 같은 값을 정하늘 책임으로 하면 상한 12만 원이라 통과",
+        "한도 초과 오류 → 사유를 넣으면 경고",
         values=trip(ev_lodge), evidence=ev_lodge, codes=["LIMIT_EXCEEDED"], user="E3001")
-    add("EXP-02", "exp02-lodging-senior", "같은 숙박비를 책임이 정산(상한 12만 원)", ["제11조의2"], "검증 통과 (직급별 상한)",
-        values=trip(ev_lodge), evidence=ev_lodge, line=["팀장"], user="E3002")
     ev_meal = ev_ok[:2] + [_ev(t0, "가상식당 세종점", "식비", 18000, "lunch.png"), _ev(t0, "가상국밥 세종점", "식비", 16000, "dinner.png")]
     add("EXP-02", "exp02-meal", "하루 식비 3만 4천 원(1일 상한 3만 원)", ["제11조의2"], "한도 초과 오류 → 사유를 넣으면 경고",
         values=trip(ev_meal), evidence=ev_meal, codes=["LIMIT_EXCEEDED"])
@@ -337,9 +333,6 @@ def presets(s: Session) -> list[dict]:
         values=mtg(m, "13:00", "14:00", "RM-A", 9, "확대 회의"), codes=["ROOM_CAPACITY"])
     add("MTG-01", "mtg01-past", f"지난 시각({d1:%m-%d} 10:00) 신청", ["제14조"], "시점 오류(사용 전에 신청)",
         values=mtg(d1, "10:00", "11:00", "RM-B", 4, "지난 회의"), codes=["TIMING"])
-    add("MTG-01", "mtg01-mgmt-self", "경영지원팀원이 대회의실 신청 → 합의 단계 없음", ["제14조", "제3조"],
-        "결재선 경영지원팀장 1단계 (결재자와 합의 부서장이 같은 사람이라 합의 생략, 해석)",
-        values=mtg(m, "14:00", "15:00", "RM-L", 12, "경영지원 업무 설명회"), line=["팀장"], user="E4017")
     return out
 
 

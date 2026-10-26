@@ -175,9 +175,7 @@ def test_http_multi_for_chatgpt(server, tmp_path):
         return out
     try:
         assert asyncio.run(main()) == {
-            "drafter": (14, "김지훈"), "approver": (8, "박서연"),                          # 시연 기본
-            "drafter-jung": (14, "정하늘"), "drafter-park": (14, "박서연"), "drafter-song": (14, "송서준"),
-            "approver-lee": (8, "이도현"), "approver-choi": (8, "최민준"), "approver-yoon": (8, "윤재민")}
+            "drafter": (14, "김지훈"), "approver": (8, "박서연")}                          # 시연 연결은 두 개
         r = httpx.post(base + paths["drafter"], headers={"Host": "x-y.trycloudflare.com", "Accept": "application/json, text/event-stream"},
                        json={"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
                            "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "t", "version": "1"}}})

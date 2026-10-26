@@ -2,9 +2,8 @@
 
 ChatGPT처럼 원격 MCP만 붙는 AI 서비스용이다. 연결마다 주소가 다르고, 주소 안의 비밀값이 접근 토큰 역할을 한다.
 주소의 마지막 부분은 연결의 slug다(seed/connections.json).
-  /mcp/<비밀값>/drafter        → 김지훈 선임(기안자용) 툴 14개      ← 시연 기본
-  /mcp/<비밀값>/approver       → 박서연 팀장(결재자용) 읽기 툴 8개   ← 시연 기본
-  /mcp/<비밀값>/drafter-jung   → 정하늘 책임(기안자용)  … 여러 사례용 추가 연결(필요한 것만 등록)
+  /mcp/<비밀값>/drafter        → 김지훈 선임(기안자용) 툴 14개
+  /mcp/<비밀값>/approver       → 박서연 팀장(결재자용) 읽기 툴 8개   (연결은 이 두 개뿐, 10/26)
   /mcp  + 헤더 Authorization: Bearer <헤더 토큰>  → 토큰의 연결로 넘긴다(배포용. 주소에 비밀값을 넣지 않는 방식)
 
 헤더 토큰은 주소 비밀값에서 연결마다 만든다(bearer_token). 시드의 REST 토큰(connections.json의 token)은

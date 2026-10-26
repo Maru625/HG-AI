@@ -71,8 +71,8 @@
 
 <div class="card">
   <h2>AI 연결 (MCP)</h2>
-  <p class="sub">연결마다 사용자가 고정됩니다. 기안자용 연결에는 쓰기 툴이, 결재자용 연결에는 읽기 툴만 있습니다. 시연 기본은 앞의 두 개이고,
-    나머지는 여러 사례(직급별 한도, 팀장 기안, 다른 팀, 실장·본부장·합의 결재)를 AI로 해 볼 때 필요한 것만 등록합니다. 대화마다 연결은 하나만 켭니다.
+  <p class="sub">연결마다 사용자가 고정됩니다. 기안자용 연결에는 쓰기 툴이, 결재자용 연결에는 읽기 툴만 있습니다. 연결은 김지훈 선임(기안자용)과
+    박서연 팀장(결재자용) 두 개입니다. 대화마다 연결은 하나만 켭니다.
     참가자에게는 <a href="/connect">AI 연결</a> 화면(복사 버튼, 등록 순서)을 안내하세요.</p>
   {% set bsrc = (mcp.connections if mcp else (gpt.connections if gpt else [])) %}
   {% set show_rest = not mcp or mcp.api_public %}

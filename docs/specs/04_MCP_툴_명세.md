@@ -15,18 +15,14 @@
 
 ## 연결 (seed/connections.json)
 
-연결마다 사용자와 역할이 고정된다. HTTP(ChatGPT)로는 `/mcp/<비밀값>/<slug>` 주소 하나가 연결 하나다. 시연 기본은 앞의 두 개다.
+연결마다 사용자와 역할이 고정된다. HTTP(ChatGPT)로는 `/mcp/<비밀값>/<slug>` 주소 하나가 연결 하나다. 연결은 두 개다.
 
 | slug | 사용자 | 역할 |
 |---|---|---|
 | `drafter` | 김지훈 선임 (기안자용) | 기안자용 연결 |
 | `approver` | 박서연 팀장 (결재자용) | 결재자용 연결 |
-| `drafter-jung` | 정하늘 책임 (기안자용 · 책임 숙박 한도 사례) | 기안자용 연결 |
-| `drafter-park` | 박서연 팀장 (기안자용 · 팀장 기안 사례) | 기안자용 연결 |
-| `drafter-song` | 송서준 선임 (기안자용 · 경영지원팀 사례) | 기안자용 연결 |
-| `approver-lee` | 이도현 실장 (결재자용) | 결재자용 연결 |
-| `approver-choi` | 최민준 본부장 (결재자용) | 결재자용 연결 |
-| `approver-yoon` | 윤재민 팀장 (결재자용 · 경영지원팀 합의) | 결재자용 연결 |
+
+> [변경 10/26] 원래(10/20): `drafter`·`approver` 2개 → 이전(10/23): 사례별 추가 6개를 더해 8개(`drafter-jung`·`drafter-park`·`drafter-song`·`approver-lee`·`approver-choi`·`approver-yoon`) → 지금: 다시 2개. 시연을 김지훈·박서연 두 사람으로 좁혔다.
 
 ## 연결별 툴 범위
 

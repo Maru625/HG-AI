@@ -44,7 +44,7 @@
 <div class="card">
   <h2>연결 {{ items|length }}개</h2>
   <p class="sub">{% if where == 'deploy' %}이 서버의 공개 주소입니다.{% elif where == 'local' %}발표 PC의 ChatGPT 데스크톱 앱용 주소입니다(127.0.0.1은 이 PC에서만 열림{% if items and items[0].lan_url %}, 다른 PC는 아래 '같은 와이파이' 주소{% endif %}).{% endif %}
-    시연 기본은 앞의 두 개이고, 나머지는 여러 사례(직급별 한도, 팀장 기안, 다른 팀, 실장·본부장·합의 결재)용입니다.</p>
+    김지훈 선임은 기안자용, 박서연 팀장은 결재자용 연결을 등록합니다.</p>
   <div class="tablewrap"><table class="tbl small connect-tbl">
     <thead><tr><th>연결(사용자)</th><th>등록 이름</th><th>툴</th><th>URL</th></tr></thead>
     <tbody>{% for c in items %}

@@ -30,7 +30,7 @@
       <input type="hidden" name="next" value="{{ path }}">
       <label for="who" class="sr">사용자 전환</label>
       <select id="who" name="emp_no" onchange="this.form.submit()">
-        {% for g in ['기안자', '결재자'] %}<optgroup label="{{ g }}">
+        {% for g in users|map(attribute='group')|unique %}<optgroup label="{{ g }}">
         {% for u in users if u.group == g %}<option value="{{ u.emp_no }}" {{ 'selected' if u.emp_no == user }}>{{ u.label }} · {{ u.dept }}</option>{% endfor %}
         </optgroup>{% endfor %}
       </select>

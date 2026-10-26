@@ -37,10 +37,11 @@ def test_one_port_serves_web_api_and_mcp(deployed):
     r, body = _rpc(c, "/mcp/s3cret/drafter", INIT)
     assert r.status_code == 200 and body["result"]["serverInfo"]["name"] == "approval-demo"
     assert "김지훈" in body["result"]["instructions"]
-    r, body = _rpc(c, "/mcp/s3cret/approver-choi", LIST)
+    r, body = _rpc(c, "/mcp/s3cret/approver", LIST)
     assert r.status_code == 200 and len(body["result"]["tools"]) == 8
     assert _rpc(c, "/mcp/wrong/drafter", INIT)[0].status_code == 404
-    assert [x["slug"] for x in MCP_INFO["connections"]][:2] == ["drafter", "approver"]
+    assert [x["slug"] for x in MCP_INFO["connections"]] == ["drafter", "approver"]       # 시연 연결은 두 개뿐
+    assert _rpc(c, "/mcp/s3cret/approver-choi", LIST)[0].status_code == 404
 
 
 def _bearer(slug: str) -> str:
@@ -55,8 +56,8 @@ def test_bearer_token_endpoint(deployed):
     assert r.status_code == 200 and "김지훈" in body["result"]["instructions"]
     r, body = _rpc(c, "/mcp", LIST, Authorization=f"Bearer {tok}")
     assert len(body["result"]["tools"]) == 14
-    r, body = _rpc(c, "/mcp", LIST, Authorization=f"Bearer {_bearer('approver-yoon')}")
-    assert len(body["result"]["tools"]) == 8 and "윤재민" in _rpc(c, "/mcp", INIT, Authorization=f"Bearer {_bearer('approver-yoon')}")[1]["result"]["instructions"]
+    r, body = _rpc(c, "/mcp", LIST, Authorization=f"Bearer {_bearer('approver')}")
+    assert len(body["result"]["tools"]) == 8 and "박서연" in _rpc(c, "/mcp", INIT, Authorization=f"Bearer {_bearer('approver')}")[1]["result"]["instructions"]
     r, body = _rpc(c, "/mcp", INIT)
     assert r.status_code == 401 and body["code"] == "UNAUTHORIZED" and r.headers["www-authenticate"].startswith("Bearer")
     assert _rpc(c, "/mcp", INIT, Authorization="Bearer nope")[0].status_code == 401
@@ -211,12 +212,12 @@ def test_connect_page_local_without_mcp(fresh):
 
 def test_connect_page_deploy_shows_urls_and_tokens(deployed):
     c = deployed
-    c.cookies.set("demo_user", "E2001")                                    # 박서연 팀장: 결재자용 + 팀장 기안용 연결 2개
+    c.cookies.set("demo_user", "E2001")                                    # 박서연 팀장: 결재자용 연결 1개
     page = c.get("/connect").text
-    assert "/mcp/s3cret/approver" in page and "/mcp/s3cret/drafter-park" in page
-    assert _bearer("approver") in page and _bearer("drafter-park") in page and DRAFT_TOKEN not in page
-    assert page.count('class="is-me"') == 4                                # 주소 표 2줄 + 헤더 토큰 표 2줄
-    assert "approval_approver" in page and "approval_drafter_park" in page
+    assert "/mcp/s3cret/approver" in page and "/mcp/s3cret/drafter" in page and "drafter-park" not in page
+    assert _bearer("approver") in page and DRAFT_TOKEN not in page
+    assert page.count('class="is-me"') == 2                                # 주소 표 1줄 + 헤더 토큰 표 1줄
+    assert "approval_approver" in page
 
 
 def test_connect_page_presenter_pc(fresh):

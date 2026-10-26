@@ -116,7 +116,7 @@ def test_art3_top_position_cannot_submit(fresh):
 
 
 def test_art3_agreement_same_person_is_skipped(fresh):
-    doc = _submit_web("mtg01-mgmt-self")                                  # 송서준(경영지원팀) 대회의실
+    doc = _submit_web("mtg01-large", emp="E4017")                         # 송서준(경영지원팀)이 대회의실 (사례 목록에선 뺐지만 규칙은 그대로)
     assert [(s["name"], s["kind"]) for s in _line(doc)] == [("윤재민 팀장", "결재")]
 
 
@@ -230,10 +230,13 @@ def test_web_redraft_after_reject(fresh):
 
 def test_switch_users_grouped(fresh):
     users = S.employees_for_switch()
-    groups = {g: [u["emp_no"] for u in users if u["group"] == g] for g in ("기안자", "결재자")}
-    assert groups["기안자"][0] == "E3001" and {"E3002", "E3003", "E4017"} <= set(groups["기안자"])
-    assert {"E2001", "E1101", "E1001", "E2004"} <= set(groups["결재자"])
-    assert all(u["role"] == "approver" for u in users if u["group"] == "결재자")
+    groups = {g: [u["emp_no"] for u in users if u["group"] == g] for g in ("시연", "회의실 예약자")}
+    assert groups["시연"] == ["E3001", "E2001"]                            # 기안(김지훈)·결재(박서연) 두 사람만 기본
+    assert groups["회의실 예약자"] == ["E2003", "E2002", "E1001"]          # 시드 회의실 예약을 가진 사람 = 가위바위보 상대
+    import json
+    from core.config import get_settings
+    seeded = json.loads((get_settings().seed_dir / "rooms.json").read_text(encoding="utf-8"))["reservations"]
+    assert {r["emp_no"] for r in seeded} <= {u["emp_no"] for u in users}
 
 
 # ───────── 화면 양식 ─────────

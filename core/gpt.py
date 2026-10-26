@@ -1,7 +1,7 @@
 """`approval-server gpt`: ChatGPT 시연을 명령 하나로 띄운다.
 
 1) 전결 서버 + 웹 화면 (이미 켜져 있으면 그것을 쓴다)
-2) MCP 서버: 연결 전부(시연 기본 drafter·approver + 여러 사례용)를 한 포트에서 streamable HTTP로
+2) MCP 서버: 연결 두 개(drafter=김지훈, approver=박서연)를 한 포트에서 streamable HTTP로
    (http://127.0.0.1:8765/mcp/<비밀값>/<slug>, slug는 seed/connections.json)
 3) 터널(선택, --tunnel): cloudflared 또는 ngrok로 공개 HTTPS 주소를 받는다. ChatGPT '웹'에서 등록할 때만 필요하다.
    ChatGPT 데스크톱 앱(Work)의 'MCP 서버 추가'는 이 컴퓨터에서 바로 붙으므로 로컬 주소로 충분하다(10/20 실기 확인).

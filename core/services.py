@@ -1024,15 +1024,18 @@ def mark_notifications_read(ctx: Ctx, nid: int | None = None) -> None:
 
 
 # ───────────────────────── 화면용 조회 ─────────────────────────
-SWITCH_DRAFTERS = ["E3001", "E3002", "E3003", "E4017"]           # 김지훈 선임(시연), 정하늘 책임, 오세준 사원, 송서준 선임(경영지원팀)
-SWITCH_APPROVERS = ["E2001", "E1101", "E1001", "E2004", "E1102", "E1002", "E2002", "E2003"]
+# 사용자 전환 목록은 시연에 실제로 쓰는 사람만 둔다. 나머지 직원은 데이터(결재선·이력·대시보드)에만 있다.
+SWITCH_GROUPS = (
+    ("시연", ["E3001", "E2001"]),                         # 김지훈 선임(기안, GPT 연결) · 박서연 팀장(결재, GPT 연결)
+    ("회의실 예약자", ["E2003", "E2002", "E1001"]),         # 시연 전부터 회의실을 잡아 둔 사람: 가위바위보 상대
+)
 
 
 def employees_for_switch() -> list[dict]:
-    """화면 상단 사용자 전환 목록. 기안자 묶음과 결재자(직책자) 묶음. 직책자도 화면에서 기안할 수 있다."""
+    """화면 상단 사용자 전환 목록. 시연 두 사람과 회의실을 먼저 잡아 둔 사람(가위바위보 상대)만 보인다."""
     with db.session() as s:
         out = []
-        for group, people in (("기안자", SWITCH_DRAFTERS), ("결재자", SWITCH_APPROVERS)):
+        for group, people in SWITCH_GROUPS:
             for e in people:
                 emp = s.get(Employee, e)
                 if not emp:
