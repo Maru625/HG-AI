@@ -104,7 +104,17 @@ def render_error(request: Request, exc: ServiceError) -> HTMLResponse:
 @router.post("/switch-user")
 def switch_user(request: Request, emp_no: str = Form(...), next: str = Form("/")):
     r = RedirectResponse(next or "/", status_code=303)
-    r.set_cookie("demo_user", emp_no, samesite="lax")
+    r.set_cookie("demo_user", emp_no, samesite="lax", max_age=365 * 86400)
+    return r
+
+
+@router.get("/as/{emp_no}")
+def as_user(request: Request, emp_no: str, next: str = "/"):
+    """기기 세팅용 링크: 이 주소를 열면 그 사용자로 고정된다(북마크해 두면 기기마다 사용자가 정해짐)."""
+    if emp_no not in {u["emp_no"] for u in S.employees_for_switch()}:
+        return back("/", err=f"없는 사용자입니다: {emp_no}")
+    r = RedirectResponse(safe_next(next), status_code=303)
+    r.set_cookie("demo_user", emp_no, samesite="lax", max_age=365 * 86400)
     return r
 
 
@@ -463,6 +473,7 @@ def demo(request: Request):
     gpt = json.loads(gpt_file.read_text(encoding="utf-8")) if gpt_file.exists() else None
     from core import clock
     return page(request, "demo.html", conns=conns, settings=get_settings(), gpt=gpt, mcp=MCP_INFO or None,
+                devices=S.employees_for_switch(), base=get_settings().base_url,
                 locked=bool(os.environ.get("APPROVAL_ADMIN_KEY")), admin_ok=_admin_ok(request), flowing=clock.flowing())
 
 

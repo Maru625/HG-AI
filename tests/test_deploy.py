@@ -235,3 +235,12 @@ def test_connect_page_presenter_pc(fresh):
             assert "이 PC에서만 열림" in page
     finally:
         f.unlink()
+
+
+def test_device_setup_link(fresh):
+    with TestClient(create_app(start_ticker=False)) as c:
+        r = c.get("/as/E2003?next=/rooms", follow_redirects=False)
+        assert r.status_code == 303 and r.headers["location"] == "/rooms" and c.cookies.get("demo_user") == "E2003"
+        assert "문채원" in c.get("/").text
+        assert "err=" in c.get("/as/E9999", follow_redirects=False).headers["location"]
+        assert "/as/E2003" in c.get("/demo").text
