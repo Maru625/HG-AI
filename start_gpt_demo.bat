@@ -1,5 +1,5 @@
 @echo off
-rem ChatGPT demo launcher: approval server + MCP (HTTP, 2 connections on 127.0.0.1:8765)
+rem ChatGPT demo launcher: approval server + MCP (HTTP, all connections on 127.0.0.1:8765)
 rem ChatGPT desktop app connects to these local addresses directly. No public tunnel.
 rem Double-click this file. Keep the window open during the demo. Close it (or Ctrl+C) to stop.
 chcp 65001 >nul

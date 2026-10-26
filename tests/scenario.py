@@ -19,6 +19,7 @@ RECEIPTS = [
      "filename": "receipt_05_lunch_dup.png", "confidence": 0.94},
 ]
 KEPT = RECEIPTS[:4]                      # 중복(5번)을 뺀 증빙
+BLURRY_SEQ = 4                           # 흐린 영수증(판독 신뢰도 0.62) → 확인 ② 때 원본 대조 확인(제22조)
 LODGING_REASON = "행사장 근처 숙소가 거의 만실이라 별빛호텔을 이용함"
 TRIP = {"trip_start": "2026-11-04", "trip_end": "2026-11-06"}
 
@@ -86,7 +87,9 @@ def run_drafter(call, *, until: str = "submitted") -> dict:
     ids = [r["doc_id"] for r in out["save1"]["results"]]
     out["doc_ids"] = ids
     out["submit_before_confirm"] = call("submit_drafts", doc_ids=ids[:1])
-    out["confirm"] = call("confirm_drafts", doc_ids=ids)
+    # 제22조: 흐린 영수증(증빙 4번)은 기안자가 원본과 대조했다고 답해야 확인된다
+    out["confirm_without_original_check"] = call("confirm_drafts", doc_ids=ids[:1])
+    out["confirm"] = call("confirm_drafts", doc_ids=ids, original_checked={ids[0]: [BLURRY_SEQ]})
     if until == "confirmed":
         return out
     out["submit"] = call("submit_drafts", doc_ids=ids)

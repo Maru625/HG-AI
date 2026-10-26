@@ -24,7 +24,11 @@
 {%- else -%}{{ v if v not in (None, '') else '—' }}{%- endif -%}
 {%- endmacro %}
 
-{% macro steps(line) -%}
+{% macro due(x) -%}
+{%- if x -%}<span class="due {{ 'over' if x.overdue else ('soon' if x.bdays_left is number and x.bdays_left <= 1 else '') }}" title="제4조: 결재 차례가 온 날부터 3영업일 안에 처리">{{ x.label }}</span>{%- endif -%}
+{%- endmacro %}
+
+{% macro steps(line, basis=false) -%}
 {% if line %}
 <ol class="steps">
   {% for s in line %}
@@ -32,7 +36,10 @@
     <span class="step-who">{{ s.name }}</span>
     <span class="step-kind">{{ s.kind }}{% if s.level != '합의' %} · {{ s.level }}{% endif %}</span>
     <span class="step-st">{{ s.status_label }}{% if s.acted_at %} · {{ s.acted_at|hm }}{% endif %}</span>
+    {% if s.due %}<span class="step-due">{{ due(s.due) }}</span>{% endif %}
+    {% if s.delay_reason %}<span class="step-delay">처리 지연 알림: “{{ s.delay_reason }}”{% if s.delay_until %} · 처리 예정 {{ s.delay_until }}{% endif %}</span>{% endif %}
     {% if s.comment %}<span class="step-comment">“{{ s.comment }}”</span>{% endif %}
+    {% if basis and s.basis %}<span class="step-basis">{{ s.basis }}</span>{% endif %}
   </li>
   {% endfor %}
 </ol>

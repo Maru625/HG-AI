@@ -3,6 +3,7 @@
 - 긴급 결재가 들어오면 즉시 알린다. 알림에는 결재할 차례인 문서 전체를 중요도순으로 묶는다.
 - 긴급이 없으면 정해진 시각(기본 09:00, 14:00)에 묶어서 알린다. 대기 문서가 없으면 보내지 않는다.
 - 같은 문서로 즉시 알림을 두 번 보내지 않는다. 중요도가 긴급으로 올라간 경우에만 다시 알린다.
+- 기안자에게는 결재 결과(RESULT: 최종 승인·반려)와 처리 지연 사유(DELAY, 제4조)를 알린다.
 """
 from __future__ import annotations
 
@@ -30,10 +31,14 @@ def briefing(s: Session, approver: str, now: dt.datetime) -> list[dict]:
         started = (st.started_at if st and st.started_at else d.submitted_at) or ""
         waited = clock.bdays_until(dt.datetime.fromisoformat(started).date(), now.date(), clock.holidays(s)) if started else 0
         drafter = s.get(Employee, d.drafter)
+        due = review.step_due(s, d, st, now) or {}
         rows.append({"doc_id": d.id, "doc_no": d.doc_no, "process_id": d.process_id,
                      "process_name": regulations.get(s, d.process_id)["name"], "title": doc_title(s, d),
                      "drafter": {"emp_no": d.drafter, "name": drafter.name if drafter else d.drafter},
                      "amount": _amount(s, d), "submitted_at": d.submitted_at, "waiting_bdays": waited,
+                     "due_date": due.get("due"), "overdue": bool(due.get("overdue")), "due_label": due.get("label"),
+                     "step_kind": st.kind if st else None,
+                     "delay_reason": st.delay_reason if st else None,
                      "importance": level, "importance_reasons": reasons, "caution_count": len(review.cautions(s, d)),
                      "ai_written": d.created_via == "MCP" or d.updated_via == "MCP"})
     rows.sort(key=lambda r: (review.LEVEL_ORDER[r["importance"]], -r["waiting_bdays"], r["submitted_at"] or ""))
@@ -65,6 +70,15 @@ def check_urgent(s: Session, approvers: set[str], now: dt.datetime, trigger: str
         titles = ", ".join(r["title"] for r in new_urgent[:3])
         made.append(_create(s, ap, "IMMEDIATE", rows, f"{trigger}: 긴급 {len(new_urgent)}건 ({titles})", now))
     return made
+
+
+def notify_drafter(s: Session, d: Document, kind: str, trigger: str, now: dt.datetime, comment: str | None = None,
+                   until: str | None = None) -> Notification:
+    """기안자 알림. kind: RESULT(최종 승인·반려·합의 거부) / DELAY(처리 지연 사유와 처리 예정일, 제4조)."""
+    from .services import STATUS_LABEL, doc_title  # 순환 참조 방지
+    row = {"doc_id": d.id, "doc_no": d.doc_no, "process_id": d.process_id, "title": doc_title(s, d),
+           "status": d.status, "status_label": STATUS_LABEL.get(d.status, d.status), "comment": comment, "until": until}
+    return _create(s, d.drafter, kind, [row], trigger, now)
 
 
 def all_approvers_with_pending(s: Session) -> set[str]:

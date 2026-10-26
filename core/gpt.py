@@ -1,7 +1,8 @@
 """`approval-server gpt`: ChatGPT 시연을 명령 하나로 띄운다.
 
 1) 전결 서버 + 웹 화면 (이미 켜져 있으면 그것을 쓴다)
-2) MCP 서버: 기안자용·결재자용 연결을 한 포트에서 streamable HTTP로 (http://127.0.0.1:8765/mcp/<비밀값>/drafter|approver)
+2) MCP 서버: 연결 전부(시연 기본 drafter·approver + 여러 사례용)를 한 포트에서 streamable HTTP로
+   (http://127.0.0.1:8765/mcp/<비밀값>/<slug>, slug는 seed/connections.json)
 3) 터널(선택, --tunnel): cloudflared 또는 ngrok로 공개 HTTPS 주소를 받는다. ChatGPT '웹'에서 등록할 때만 필요하다.
    ChatGPT 데스크톱 앱(Work)의 'MCP 서버 추가'는 이 컴퓨터에서 바로 붙으므로 로컬 주소로 충분하다(10/20 실기 확인).
 4) 등록할 주소를 화면에 보여주고 data/gpt_connect.json에 남긴다(시연 제어 패널에도 보임)
@@ -107,7 +108,7 @@ def _box(lines: list[str]) -> str:
 
 
 async def run(args) -> int:
-    from mcp_server.http_multi import build_app, load_connections, load_or_create_secret
+    from mcp_server.http_multi import bearer_token, build_app, conn_name, conn_slug, load_connections, load_or_create_secret
 
     st = get_settings()
     out_file = st.db_path.parent / "gpt_connect.json"
@@ -124,14 +125,29 @@ async def run(args) -> int:
             seed_loader.reset(st.seed_dir)
         servers.append(uvicorn.Server(uvicorn.Config(create_app(), host=st.host, port=st.port, log_level="warning")))
 
-    # 2) MCP (연결 2개, 한 포트)
+    # 2) MCP (연결 전부, 한 포트)
     secret = load_or_create_secret(st.db_path.parent / "mcp_secret.txt", args.secret)
     conns = load_connections(st.seed_dir)
     app, paths = build_app(st.base_url, conns, secret, check_host=False)
     if _port_open("127.0.0.1", args.mcp_port):
-        print(f"[오류] MCP 포트 {args.mcp_port}을 다른 프로그램이 쓰고 있습니다. --mcp-port로 바꾸세요.")
+        ours = False
+        try:
+            import httpx
+            ours = "approval-demo MCP ok" in httpx.get(f"http://127.0.0.1:{args.mcp_port}/healthz", timeout=2).text
+        except Exception:
+            pass
+        if ours:
+            print(f"[알림] 이 시연의 MCP 서버가 이미 {args.mcp_port} 포트에서 실행 중입니다(이전 창이 아직 살아 있음).")
+            print("  그대로 써도 시연은 됩니다. 주소는 같습니다:")
+            for c in conns:
+                print(f"    {conn_name(c)}: http://127.0.0.1:{args.mcp_port}{paths[conn_slug(c)]}")
+            print("  새로 띄우려면 이전 검은 창을 닫거나, 작업 관리자에서 approval-server.exe·cloudflared.exe를 끝낸 뒤 다시 실행하세요.")
+        else:
+            print(f"[오류] MCP 포트 {args.mcp_port}을 다른 프로그램이 쓰고 있습니다. --mcp-port로 바꾸세요.")
         return 2
-    servers.append(uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=args.mcp_port, log_level="warning")))
+    lan = os.environ.get("APPROVAL_LAN_IP") if getattr(args, "lan", False) else None
+    servers.append(uvicorn.Server(uvicorn.Config(app, host="0.0.0.0" if lan else "127.0.0.1", port=args.mcp_port,
+                                                 log_level="warning")))
 
     # 3) 터널
     tunnel = None
@@ -161,21 +177,40 @@ async def run(args) -> int:
         local = f"http://127.0.0.1:{args.mcp_port}"
         info = {"created": time.strftime("%Y-%m-%d %H:%M:%S"), "tunnel": tunnel.kind if tunnel else None,
                 "public": bool(public), "web": st.base_url,
-                "connections": [{"mode": c["mode"], "label": c.get("label", ""), "local_url": local + paths[c["mode"]],
-                                 "url": (public + paths[c["mode"]]) if public else None} for c in conns]}
+                "token_url": local + "/mcp", "public_token_url": (public + "/mcp") if public else None,
+                "connections": [{"mode": c["mode"], "slug": conn_slug(c), "name": conn_name(c), "label": c.get("label", ""),
+                                 "default": i < 2, "local_url": local + paths[conn_slug(c)],
+                                 "bearer": bearer_token(secret, conn_slug(c)),
+                                 "lan_url": f"http://{lan}:{args.mcp_port}{paths[conn_slug(c)]}" if lan else None,
+                                 "url": (public + paths[conn_slug(c)]) if public else None} for i, c in enumerate(conns)]}
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding="utf-8")
         lines = ["ChatGPT 시연 준비 완료", "",
                  f"웹 화면(발표 PC 브라우저): {st.base_url}", "",
                  "ChatGPT 데스크톱 앱: 설정 > 플러그인 > 추가 > MCP 서버 추가 > 스트리밍 가능한 HTTP"]
         for c in info["connections"]:
-            lines.append(f"  [{c['label'] or c['mode']}] 이름 approval_{c['mode']}")
-            lines.append(f"    {c['local_url']}")
+            if c["default"]:
+                lines.append(f"  [{c['label'] or c['mode']}] 이름 {c['name']}")
+                lines.append(f"    {c['local_url']}")
+        extra = [c for c in info["connections"] if not c["default"]]
+        if extra:
+            lines += ["", "여러 사례용 추가 연결 (필요한 것만 등록. 대화마다 연결은 하나만 켠다):"]
+            for c in extra:
+                lines.append(f"  [{c['label']}] 이름 {c['name']}")
+                lines.append(f"    {c['local_url']}")
+        if lan:
+            lines += ["", f"같은 와이파이의 다른 PC: 웹 화면 {st.base_url}  (AI 연결 주소는 웹의 'AI 연결' 메뉴)"]
+            for c in info["connections"]:
+                if c["default"]:
+                    lines.append(f"  [{c['label'] or c['mode']}] {c['lan_url']}")
+            if not os.environ.get("APPROVAL_SITE_KEY"):
+                lines.append("  [주의] 입장 코드(APPROVAL_SITE_KEY)가 없어 같은 망의 누구나 화면을 열 수 있습니다.")
         if public:
             lines += ["", "ChatGPT 웹(Plugins > Add custom MCP server)용 공개 주소:"]
             for c in info["connections"]:
                 lines.append(f"  [{c['label'] or c['mode']}] {c['url']}")
         lines += ["", "인증: 없음 — 주소 안의 비밀값이 토큰 역할. 비밀값은 data/mcp_secret.txt에 남아 재시작해도 같다.",
+                  f"(헤더 토큰 방식) {info['token_url']} + Authorization: Bearer <헤더 토큰> — 토큰은 시연 제어 패널",
                   "이 창을 닫으면 연결이 끊긴다. 시연이 끝나면 Ctrl+C로 닫는다."]
         print(_box(lines), flush=True)
 

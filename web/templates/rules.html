@@ -2,7 +2,9 @@
 {% block title %}전결 규정{% endblock %}
 {% block content %}
 <div class="pagehead"><h1>전결 규정 <span class="muted small">샘플테크 전결 규정(가상)</span></h1>
-  <p class="sub">AI는 MCP의 search_rules, get_process_spec으로 이 규정을 읽습니다. 결재선과 검증은 서버가 이 규정으로 계산합니다.</p></div>
+  <p class="sub">AI는 MCP의 search_rules, get_process_spec으로 이 규정을 읽습니다. 결재선과 검증은 서버가 이 규정으로 계산합니다.
+    조항마다 이 시스템이 무엇으로 대응하는지와, <a href="/new">새 기안</a>에서 바로 해 볼 수 있는 사례를 붙였습니다.</p></div>
+<nav class="chips" aria-label="조항으로 가기">{% for a in rules.articles %}<a class="chip-link" href="#art-{{ a.id }}">{{ a.id }}</a>{% endfor %}</nav>
 
 <h2>처리 프로세스 {{ rules.processes|length }}종</h2>
 <div class="grid2">
@@ -24,11 +26,19 @@
 {% endfor %}
 </div>
 
-<h2 class="mt">조항</h2>
+<h2 class="mt">조항과 이 시스템의 대응</h2>
 {% for a in rules.articles %}
 <div class="article" id="art-{{ a.id }}">
   <h3>{{ a.id }} {{ a.title }} {% for pid in a.processes %}<a class="badge" href="#{{ pid }}">{{ pid }}</a>{% endfor %}</h3>
   <p>{{ a.body }}</p>
+  {% if a.features %}
+  <ul class="feats">
+  {% for f in a.features %}
+    <li><span class="how">{{ f.how }}</span> <span>{{ f.text }}</span>
+      {% if f.cases %}<div class="feat-cases">해 보기: {% for c in f.cases %}<a class="case-link" href="/new/{{ c.process_id }}?case={{ c.id }}">{{ c.label }}{% if c.user_label %} <span class="muted">({{ c.user_label }})</span>{% endif %}</a>{% endfor %}</div>{% endif %}</li>
+  {% endfor %}
+  </ul>
+  {% endif %}
 </div>
 {% endfor %}
 {% endblock %}

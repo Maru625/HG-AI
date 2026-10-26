@@ -10,7 +10,7 @@ AI 서비스(Claude Desktop, ChatGPT 등)를 그대로 쓰고, MCP로 연결한 
 | 프로그램 | 폴더 | 하는 일 |
 |---|---|---|
 | P1 전결 코어 | `core/` | 규정·검증·결재선·상태·알림·감사 기록. REST API(`/api`) |
-| P3 웹 화면 | `web/` | 대시보드, 작업 계획, 임시저장함, 결재함·결재 검토, 회의실, 규정, 작업 기록, 시연 제어 패널 |
+| P3 웹 화면 | `web/` | 대시보드, 새 기안(화면에서 직접 작성·규정 사례), 작업 계획, 임시저장함, 결재함·결재 검토, 회의실, 규정, 작업 기록, 시연 제어 패널 |
 | P2 MCP 서버 | `mcp_server/` | AI 서비스가 부르는 툴(기안자용 14개 / 결재자용 읽기 8개). 판정 없이 REST API를 부른다. stdio(Claude Desktop)와 HTTP(ChatGPT, `http_multi.py`) |
 | P4 생성기 | `seedgen/` | 더미 규정·조직·이력·대시보드 데이터·시연 자료(영수증 5장, 메모)·과제 엑셀 |
 
@@ -18,8 +18,10 @@ AI 서비스(Claude Desktop, ChatGPT 등)를 그대로 쓰고, MCP로 연결한 
 AI 서비스 ──MCP(stdio 또는 streamable HTTP)──▶ approval-mcp ──REST──▶ approval-server (전결 코어 + 웹 화면) ◀── 브라우저
 ```
 
-- 판정(결재선, 한도, 중복, 중요도)은 전결 서버만 한다. AI는 서버 결과를 따른다.
-- 사람 확인 3번: ① 작업 계획 승인 ② 초안 확인 ③ 상신. 승인·반려는 **웹 화면에서만** 한다(MCP·REST에 없음).
+- 판정(결재선, 한도, 중복, 시점, 첨부, 중요도, 처리 기한)은 전결 서버만 한다. AI는 서버 결과를 따른다.
+- 사람 확인 3번: ① 작업 계획 승인 ② 초안 확인(판독이 흐린 영수증은 원본 대조 표시 포함) ③ 상신. 승인·반려와 처리 지연 알림은 **웹 화면에서만** 한다(MCP·REST에 없음).
+- 규정 조항마다 대응 기능과 해 볼 수 있는 사례(45개)가 있다: 웹 '새 기안', '규정' 화면, [08 규정 대응표](docs/specs/08_규정_대응표.md).
+- 재미 기능: 겹치는 시간에 회의실을 신청하면 기존 예약자와 **가위바위보**로 자리를 다툴 수 있다(두 사람 화면에 대결 창). 시연 제어 패널에서 끌 수 있다.
 
 ## 2. 준비물 (Windows 기준)
 
@@ -44,30 +46,54 @@ uv run approval-server           # 전결 서버 + 웹 화면: http://localhost:
 - 끄려면 `Ctrl+C`. 시연을 처음부터 다시 하려면 웹의 **시연 제어 패널(`/demo`) → 처음 상태로 초기화**.
 - 포트를 바꾸려면 `.env`에 `APPROVAL_PORT=8010` (`.env.example` 참고).
 
-## 4. ChatGPT로 시연 (원격, 권장 방식)
+## 4. ChatGPT로 시연 (권장)
 
-[사실] ChatGPT는 공개 HTTPS 주소의 MCP 서버에만 연결하고, 노트북의 로컬 서버에는 바로 붙지 못합니다. 쓰기 툴까지 쓰는 사용자 지정 MCP는 Business·Enterprise/Edu 워크스페이스에서 열려 있고, Business는 관리자·소유자만 만들 수 있습니다. Pro는 읽기·조회 권한으로만 연결됩니다. ([OpenAI 도움말](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt))
-[해석] 기안 흐름(계획·저장·확인·상신)은 쓰기 툴이라, 개인 Plus/Pro 계정에서는 막힐 수 있습니다. 실제 계정에서 먼저 확인하세요. (OpenAI [개발자 문서](https://developers.openai.com/api/docs/guides/developer-mode)는 Plus·Pro도 개발자 모드를 쓸 수 있다고 적고 있어 도움말과 다릅니다.)
+### 4.1 ChatGPT 데스크톱 앱 — 터널 없이 (10/20 실기 확인)
 
-1. 터널 프로그램 cloudflared를 프로젝트의 `tools` 폴더에 받습니다(한 번만, [Cloudflare 내려받기 문서](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/)).
+[사실·실기] Windows용 ChatGPT 데스크톱 앱의 설정 › 플러그인 › 추가 › **MCP 서버 추가**는 STDIO와 스트리밍 가능한 HTTP를 받고, 이 컴퓨터에서 바로 연결합니다. 10/20 개인 계정으로 `http://127.0.0.1:8765/…` 주소를 등록해 Work 모드에서 툴 호출까지 확인했습니다. 공식 문서 출처는 찾지 못했습니다.
+
+1. 프로젝트 폴더의 **`start_gpt_demo.bat`을 더블클릭**합니다. 시드를 초기화하고 전결 서버(8000)와 MCP 서버(8765, 연결 8개 — 시연 기본 2개 + 여러 사례용 6개)를 띄운 뒤, 등록할 주소를 보여줍니다. 시연 제어 패널(`/demo`)에도 보입니다. 창을 닫으면 끊깁니다.
+2. ChatGPT 데스크톱 앱 › 설정 › 플러그인 › 추가 › MCP 서버 추가 › **스트리밍 가능한 HTTP**로 두 개를 등록합니다(한 번만).
+   - 이름 `approval_drafter`, URL `http://127.0.0.1:8765/mcp/<비밀값>/drafter`
+   - 이름 `approval_approver`, URL `http://127.0.0.1:8765/mcp/<비밀값>/approver`
+   - 비밀값은 `data\mcp_secret.txt`에 한 번 만들어져 다시 실행해도 같습니다.
+3. Work 대화에서 첫 메시지에 어느 연결로 할지 말합니다(“기안자 연결(approval_drafter)로 …”). 두 연결이 모든 대화에 함께 켜져 있기 때문입니다.
+
+- 초기화 없이 켜려면: `.venv\Scripts\approval-server.exe gpt`
+- 시연 순서: Claude 문서 「목업 전결 시연 순서 (ChatGPT)」, 자세한 대본: `docs/specs/01_시연_대본.md`
+- 10/23부터 확인 ② 때 흐린 영수증(④ 은행동 칼국수)은 원본 대조를 확인합니다. 대화로 확인하면 AI가 "원본과 맞나요?"라고 묻고, 화면으로 확인하면 임시저장함의 체크 칸에 표시한 뒤 [내용 확인]을 누릅니다. **`confirm_drafts`의 입력이 바뀌었으니 ChatGPT에서 연결의 툴 목록을 한 번 새로 고칩니다**(연결 설정에서 새로 고침, 또는 삭제 후 다시 추가).
+
+### 4.3 여러 사례용 연결 (선택, 10/23)
+
+규정 사례를 AI 대화로도 해 보려면 필요한 연결만 더 등록합니다. 주소는 시연 기본 연결과 비밀값이 같고 끝만 다릅니다. 대화마다 연결은 하나만 켭니다.
+
+| 이름 | 주소 끝 | 사용자 | 쓰임 |
+|---|---|---|---|
+| `approval_drafter_jung` | `/drafter-jung` | 정하늘 책임 (기안자용) | 숙박비 상한 12만 원(책임) |
+| `approval_drafter_park` | `/drafter-park` | 박서연 팀장 (기안자용) | 팀장이 기안 → 실장 결재(제3조) |
+| `approval_drafter_song` | `/drafter-song` | 송서준 선임 (기안자용) | 다른 팀(경영지원팀) 결재선 |
+| `approval_approver_lee` | `/approver-lee` | 이도현 실장 (결재자용) | 실장 결재 대기 조회 |
+| `approval_approver_choi` | `/approver-choi` | 최민준 본부장 (결재자용) | 본부장 결재 대기 조회 |
+| `approval_approver_yoon` | `/approver-yoon` | 윤재민 팀장 (결재자용) | 경영지원팀 합의 대기 조회 |
+
+- 시연 기본 두 주소(`/drafter`, `/approver`)는 바뀌지 않았습니다.
+- 화면만으로 해 보려면 연결 없이 웹 상단 **새 기안**에서 사례를 고르고, 오른쪽 위 사용자 전환으로 결재자를 바꿔 가며 처리합니다.
+
+### 4.2 ChatGPT 웹 — 공개 터널 필요 (예비)
+
+[사실] ChatGPT 웹은 공개 HTTPS 주소의 MCP 서버에만 연결합니다. 쓰기 툴까지 쓰는 사용자 지정 MCP는 Business·Enterprise/Edu 워크스페이스에서 열려 있고, Business는 관리자·소유자만 만들 수 있습니다. Pro는 읽기·조회 권한으로만 연결됩니다. ([OpenAI 도움말](https://help.openai.com/en/articles/12584461-developer-mode-apps-and-full-mcp-connectors-in-chatgpt)) OpenAI [개발자 문서](https://developers.openai.com/api/docs/guides/developer-mode)는 Plus·Pro도 개발자 모드를 쓸 수 있다고 적고 있어 도움말과 다릅니다.
+
+1. cloudflared를 `tools\cloudflared.exe`로 받습니다([Cloudflare 내려받기 문서](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/)).
    ```powershell
    mkdir tools
    Invoke-WebRequest -Uri https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe -OutFile tools\cloudflared.exe
    ```
-2. 한 명령으로 전결 서버 + MCP 서버(기안자용·결재자용 연결 2개, 한 포트) + 터널을 띄웁니다.
-   ```powershell
-   uv run approval-server reset
-   uv run approval-server gpt
-   ```
-   화면에 ChatGPT에 등록할 주소 2개(`https://….trycloudflare.com/mcp/<비밀값>/drafter`, `…/approver`)가 나옵니다. 시연 제어 패널(`/demo`)에도 보입니다. 이 창을 닫으면 연결이 끊깁니다.
-3. ChatGPT → Plugins → + → **Add custom MCP server**(이전 화면: 설정 → 앱 → Create app)에서 앱 2개를 등록합니다. 인증은 **No authentication**. 주소 안의 비밀값이 토큰 역할을 합니다.
-4. 대화에서는 메시지마다 `@앱 이름`을 붙입니다. ChatGPT에서 앱 선택은 그 메시지에만 적용됩니다(같은 도움말).
+2. `start_gpt_demo.bat --tunnel cloudflared` (또는 `uv run approval-server gpt --tunnel cloudflared`) → 공개 주소 2개(`https://….trycloudflare.com/mcp/<비밀값>/drafter`, `…/approver`)가 함께 나옵니다.
+3. ChatGPT 웹 → Plugins → + → **Add custom MCP server**에 등록합니다. 인증은 No authentication. 대화에서는 메시지마다 `@앱 이름`을 붙입니다(앱 선택은 그 메시지에만 적용, 같은 도움말).
 
-- 빠른 터널(trycloudflare)은 계정이 필요 없지만 테스트용이고, 실행할 때마다 주소가 바뀝니다. 바뀌면 ChatGPT 앱의 주소를 고치고 새로고침합니다. 비밀값은 `data/mcp_secret.txt`에 남아 그대로 씁니다.
-- [사실] 빠른 터널은 SSE를 지원하지 않습니다([Cloudflare 문서](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)). 그래서 이 모드의 MCP 서버는 응답을 JSON 한 덩어리로 보내고 세션을 두지 않습니다.
-- 주소가 바뀌지 않게 하려면 ngrok 고정 도메인을 씁니다: `uv run approval-server gpt --tunnel ngrok --ngrok-domain <도메인>`.
-- 공개 주소를 열지 않는 대안은 OpenAI Secure MCP Tunnel입니다. OpenAI Platform 조직의 터널 권한과 API 키가 필요합니다([문서](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels)).
-- **시연이 끝나면 Ctrl+C로 터널과 서버를 닫습니다.** 회사 보안 정책을 먼저 확인하세요(설계서 12장).
+- 빠른 터널은 테스트용이고 실행할 때마다 주소가 바뀝니다. [사실] SSE를 지원하지 않아([Cloudflare 문서](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/)) 이 모드의 MCP 서버는 JSON 응답·세션 없음으로 동작합니다.
+- 고정 주소: `--tunnel ngrok --ngrok-domain <도메인>`. 공개 노출 없는 대안: OpenAI Secure MCP Tunnel([문서](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels)).
+- **시연이 끝나면 창을 닫아 터널을 닫습니다.** 회사 보안 정책을 먼저 확인하세요(설계서 12장).
 
 ## 5. Claude Desktop으로 시연 (로컬, 예비)
 
@@ -110,12 +136,15 @@ uv run approval-server           # 전결 서버 + 웹 화면: http://localhost:
 | `uv run approval-server` | 전결 서버 + 웹 화면 실행 (DB가 없으면 먼저 초기화) |
 | `uv run approval-server reset` | DB 초기화, 시드 적재, 시연 시계 처음으로 |
 | `uv run approval-server connections` | MCP 연결 토큰과 Claude Desktop 설정 예 |
-| `uv run approval-server gpt` | ChatGPT 시연: 전결 서버 + MCP(HTTP, 연결 2개) + 터널, 등록할 주소 출력 |
+| `start_gpt_demo.bat` (더블클릭) | ChatGPT 시연: 초기화 + 전결 서버 + MCP(HTTP, 연결 8개), 등록할 주소 출력 |
+| `uv run approval-server gpt [--tunnel cloudflared]` | 위와 같고 초기화 없음. `--tunnel`이면 ChatGPT 웹용 공개 주소도 |
+| `start_lan_demo.bat` (더블클릭) | 위와 같고 **같은 와이파이의 다른 PC**도 접속(`gpt --lan`). 웹 `http://<이 PC IP>:8000`, 연결 주소는 'AI 연결' 메뉴 |
+| `uv run approval-server deploy [--port 8000]` | 서버 배포용: 웹·REST·MCP를 포트 하나로 (11장) |
 | `uv run approval-mcp` | MCP 서버(stdio). 보통 Claude Desktop이 직접 띄운다 |
 | `uv run approval-seed build` | 시드와 시연 자료를 다시 만든다 (seed 고정: 같은 결과) |
-| `uv run approval-seed check` | 시드 검사 14개 |
+| `uv run approval-seed check` | 시드 검사 15개 |
 | `uv run python -m mcp_server.export_spec` | MCP 툴 명세 문서를 코드에서 다시 만든다 |
-| `uv run pytest` | 자동 시험 32개 (임시 DB 사용) |
+| `uv run pytest` | 자동 시험 70개 (임시 DB 사용) |
 
 ## 8. 문서
 
@@ -127,7 +156,9 @@ uv run approval-server           # 전결 서버 + 웹 화면: http://localhost:
 | [04 MCP 툴 명세](docs/specs/04_MCP_툴_명세.md) | 코드에서 생성. 서버 지침, 연결별 툴, 입력 스키마 |
 | [05 화면 명세](docs/specs/05_화면_명세.md) | 화면별 내용, 자동 갱신, 알림, 강조·접근성 |
 | [06 지표·더미 데이터](docs/specs/06_지표_더미데이터.md) | 과제 데이터 파일, 대시보드 지표 계산, 결정성 |
-| [07 시험 케이스](docs/specs/07_시험_케이스.md) | 설계서 시험 케이스 10종과 시험 함수, 상태 전이 확인 |
+| [07 시험 케이스](docs/specs/07_시험_케이스.md) | 설계서 시험 케이스 10종과 시험 함수, 상태 전이 확인, 규정 대응 시험 |
+| [08 규정 대응표](docs/specs/08_규정_대응표.md) | 조항별 대응 기능, 해 볼 사례 45개, 해석으로 정한 것, 10/23 바뀐 점 |
+| [09 서버 배포 준비](docs/specs/09_배포_준비.md) | 배포하면 달라지는 점, 실행·환경 변수, AI 서비스별 MCP 붙이기, 사용자 구분, 보안 점검 |
 
 ## 9. 폴더
 
@@ -139,8 +170,10 @@ approval-demo/
 ├─ seedgen/       P4 생성기 (source/*.yaml이 원본)
 ├─ seed/          생성된 시드 (규정, 조직, 이력, 대시보드 CSV, 과제 엑셀)
 ├─ demo_inputs/   시연 때 AI에 올리는 자료
-├─ docs/specs/    명세 문서 01~07
+├─ docs/specs/    명세 문서 01~09
+├─ deploy/        서버 배포 묶음 (docker compose + Caddy: HTTPS까지)
 ├─ tests/         자동 시험 (scenario.py = 대본의 AI 호출 값)
+├─ Dockerfile     배포 이미지 (웹·REST·MCP 한 포트)
 └─ data/          실행 중 DB (git 제외)
 ```
 
@@ -149,3 +182,22 @@ approval-demo/
 `docs/screens/`에 시연 대본대로 MCP 클라이언트로 진행한 상태의 화면 캡처 8장이 있습니다(1366px).
 홈 대시보드, 작업 계획, 임시저장함 초안, 결재함과 긴급 알림, 결재 검토(주의 강조), 회의실 가예약, 작업 기록, 시연 제어 패널.
 지금 화면은 기능 확인용 기본 디자인이며, 화면 디자인 작업(D2) 시안이 오면 `web/templates`와 `web/static/app.css`만 바꾸면 됩니다.
+
+## 11. 서버에 배포 (준비, 10/23)
+
+여러 사람이 쓰도록 서버 한 대에 올릴 때는 `deploy`로 실행합니다. 웹 화면·REST API·MCP가 **포트 하나**에 함께 열립니다.
+배포 뒤에도 **ChatGPT + MCP만** 씁니다(10/23 결정). 참가자는 웹의 **AI 연결**(`/connect`) 화면에서 주소를 복사해 각자 ChatGPT 데스크톱 앱에 등록합니다.
+자세한 내용(서비스별 MCP 붙이기, 사용자 구분, 보안 점검, 보류한 안): [09 서버 배포 준비](docs/specs/09_배포_준비.md).
+
+```bash
+APPROVAL_BASE_URL=https://demo.example.com APPROVAL_MCP_SECRET=<임의 문자열> \
+APPROVAL_ADMIN_KEY=<운영자 키> APPROVAL_SITE_KEY=<입장 코드> APPROVAL_CLOCK_FLOW=frozen \
+uv run approval-server deploy --port 8000
+# 또는: docker build -t approval-demo . && docker run -p 8000:8000 -v approval-data:/app/data -e APPROVAL_BASE_URL=... approval-demo
+# 서버(VM) 한 대 + 도메인이면 HTTPS까지: cd deploy && cp .env.example .env (값 채우기) && docker compose up -d --build
+```
+
+- MCP 주소: `https://<공개 주소>/mcp/<비밀값>/<slug>` (연결 8개), 또는 `https://<공개 주소>/mcp` + 헤더 `Authorization: Bearer <헤더 토큰>`. 주소와 헤더 토큰은 시연 제어 패널에 나옵니다.
+- 사용자 구분은 지금처럼 **화면에서 고른 사용자**입니다(로그인 없음). MCP는 연결마다 사용자가 고정됩니다.
+- 배포 모드에서 REST API는 서버 안 MCP 툴만 부를 수 있고, 시연 제어는 운영자 키, 웹 화면은 (선택) 입장 코드로 잠급니다.
+- HTTPS는 앞단(클라우드 플랫폼·프록시)이 붙입니다. 시연이 끝나면 서버를 내리거나 `APPROVAL_MCP_SECRET`을 바꿉니다.

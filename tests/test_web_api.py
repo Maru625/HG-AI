@@ -72,7 +72,8 @@ def test_api_links_point_to_screens(client):
 
 # ───────── 웹 화면 ─────────
 PAGES = ["/", "/plans", "/drafts", "/inbox", "/inbox?view=drafter", "/rooms", "/rules", "/audit", "/demo",
-         "/partials/notifications"]
+         "/partials/notifications", "/new", "/new/EXP-01", "/new/EXP-02?case=exp02-lodging", "/new/RPT-01?case=rpt01-missing",
+         "/new/PUR-01?case=pur01-division", "/new/MTG-01?case=mtg01-weekend"]
 
 
 def test_pages_render_for_both_roles(client):
@@ -91,8 +92,12 @@ def test_full_flow_on_screens(client):
     assert "PLAN-001" in c.get("/plans").text
     page = c.get(f"/plans/{plan_id}").text
     assert "제외 제안" in page and "증빙 3 한도 초과 사유" in page
-    # 확인 ② 화면에서
-    r = c.post(f"/drafts/{ids[0]}/confirm", follow_redirects=False)
+    # 확인 ② 화면에서. 흐린 영수증(증빙 4번)은 원본 대조 표시가 있어야 한다(제22조)
+    page = c.get(f"/drafts/{ids[0]}").text
+    assert 'name="original_checked" value="4"' in page
+    r = c.post(f"/drafts/{ids[0]}/confirm", headers={"referer": f"http://testserver/drafts/{ids[0]}"}, follow_redirects=False)
+    assert r.status_code == 303 and "err=" in r.headers["location"]
+    r = c.post(f"/drafts/{ids[0]}/confirm", data={"original_checked": "4"}, follow_redirects=False)
     assert r.status_code == 303 and "msg=" in r.headers["location"]
     assert "확인완료" in c.get(f"/drafts/{ids[0]}").text
     for d in ids[1:]:

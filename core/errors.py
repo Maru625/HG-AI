@@ -1,7 +1,7 @@
 """오류 형식 통일: ok, code, message, fix_hint (설계서 6.4)."""
 from __future__ import annotations
 
-# 설계서 6.4 오류 코드 초안 11개 + 구현에 필요해 더한 일반 코드 5개(★)
+# 설계서 6.4 오류 코드 초안 11개 + 구현에 필요해 더한 코드 6개(★)
 ERROR_CODES: dict[str, tuple[int, str]] = {
     "UNKNOWN_PROCESS": (404, "없는 프로세스 ID입니다."),
     "PLAN_NOT_APPROVED": (409, "작업 계획이 아직 승인되지 않았습니다."),
@@ -19,6 +19,7 @@ ERROR_CODES: dict[str, tuple[int, str]] = {
     "FORBIDDEN": (403, "이 연결 또는 사용자에게 허용되지 않은 작업입니다."),          # ★
     "BAD_REQUEST": (400, "입력 형식이 잘못되었습니다."),                            # ★
     "UNAUTHORIZED": (401, "연결 토큰이 없거나 잘못되었습니다."),                     # ★
+    "ORIGINAL_CHECK_REQUIRED": (409, "판독이 불확실한 증빙을 기안자가 원본과 대조했는지 확인이 필요합니다."),  # ★ 제22조
 }
 
 

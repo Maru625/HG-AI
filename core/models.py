@@ -2,7 +2,7 @@
 
 문서 상태: INVALID(작성중) · VALID(작성완료) · CONFIRMED(확인완료) · SUBMITTED(결재대기) · APPROVED(승인) · REJECTED(반려) · CANCELED(취소, 계획 취소 시)
 계획 상태: PENDING(승인대기) · APPROVED(승인됨) · CANCELED(취소)
-예약 상태: HOLD(가예약) · CONFIRMED(확정) · RELEASED(해제)
+예약 상태: HOLD(가예약) · CONFIRMED(확정) · RELEASED(해제). 가위바위보에서 이긴 초안은 상신 전에도 HOLD(note에 표시)
 결재 단계: WAITING(앞 단계 대기) · PENDING(결재 차례) · APPROVED · REJECTED · SKIPPED(반려로 중단)
 """
 from __future__ import annotations
@@ -75,6 +75,34 @@ class Reservation(Base):
     emp_no: Mapped[str] = mapped_column(String)
     doc_id: Mapped[str | None] = mapped_column(String, nullable=True)
     status: Mapped[str] = mapped_column(String)        # HOLD / CONFIRMED / RELEASED
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)   # 가위바위보 승리·패배 등 (재미 기능)
+
+
+class Duel(Base):
+    """회의실 가위바위보 대결 (재미 기능, 규정 밖). 겹치는 시간에 신청한 사람(도전자)이 기존 예약자(수비자)에게 도전한다.
+    상태: WAITING(고르는 중) · DONE(결판) · CANCELED(도전 취소). winner: challenger / defender."""
+    __tablename__ = "duels"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    room_id: Mapped[str] = mapped_column(String)
+    date: Mapped[str] = mapped_column(String)
+    start: Mapped[str] = mapped_column(String)
+    end: Mapped[str] = mapped_column(String)
+    challenger: Mapped[str] = mapped_column(String, index=True)
+    challenger_doc: Mapped[str] = mapped_column(String)
+    defender: Mapped[str] = mapped_column(String, index=True)
+    defender_res: Mapped[int] = mapped_column(Integer)
+    defender_doc: Mapped[str | None] = mapped_column(String, nullable=True)
+    status: Mapped[str] = mapped_column(String)
+    round: Mapped[int] = mapped_column(Integer, default=1)
+    c_pick: Mapped[str | None] = mapped_column(String, nullable=True)
+    d_pick: Mapped[str | None] = mapped_column(String, nullable=True)
+    rounds: Mapped[list] = mapped_column(JSON, default=list)        # [{round, c, d, result: challenger/defender/tie}]
+    winner: Mapped[str | None] = mapped_column(String, nullable=True)
+    how: Mapped[str | None] = mapped_column(String, nullable=True)   # rps / yield / cancel
+    seen: Mapped[list] = mapped_column(JSON, default=list)          # 결과를 본 사람(사번)
+    created_at: Mapped[str] = mapped_column(String)
+    decided_at: Mapped[str | None] = mapped_column(String, nullable=True)
+    rev: Mapped[int] = mapped_column(Integer, default=0)            # 바뀔 때마다 1씩(화면 갱신 판단용)
 
 
 class Plan(Base):
@@ -132,6 +160,9 @@ class Document(Base):
     reject_comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     reject_code: Mapped[str | None] = mapped_column(String, nullable=True)
     is_history: Mapped[bool] = mapped_column(Boolean, default=False)
+    # 제22조: 판독이 불확실한 증빙을 기안자가 원본과 대조했다고 확인한 증빙 번호(확인 ② 때). 내용을 고치면 비운다.
+    original_checked: Mapped[list] = mapped_column(JSON, default=list)
+    original_checked_at: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
 class ApprovalStep(Base):
@@ -148,13 +179,17 @@ class ApprovalStep(Base):
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     started_at: Mapped[str | None] = mapped_column(String, nullable=True)
     acted_at: Mapped[str | None] = mapped_column(String, nullable=True)
+    # 제4조: 결재자가 기한 안에 처리할 수 없을 때 기안자에게 알린 사유와 처리 예정일
+    delay_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    delay_until: Mapped[str | None] = mapped_column(String, nullable=True)
+    delay_at: Mapped[str | None] = mapped_column(String, nullable=True)
 
 
 class Notification(Base):
     __tablename__ = "notifications"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     recipient: Mapped[str] = mapped_column(String, index=True)
-    kind: Mapped[str] = mapped_column(String)          # IMMEDIATE / DIGEST
+    kind: Mapped[str] = mapped_column(String)          # 결재자: IMMEDIATE / DIGEST · 기안자: RESULT(승인·반려) / DELAY(처리 지연, 제4조) · 모두: DUEL(가위바위보 결과)
     created_at: Mapped[str] = mapped_column(String)
     trigger: Mapped[str] = mapped_column(Text, default="")
     docs: Mapped[list] = mapped_column(JSON, default=list)

@@ -100,11 +100,13 @@ def test_tc04_limit_exceeded(drafter, approver):
     assert w["reason"] == sc.LODGING_REASON
     # 사유 없이 확인하려 하면 사유 필요 / 사유가 있으면 결재자에게 주의 항목으로 강조된다
     ids = out["doc_ids"] if "doc_ids" in out else [r["doc_id"] for r in out["save1"]["results"]]
-    drafter("confirm_drafts", doc_ids=ids)
+    drafter("confirm_drafts", doc_ids=ids, original_checked={ids[0]: [sc.BLURRY_SEQ]})
     drafter("submit_drafts", doc_ids=ids)
     brief = approver("get_review_brief", doc_id=ids[0])
     codes = {c["code"] for c in brief["cautions"]}
     assert {"LIMIT_EXCEEDED", "LOW_CONFIDENCE"} <= codes
+    low = next(c for c in brief["cautions"] if c["code"] == "LOW_CONFIDENCE")
+    assert low["evidence_seq"] == sc.BLURRY_SEQ and low["original_checked"] and low["original_checked_at"]
     lim = next(c for c in brief["cautions"] if c["code"] == "LIMIT_EXCEEDED")
     assert lim["reason"] == sc.LODGING_REASON and lim["evidence_seq"] == 3 and "article_text" in lim
 

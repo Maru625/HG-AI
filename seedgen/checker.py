@@ -96,6 +96,11 @@ def run_checks(seed_dir: Path, inputs_dir: Path, source_dir: Path = SOURCE_DIR) 
     ok(modes == {"drafter", "approver"} and all(c["emp_no"] in emps for c in conns), "기안자용·결재자용 연결 토큰이 있다")
     appr = next(c for c in conns if c["mode"] == "approver")
     ok(team_head[emps[trip["traveler"]]["dept"]] == appr["emp_no"], "결재자용 연결의 사용자가 출장자의 팀장이다")
+    slugs = [c.get("slug") for c in conns]
+    ok(all(set(c) == {"token", "emp_no", "mode", "slug", "label"} for c in conns)
+       and len(set(slugs)) == len(slugs) and len({c["token"] for c in conns}) == len(conns)
+       and slugs[:2] == ["drafter", "approver"],
+       "연결마다 주소(slug)와 토큰이 다르고 형식이 맞다(시연 기본 연결 drafter·approver가 앞)")
 
     # 9. 범주
     allowed = set(STAGES) | {""}

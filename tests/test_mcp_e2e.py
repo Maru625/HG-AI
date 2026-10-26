@@ -97,11 +97,14 @@ def test_mcp_full_demo_script(server):
     assert {e["code"] for e in s1[2]["errors"]} == {"REQUIRED_MISSING"}
     assert all(r["status"] == "VALID" for r in out["save2"]["results"])
     assert out["submit_before_confirm"]["results"][0]["code"] == "NOT_CONFIRMED"
+    blur = out["confirm_without_original_check"]["results"][0]                     # 제22조: 원본 대조 확인 필요
+    assert blur["code"] == "ORIGINAL_CHECK_REQUIRED" and blur["details"]["evidence"][0]["seq"] == sc.BLURRY_SEQ
+    assert all(r["ok"] for r in out["confirm"]["results"])
     assert [r["status"] for r in out["submit"]["results"]] == ["SUBMITTED"] * 3
     assert out["submit"]["notified"][0]["kind"] == "IMMEDIATE"
     # 막힌 시도도 작업 기록에 남는다
     blocked = {r["result"] for r in S.audit_list() if r["channel"] == "MCP" and r["result"] != "ok"}
-    assert {"PLAN_NOT_APPROVED", "NOT_CONFIRMED"} <= blocked
+    assert {"PLAN_NOT_APPROVED", "NOT_CONFIRMED", "ORIGINAL_CHECK_REQUIRED"} <= blocked
 
     # 2) 결재자 대화: 묶음 목록과 검토 요약 (읽기만)
     def approver_script(call, *_):
@@ -146,7 +149,7 @@ def test_mcp_stdio_stdout_is_clean():
 
 
 def test_http_multi_for_chatgpt(server, tmp_path):
-    """ChatGPT용: 한 포트에서 기안자용·결재자용 연결을 비밀 경로로 연다. 터널을 지나 Host가 달라도 받는다."""
+    """ChatGPT용: 한 포트에서 연결 전부(기안자용·결재자용, 여러 사례용)를 비밀 경로로 연다. 터널을 지나 Host가 달라도 받는다."""
     import httpx
     from mcp import Client
     from mcp_server.http_multi import build_app, load_connections, load_or_create_secret
@@ -166,12 +169,15 @@ def test_http_multi_for_chatgpt(server, tmp_path):
 
     async def main():
         out = {}
-        for mode, path in paths.items():
+        for slug, path in paths.items():
             async with Client(base + path) as c:
-                out[mode] = (len((await c.list_tools()).tools), _parse(await c.call_tool("whoami", {}))["name"])
+                out[slug] = (len((await c.list_tools()).tools), _parse(await c.call_tool("whoami", {}))["name"])
         return out
     try:
-        assert asyncio.run(main()) == {"drafter": (14, "김지훈"), "approver": (8, "박서연")}
+        assert asyncio.run(main()) == {
+            "drafter": (14, "김지훈"), "approver": (8, "박서연"),                          # 시연 기본
+            "drafter-jung": (14, "정하늘"), "drafter-park": (14, "박서연"), "drafter-song": (14, "송서준"),
+            "approver-lee": (8, "이도현"), "approver-choi": (8, "최민준"), "approver-yoon": (8, "윤재민")}
         r = httpx.post(base + paths["drafter"], headers={"Host": "x-y.trycloudflare.com", "Accept": "application/json, text/event-stream"},
                        json={"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
                            "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "t", "version": "1"}}})

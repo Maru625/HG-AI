@@ -37,12 +37,12 @@
     {
       "id": "제3조",
       "title": "결재선의 원칙",
-      "body": "결재는 기안자, 소속 팀장, 실장, 본부장 순으로 올린다. 전결 기준 금액에 따라 정해진 전결권자까지만 결재하며, 기안자가 팀장이면 팀장 단계는 생략한다. 합의가 필요한 업무는 결재선 끝에 합의 부서장을 둔다."
+      "body": "결재는 기안자, 소속 팀장, 실장, 본부장 순으로 올린다. 전결 기준 금액에 따라 정해진 전결권자까지만 결재하며, 기안자가 팀장이면 팀장 단계는 생략한다. 기안자가 전결권자 본인이어서 결재할 사람이 없으면 바로 위 직책자가 결재한다. 합의가 필요한 업무는 결재선 끝에 합의 부서장을 둔다."
     },
     {
       "id": "제4조",
       "title": "결재 처리 기한",
-      "body": "결재자는 상신된 문서를 상신일로부터 3영업일 안에 처리한다. 처리할 수 없는 경우 기안자에게 사유를 알린다."
+      "body": "결재자는 상신된 문서를 상신일로부터 3영업일 안에 처리한다. 여러 단계로 결재하는 문서는 각 결재자에게 결재 차례가 온 날을 상신일로 본다. 처리할 수 없는 경우 기안자에게 사유를 알린다."
     },
     {
       "id": "제10조",
@@ -101,12 +101,13 @@
       "name": "일반경비 정산",
       "when": "업무상 지출(회식, 소모품 등)을 사용한 뒤 정산할 때",
       "approval_required": true,
-      "depth": "목록 수준",
+      "depth": "상세",
       "articles": [
         "제10조",
         "제10조의2",
         "제20조",
-        "제21조"
+        "제21조",
+        "제22조"
       ],
       "amount_field": "amount",
       "fields": [
@@ -163,7 +164,8 @@
       },
       "checks": [
         "sum_matches_evidence",
-        "per_person_meal_limit"
+        "per_person_meal_limit",
+        "use_after"
       ],
       "limits": {
         "per_person_meal": 50000
@@ -265,7 +267,8 @@
         "sum_matches_evidence",
         "lodging_limit",
         "meal_limit",
-        "trip_dates"
+        "trip_dates",
+        "trip_ended"
       ],
       "limits": {
         "lodging_per_night": {
@@ -400,7 +403,8 @@
       },
       "checks": [
         "trip_dates",
-        "report_deadline"
+        "report_deadline",
+        "trip_ended"
       ],
       "approval": {
         "bands": [
@@ -433,7 +437,7 @@
       "name": "물품 구매 요청",
       "when": "물품을 사기 전에 구매를 요청할 때",
       "approval_required": true,
-      "depth": "목록 수준",
+      "depth": "상세",
       "articles": [
         "제13조"
       ],
@@ -485,7 +489,8 @@
         ]
       },
       "checks": [
-        "qty_times_price"
+        "qty_times_price",
+        "due_not_past"
       ],
       "approval": {
         "bands": [
@@ -595,7 +600,8 @@
       "checks": [
         "room_capacity",
         "room_conflict",
-        "time_order"
+        "time_order",
+        "not_past"
       ],
       "approval": {
         "bands": [

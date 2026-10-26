@@ -1,0 +1,6 @@
+# Caddy: 도메인 인증서(HTTPS)를 자동으로 받고 요청을 앱으로 넘긴다.
+# X-Forwarded-Proto 등은 Caddy가 붙이고, 앱은 그 헤더를 믿도록 실행된다(approval-server deploy).
+{$APPROVAL_DOMAIN} {
+	encode gzip
+	reverse_proxy app:8000
+}

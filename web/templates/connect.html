@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}AI 연결{% endblock %}
+{% block content %}
+<div class="pagehead"><h1>AI 연결</h1>
+  <p class="sub">ChatGPT 데스크톱 앱에 이 서버를 MCP로 연결합니다. 연결마다 사용자가 정해져 있어서, 연결을 고르는 것이 곧 시연할 사람을 고르는 것입니다.
+    승인·반려는 AI 연결로는 할 수 없고 이 화면의 <a href="/inbox">결재함</a>에서만 합니다.</p></div>
+
+{% if not where %}
+<div class="actionbar warn"><span><b>이 서버에는 MCP가 켜져 있지 않습니다.</b> 발표 PC에서는 <span class="mono">start_gpt_demo.bat</span>,
+  배포 서버에서는 <span class="mono">uv run approval-server deploy</span>로 실행하면 등록할 주소가 여기에 나옵니다.</span></div>
+{% endif %}
+
+{% set mine = items|selectattr('is_me')|list %}
+<div class="card connect-me">
+  {% if mine %}
+  <p><b>지금 고른 사용자({{ me_label }})</b>로 AI를 쓰려면 이 연결을 등록하세요:
+    {% for c in mine %}<span class="mono connect-pick">{{ c.name }}</span> <span class="muted small">({{ '기안' if c.mode == 'drafter' else '결재 검토' }})</span>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+  {% else %}
+  <p><b>지금 고른 사용자({{ me_label }})</b>에게는 AI 연결이 없습니다. 이 사람은 웹 화면으로만 시연합니다. 오른쪽 위에서 사용자를 바꾸면 그 사람의 연결이 표시됩니다.</p>
+  {% endif %}
+</div>
+
+<div class="grid2 inner">
+  <div class="card">
+    <h2>등록 순서 <span class="muted small">ChatGPT 데스크톱 앱</span></h2>
+    <ol class="steps">
+      <li class="step"><span class="step-who">아래 표에서 연결을 고릅니다</span><span class="step-kind">기안은 기안자용(툴 14개), 결재 검토는 결재자용(읽기 툴 8개)입니다.</span></li>
+      <li class="step"><span class="step-who">MCP 서버 추가 창을 엽니다</span><span class="step-kind">설정 › 플러그인 › 추가 › MCP 서버 추가. 앱 버전에 따라 설정 › MCP 서버 › 서버 추가입니다.</span></li>
+      <li class="step"><span class="step-who">스트리밍 가능한 HTTP로 등록합니다</span><span class="step-kind">이름과 URL을 아래에서 복사해 붙입니다. 인증은 비워 둡니다(주소 안 비밀값이 토큰 역할).</span></li>
+      <li class="step"><span class="step-who">새 대화에서 연결 하나만 켜고 시작합니다</span><span class="step-kind">첫 메시지에 연결 이름을 말합니다. 예: “기안자 연결(approval_drafter)로 지난주 대전 출장 정산해 줘.”</span></li>
+    </ol>
+  </div>
+  <div class="card">
+    <h2>알아 둘 것</h2>
+    <ul class="plain">
+      <li>대화마다 연결은 <b>하나만</b> 켭니다. 기안자·결재자 연결이 함께 켜져 있으면 AI가 다른 연결을 고를 수 있습니다.</li>
+      <li>서버가 바뀐 뒤 툴이 이상하면 연결을 껐다 켜서 툴 목록을 새로 받습니다.</li>
+      <li>같은 연결을 여러 사람이 쓰면 같은 사람으로 일하므로 초안·결재함을 함께 봅니다.</li>
+      <li>주소와 토큰은 이 서버를 쓰는 사람끼리만 나눕니다. 시연이 끝나면 운영자가 비밀값을 바꿔 모두 무효로 합니다.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card">
+  <h2>연결 {{ items|length }}개</h2>
+  <p class="sub">{% if where == 'deploy' %}이 서버의 공개 주소입니다.{% elif where == 'local' %}발표 PC의 ChatGPT 데스크톱 앱용 주소입니다(127.0.0.1은 이 PC에서만 열림{% if items and items[0].lan_url %}, 다른 PC는 아래 '같은 와이파이' 주소{% endif %}).{% endif %}
+    시연 기본은 앞의 두 개이고, 나머지는 여러 사례(직급별 한도, 팀장 기안, 다른 팀, 실장·본부장·합의 결재)용입니다.</p>
+  <div class="tablewrap"><table class="tbl small connect-tbl">
+    <thead><tr><th>연결(사용자)</th><th>등록 이름</th><th>툴</th><th>URL</th></tr></thead>
+    <tbody>{% for c in items %}
+      <tr class="{{ 'is-me' if c.is_me }}">
+        <td>{{ c.label }}{% if c.default %} <span class="badge">시연 기본</span>{% endif %}{% if c.is_me %} <span class="badge me">지금 고른 사용자</span>{% endif %}</td>
+        <td class="nowrap"><code class="copyval" id="n-{{ c.slug }}">{{ c.name }}</code> <button type="button" class="btn sm copy" data-copy="#n-{{ c.slug }}" aria-label="{{ c.name }} 이름 복사">복사</button></td>
+        <td class="nowrap">{{ '기안자용 ' ~ c.tools ~ '개' if c.mode == 'drafter' else '읽기 ' ~ c.tools ~ '개' }}</td>
+        <td>{% if c.url %}<code class="copyval url" id="u-{{ c.slug }}">{{ c.url }}</code> <button type="button" class="btn sm copy" data-copy="#u-{{ c.slug }}" aria-label="{{ c.name }} URL 복사">복사</button>
+          {% if c.lan_url %}<div class="muted small mt-xs">같은 와이파이의 다른 PC: <code class="copyval url" id="l-{{ c.slug }}">{{ c.lan_url }}</code> <button type="button" class="btn sm copy" data-copy="#l-{{ c.slug }}">복사</button></div>{% endif %}
+          {% if c.web_url %}<div class="muted small mt-xs">ChatGPT 웹용 공개 주소: <code class="copyval url" id="w-{{ c.slug }}">{{ c.web_url }}</code> <button type="button" class="btn sm copy" data-copy="#w-{{ c.slug }}">복사</button></div>{% endif %}
+          {% else %}<span class="muted">—</span>{% endif %}</td>
+      </tr>{% endfor %}</tbody></table></div>
+</div>
+
+{% if token_url %}
+<details class="card">
+  <summary><b>헤더 토큰 방식 (선택)</b> <span class="muted small">주소에 비밀값을 넣고 싶지 않을 때</span></summary>
+  <p class="mt">앱에서 요청 헤더를 넣을 수 있으면, URL은 <code class="copyval" id="tok-url">{{ token_url }}</code> <button type="button" class="btn sm copy" data-copy="#tok-url">복사</button>
+    하나로 두고 헤더 <span class="mono">Authorization: Bearer &lt;헤더 토큰&gt;</span>을 넣습니다. 토큰이 사용자를 정합니다.
+    주소 안 비밀값과 달리 접속 기록에 남지 않습니다.</p>
+  <div class="tablewrap"><table class="tbl small">
+    <thead><tr><th>연결(사용자)</th><th>헤더 토큰</th></tr></thead>
+    <tbody>{% for c in items if c.bearer %}<tr class="{{ 'is-me' if c.is_me }}"><td>{{ c.label }}</td>
+      <td class="nowrap"><code class="copyval" id="b-{{ c.slug }}">{{ c.bearer }}</code> <button type="button" class="btn sm copy" data-copy="#b-{{ c.slug }}" aria-label="{{ c.name }} 헤더 토큰 복사">복사</button></td></tr>{% endfor %}</tbody></table></div>
+</details>
+{% endif %}
+{% endblock %}

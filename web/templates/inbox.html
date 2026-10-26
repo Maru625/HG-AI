@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_macros.html" import status, ai, imp %}
+{% from "_macros.html" import status, ai, imp, due %}
 {% block title %}결재함{% endblock %}
 {% block content %}
 <div class="pagehead"><h1>결재함</h1>
@@ -24,9 +24,10 @@
       {% for r in rows %}
       <a class="qrow imp-row-{{ {'긴급':'urgent','보통':'normal','낮음':'low'}[r.importance] }}" href="/review/{{ r.doc_id }}">
         <div class="q-main">
-          <div class="q-title">{{ r.title }} {{ ai(r.ai_written) }}</div>
-          <div class="q-meta"><span class="mono">{{ r.doc_no }}</span> · {{ r.process_name }}</div>
+          <div class="q-title">{{ r.title }} {{ ai(r.ai_written) }}{% if r.step_kind == '합의' %} <span class="badge agree">합의 요청</span>{% endif %}</div>
+          <div class="q-meta"><span class="mono">{{ r.doc_no }}</span> · {{ r.process_name }}{% if r.due_label %} · <span class="due {{ 'over' if r.overdue }}">{{ r.due_label }}</span>{% endif %}</div>
           {% if r.importance_reasons %}<div class="q-why">근거: <b>{{ r.importance_reasons|join(', ') }}</b></div>{% endif %}
+          {% if r.delay_reason %}<div class="q-delay">지연 알림을 보냄: “{{ r.delay_reason }}”</div>{% endif %}
         </div>
         <div class="q-col"><span class="k">기안자</span>{{ r.drafter.name }}</div>
         <div class="q-amt">{{ r.amount|won if r.amount is number else '—' }}</div>
@@ -38,7 +39,7 @@
     </section>
     {% endif %}
   {% endfor %}
-  <p class="note">중요도: 긴급 = 회의일 3영업일 이내·처리 기한 2영업일 이내·상신 후 3영업일 넘게 대기 중 하나 / 보통 = 주의 항목 있음 / 낮음 = 그 밖 (설계서 7.6)</p>
+  <p class="note">중요도: 긴급 = 회의일 3영업일 이내·업무 처리 기한 2영업일 이내·결재 차례가 온 뒤 3영업일 넘게 대기(제4조 처리 기한 초과) 중 하나 / 보통 = 주의 항목 있음 / 낮음 = 그 밖 (설계서 7.6)</p>
   {% else %}
   <div class="empty">지금 결재할 차례인 문서가 없습니다.</div>
   {% endif %}
@@ -51,12 +52,13 @@
     <tbody>{% for d in data.sent %}
       <tr class="clickrow" onclick="location.href='/docs/{{ d.doc_id }}'">
         <td><a href="/docs/{{ d.doc_id }}"><b>{{ d.title }}</b></a> {{ ai(d.ai_written) }}<div class="muted small"><span class="mono">{{ d.doc_no }}</span> · {{ d.process_name }}</div></td>
-        <td>{{ status(d.status, d.status_label) }}{% if d.approval_line %}<div class="muted small line-mini">{% for s in d.approval_line %}{{ s.name }} {{ s.status_label }}{% if not loop.last %} → {% endif %}{% endfor %}</div>{% endif %}</td>
+        <td>{{ status(d.status, d.status_label) }}{% if d.approval_line %}<div class="muted small line-mini">{% for s in d.approval_line %}{{ s.name }} {{ s.status_label }}{% if not loop.last %} → {% endif %}{% endfor %}</div>{% endif %}
+          {% for s in d.approval_line or [] if s.status == 'PENDING' %}{% if s.due %}<div class="small">{{ due(s.due) }}</div>{% endif %}{% if s.delay_reason %}<div class="small warn-text">처리 지연 알림: “{{ s.delay_reason }}”{% if s.delay_until %} · 처리 예정 {{ s.delay_until }}{% endif %}</div>{% endif %}{% endfor %}</td>
         <td class="small nowrap">{{ d.submitted_at|hm }}</td><td class="small nowrap">{{ d.final_at|hm or '—' }}</td>
       </tr>{% endfor %}</tbody>
   </table></div>
   </div>
-  {% else %}<div class="empty">이번 시연에서 올린 문서가 아직 없습니다.</div>{% endif %}
+  {% else %}<div class="empty">이번 시연에서 올린 문서가 아직 없습니다. <a href="/new">새 기안</a>에서 화면으로 바로 써 볼 수 있습니다.</div>{% endif %}
   {% if data.history %}
   <h2 class="mt">지난 결재 이력 <span class="muted small">최근 {{ data.history|length }}건 · 시드 데이터</span></h2>
   <div class="card flush">

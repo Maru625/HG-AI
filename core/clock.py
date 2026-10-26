@@ -24,12 +24,21 @@ def set_state(s: Session, key: str, value) -> None:
         s.add(DemoState(key=key, value=value))
 
 
+def flowing() -> bool:
+    """시연 시계가 실제 시간과 함께 흐르는지. 배포처럼 여러 날 켜 두는 서버는 APPROVAL_CLOCK_FLOW=frozen으로 멈춰 둔다
+    (대본의 날짜 조건이 며칠 뒤에도 그대로 맞도록). 멈춰도 시연 제어 패널의 시각 맞추기·+N분은 된다."""
+    import os
+    return os.environ.get("APPROVAL_CLOCK_FLOW", "real").lower() not in ("frozen", "stop", "0", "off")
+
+
 def now(s: Session) -> dt.datetime:
     c = _state(s, "clock")
     real = dt.datetime.now()
     if not c:
         return real.replace(microsecond=0)
     demo_start = dt.datetime.fromisoformat(c["demo_start"])
+    if not flowing():
+        return demo_start.replace(microsecond=0)
     real_start = dt.datetime.fromisoformat(c["real_start"])
     return (demo_start + (real - real_start)).replace(microsecond=0)
 

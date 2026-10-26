@@ -1,19 +1,31 @@
 """REST API (P2 MCP 서버용, 계약 C1). 서비스 계층을 그대로 감싼다.
 
 - 인증: 헤더 X-Approval-Token (연결 토큰 → 사용자·역할)
+- 배포 모드(MCP를 같은 포트에 연 경우)에는 헤더 X-Approval-Internal(내부 열쇠)도 있어야 한다. MCP 툴만 REST를 부른다.
 - 승인·반려는 열지 않는다(설계서 3.2). 결재 처리는 웹 화면에서만 한다.
 """
 from __future__ import annotations
 
+import hmac
 from typing import Any
 
-from fastapi import APIRouter, Depends, Header, Query
+from fastapi import APIRouter, Depends, Header, Query, Request
 from pydantic import BaseModel, Field
 
 from . import services as S
 from .errors import ServiceError
 
-router = APIRouter(prefix="/api", tags=["MCP용 REST API"])
+
+def internal_guard(request: Request, x_approval_internal: str | None = Header(default=None)) -> None:
+    """배포 모드에서는 REST API를 MCP 툴(같은 서버 안)만 부를 수 있다. 시드의 연결 토큰은 문서에 공개돼 있어서다."""
+    key = getattr(request.app.state, "api_internal_key", None)
+    if key and not hmac.compare_digest((x_approval_internal or "").encode(), key.encode()):
+        raise ServiceError("UNAUTHORIZED", "배포 모드에서는 REST API를 밖에서 바로 부를 수 없습니다.",
+                           "AI 서비스에는 MCP 연결 주소(/mcp/…)를 등록하세요. 밖에서 REST를 꼭 써야 하면 서버를 "
+                           "APPROVAL_API_PUBLIC=1로 실행합니다.")
+
+
+router = APIRouter(prefix="/api", tags=["MCP용 REST API"], dependencies=[Depends(internal_guard)])
 
 
 def ctx_from_token(x_approval_token: str | None = Header(default=None)) -> S.Ctx:
@@ -61,6 +73,11 @@ class DraftsIn(BaseModel):
 
 class DocIdsIn(BaseModel):
     doc_ids: list[str]
+
+
+class ConfirmIn(BaseModel):
+    doc_ids: list[str]
+    original_checked: dict[str, list[int]] | None = None   # 문서 ID → 원본과 대조한 증빙 번호 (제22조)
 
 
 @router.get("/connection")
@@ -133,8 +150,8 @@ def save_drafts(plan_id: str, body: DraftsIn, ctx: S.Ctx = Depends(ctx_from_toke
 
 
 @router.post("/drafts/confirm")
-def confirm(body: DocIdsIn, ctx: S.Ctx = Depends(ctx_from_token)):
-    return ok(S.confirm_drafts(ctx, body.doc_ids))
+def confirm(body: ConfirmIn, ctx: S.Ctx = Depends(ctx_from_token)):
+    return ok(S.confirm_drafts(ctx, body.doc_ids, body.original_checked))
 
 
 @router.post("/drafts/submit")

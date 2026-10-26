@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}샘플테크 전결{% endblock %} · DEMO</title>
   <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/duel.css">
   <script src="/static/vendor/htmx-2.0.4.min.js"></script>
 </head>
 <body>
-{% set me = (users|selectattr('emp_no', 'equalto', user)|list or [{'label': user}])[0] %}
-{% set is_approver = ('팀장' in me.label) or ('실장' in me.label) %}
+{% set me = (users|selectattr('emp_no', 'equalto', user)|list or [{'label': user, 'role': 'drafter'}])[0] %}
+{% set is_approver = me.role == 'approver' %}
 <header class="topbar">
   <a class="brand" href="/"><span class="logo">샘플테크</span> 전결 시스템</a>
   <span class="demo-tag" title="모든 데이터는 시연용 더미입니다">DEMO · 더미 데이터</span>
   <nav class="nav" aria-label="주 메뉴">
-    {% set links = [('/', '홈'), ('/plans', '작업 계획'), ('/drafts', '임시저장함'), ('/inbox', '결재함'), ('/rooms', '회의실'), ('/rules', '규정'), ('/audit', '작업 기록')] %}
+    {% set links = [('/', '홈'), ('/new', '새 기안'), ('/plans', '작업 계획'), ('/drafts', '임시저장함'), ('/inbox', '결재함'), ('/rooms', '회의실'), ('/rules', '규정'), ('/audit', '작업 기록'), ('/connect', 'AI 연결')] %}
     {% for href, label in links %}
       <a href="{{ href }}" class="{{ 'on' if (href == '/' and path == '/') or (href != '/' and path.startswith(href)) or (href == '/inbox' and path.startswith('/review')) or (href == '/drafts' and path.startswith('/docs')) }}">{{ label }}</a>
     {% endfor %}
@@ -29,7 +30,9 @@
       <input type="hidden" name="next" value="{{ path }}">
       <label for="who" class="sr">사용자 전환</label>
       <select id="who" name="emp_no" onchange="this.form.submit()">
-        {% for u in users %}<option value="{{ u.emp_no }}" {{ 'selected' if u.emp_no == user }}>{{ u.label }}</option>{% endfor %}
+        {% for g in ['기안자', '결재자'] %}<optgroup label="{{ g }}">
+        {% for u in users if u.group == g %}<option value="{{ u.emp_no }}" {{ 'selected' if u.emp_no == user }}>{{ u.label }} · {{ u.dept }}</option>{% endfor %}
+        </optgroup>{% endfor %}
       </select>
     </form>
   </div>
@@ -42,7 +45,9 @@
   {% block content %}{% endblock %}
 </main>
 {% block after %}{% endblock %}
+<div id="duel-root"></div>
 <script src="/static/app.js"></script>
+<script src="/static/duel.js"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

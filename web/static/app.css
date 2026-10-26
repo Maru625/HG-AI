@@ -460,9 +460,117 @@ pre.code { background: #111111; color: #f2f2f2; padding: 14px; border-radius: va
   .clock { padding: 7px 9px; }
   .switch select { max-width: 112px; text-overflow: ellipsis; }
 }
-/* 창이 좁을 때(1300px 이하): 메뉴를 상단바 둘째 줄로 내려 모두 보이게 한다. 'DEMO · 더미 데이터'는 어느 폭에서도 숨기지 않는다 */
-@media (max-width: 1300px) {
+/* 창이 좁을 때(1520px 이하): 메뉴를 상단바 둘째 줄로 내려 모두 보이게 한다. 'DEMO · 더미 데이터'는 어느 폭에서도 숨기지 않는다 */
+@media (max-width: 1520px) {
   .topbar { height: auto; flex-wrap: wrap; row-gap: 6px; padding: 10px 16px 6px; }
   .nav { order: 3; width: 100%; }
   .topbar .right { margin-left: auto; }
 }
+
+/* ── 규정 확장: 화면에서 직접 기안·사례·처리 기한·지연 알림·합의 (10/23) ── */
+input[type=date], input[type=time], textarea, select.inp, input.inp {
+  font: inherit; height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); }
+textarea { height: auto; min-height: 64px; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+input[type=date]:focus, input[type=time]:focus, textarea:focus, input.inp:focus { outline: none; border-color: transparent; box-shadow: 0 0 0 2px var(--brand); }
+.inp { width: 100%; }
+.form-grid { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 12px 16px; align-items: start; }
+.fg-label { font-size: 14px; font-weight: 700; color: var(--ink-2); padding-top: 10px; }
+.fg-input { min-width: 0; }
+.help { font-size: 12px; color: var(--ink-3); margin-top: 4px; }
+.evtable input, .evtable select { width: 100%; min-width: 0; height: 36px; padding: 0 8px; font: inherit; font-size: 13px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.evtable td { padding: 6px 4px; vertical-align: middle; }
+.evtable th { padding: 8px 4px; }
+.evtable td:first-child { width: 28px; text-align: center; }
+.evtable { min-width: 760px; }
+.evtable.items { min-width: 420px; }
+.evtable input[type=date] { min-width: 132px; }
+.evtable input[name$=".merchant"], .evtable input[name$=".task"] { min-width: 130px; }
+.evtable select { min-width: 86px; }
+.evtable input[name$=".amount"] { min-width: 84px; }
+.evtable input[name$=".nights"], .evtable input[name$=".confidence"] { min-width: 52px; }
+.evtable input[name$=".filename"] { min-width: 112px; }
+.evtable input[name$=".owner"] { min-width: 84px; }
+.grid2 + .card { margin-top: 16px; }
+.btnrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 4px 0 16px; }
+.btnrow form { margin: 0; }
+.btn.sm { height: 34px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+.push { margin-left: auto; }
+.right { text-align: right; }
+.row-between { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.h-inline { display: inline; margin: 0; font-size: 18px; }
+.inlineform { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: flex-end; flex: 1 1 100%; }
+.inlineform > span { flex: 1 1 320px; }
+.inlineform .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 260px; }
+.inlineform .field label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.inlineform input[type=text] { width: 100%; }
+.origcheck { flex: 1 1 100%; margin: 0; padding: 12px 16px; border: 1px solid var(--warning-line); border-radius: var(--r); background: var(--surface); }
+.origcheck legend { font-weight: 800; font-size: 14px; padding: 0 6px; }
+.check { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; font-size: 14px; cursor: pointer; }
+.check input[type=checkbox] { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--brand); }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.due { display: inline-block; font-size: 12px; font-weight: 700; color: var(--ink-2); background: var(--surface-3); padding: 1px 8px; border-radius: 6px; white-space: nowrap; }
+.due.soon { color: var(--warning-ink); background: var(--warning-tint); }
+.due.over { color: var(--critical-ink); background: var(--critical-tint); }
+.due.over::before { content: "! "; font-weight: 800; }
+.step-due, .step-delay { display: block; font-size: 12px; margin-top: 3px; }
+.step-delay { color: var(--warning-ink); }
+.badge.agree { background: var(--info-tint); color: var(--info-ink); }
+.judge .v.bad { color: var(--critical-ink); }
+.qrow .q-delay { font-size: 12px; color: var(--warning-ink); margin-top: 3px; }
+.toast.single { grid-template-columns: minmax(0, 1fr); }
+.toast.good { border-color: var(--good-line); border-left-color: var(--good); }
+.toast.good .toast-head strong { color: var(--good-ink); }
+.toast.info { border-color: #c9dbf7; border-left-color: var(--info); }
+.toast-comment { grid-column: 1; margin: 0; font-size: 14px; color: var(--ink-2); background: var(--surface-2); padding: 8px 12px; border-radius: var(--r-sm); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; }
+.chip-link { display: inline-flex; gap: 6px; align-items: center; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); font-size: 13px; font-weight: 700; }
+.chip-link:hover { border-color: var(--brand-50); color: var(--brand-ink); text-decoration: none; }
+.tbl.cases td { vertical-align: middle; }
+.tbl.cases form { margin: 0; }
+.guide { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; }
+.feats { list-style: none; margin: 12px 0 0; padding: 12px 0 0; border-top: 1px dashed var(--line); display: grid; gap: 8px; font-size: 14px; }
+.feats .how { display: inline-block; font-size: 12px; font-weight: 700; color: var(--brand-ink); background: var(--brand-tint); padding: 1px 8px; border-radius: 6px; margin-right: 4px; }
+.feat-cases { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; font-size: 13px; color: var(--ink-3); align-items: center; }
+.case-link { display: inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); font-size: 13px; font-weight: 600; }
+.case-link:hover { border-color: var(--brand-50); text-decoration: none; }
+details.artd { border-top: 1px solid var(--line); padding: 8px 0; }
+details.artd:first-of-type { border-top: 0; padding-top: 0; }
+details.artd summary { cursor: pointer; font-size: 14px; }
+details.artd p { margin: 6px 0 0; color: var(--ink-2); }
+optgroup { font-weight: 800; color: var(--ink-3); }
+optgroup option { font-weight: 600; color: var(--ink); }
+@media (max-width: 720px) {
+  .form-grid { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .fg-label { padding-top: 8px; }
+  .evtable { min-width: 760px; }
+}
+
+/* ── 회의실 가위바위보 도전 카드 (재미 기능, 초안 화면) ── */
+.duel-call { margin: 0 0 16px; padding: 18px 20px; border-radius: var(--r-card); color: #fff;
+  background: repeating-linear-gradient(135deg, #1a0b02 0 18px, #261003 18px 36px); border: 3px solid #000; box-shadow: 0 0 0 3px var(--brand), var(--shadow-hover); }
+.duel-call-head { display: flex; gap: 14px; align-items: flex-start; }
+.duel-call-head b { font-size: 17px; color: #ffd400; }
+.duel-call-head p { margin: 4px 0 0; font-size: 14px; color: #f5e6d8; }
+.duel-hands { font-size: 34px; line-height: 1; flex: none; animation: dl-bob 1.4s ease-in-out infinite; }
+.duel-tag { display: inline-block; margin-left: 4px; font-size: 12px; font-weight: 800; color: #000; background: #ffd400; padding: 1px 8px; border-radius: 999px; }
+.duel-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding: 10px 12px;
+  border-radius: var(--r); background: rgba(255, 255, 255, .08); }
+.duel-row form { margin: 0; }
+.duel-target { font-size: 14px; }
+.duel-btn { background: #ffd400; color: #000; border: 3px solid #000; box-shadow: 0 4px 0 #000; font-weight: 900; }
+.duel-btn:hover { background: #ffe14d; transform: translateY(-1px) rotate(-1deg); }
+.duel-call .muted { color: #d9c7b8; }
+.slot-note { margin-top: 3px; font-size: 12px; font-weight: 700; color: var(--brand-ink); }
+
+/* ── AI 연결 화면 (/connect) ── */
+.connect-me { padding: 16px 20px; }
+.connect-me p { margin: 0; }
+.connect-pick { display: inline-block; padding: 2px 8px; border-radius: 6px; background: var(--brand-tint); color: var(--brand-ink); font-weight: 700; }
+.badge.me { background: var(--brand-tint); color: var(--brand-ink); }
+.copyval { font-family: var(--mono); font-size: 12.5px; background: var(--surface-3); padding: 3px 6px; border-radius: 6px; word-break: break-all; }
+.copyval.url { display: inline; }
+.btn.sm.copy { height: 28px; padding: 0 10px; font-size: 12px; vertical-align: middle; }
+.btn.sm.copy.copied { background: var(--good-tint); color: var(--good-ink); }
+.connect-tbl tr.is-me > td, .tbl tr.is-me > td { background: var(--brand-tint); }
+.connect-tbl td:last-child { min-width: 320px; }
+.mt-xs { margin-top: 6px; }

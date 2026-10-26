@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{# 화면에서 직접 쓰는 작성 양식. 새 기안(/new/<프로세스>)과 초안 고치기(/drafts/<문서>/edit)가 같이 쓴다.
+   이름 규칙: v.<키>, it.<키>.<번호>.<하위 키>, ev.<번호>.<항목>, r.<사유 키>, memo — web/routes.py _parse_draft_form #}
+{% set sp = f.spec %}
+{% set v = f.data['values'] or {} %}
+{% set back_to = '/drafts/' ~ f.doc.doc_id if f.doc else '/new' %}
+{% block title %}{{ (f.doc.doc_id ~ ' 고치기') if f.doc else ('새 기안 · ' ~ sp.name) }}{% endblock %}
+{% block content %}
+<div class="pagehead">
+  <a class="backlink" href="{{ back_to }}">← {{ '초안으로' if f.doc else '새 기안' }}</a>
+  <h1>{% if f.doc %}<span class="mono">{{ f.doc.doc_id }}</span> 고치기{% else %}새 기안{% endif %} · {{ sp.name }} <span class="mono muted">{{ sp.process_id }}</span></h1>
+  <p class="sub">기안자 {{ f.me }} · 화면에서 직접 씁니다. 저장하면 AI가 쓴 초안과 같은 규칙으로 서버가 검증하고 결재선을 계산합니다. 날짜 기준은 시연 시계의 오늘({{ f.today }})입니다.</p>
+</div>
+
+{% if f.case %}
+<div class="actionbar {{ 'warn' if f.case.user and f.case.user != user }}">
+  <span><b>사례: {{ f.case.label }}</b> · {% for a in f.case.articles %}<span class="art">{{ a }}</span> {% endfor %}<br>기대 결과: {{ f.case.expect }}
+    {% if f.case.user and f.case.user != user %}<br><b>이 사례는 {{ f.case.user_label }}으로 해야 의도대로 걸립니다.</b>{% endif %}</span>
+  {% if f.case.user and f.case.user != user %}
+  <form method="post" action="/switch-user"><input type="hidden" name="emp_no" value="{{ f.case.user }}"><input type="hidden" name="next" value="/new/{{ sp.process_id }}?case={{ f.case.id }}"><button class="btn">{{ f.case.user_label }}으로 바꾸기</button></form>
+  {% endif %}
+</div>
+{% elif f.doc and f.doc.ai_written %}
+<div class="actionbar"><span>AI가 쓴 초안을 사람이 고칩니다. 저장하면 '화면(사람)'으로 작업 기록에 남고, 확인완료였다면 확인이 풀립니다.</span></div>
+{% endif %}
+
+<form method="post" action="{{ ('/drafts/' ~ f.doc.doc_id ~ '/edit') if f.doc else ('/new/' ~ sp.process_id) }}" class="draftform" autocomplete="off">
+<div class="cols">
+  <div class="col-main">
+    <div class="card">
+      <h3>입력 내용</h3>
+      <div class="form-grid">
+      {% for fd in sp.fields %}
+        {% set val = v.get(fd.key) %}
+        {% if fd.type == 'items' %}
+          <div class="fg-label">{{ fd.label }}{% if fd.required %}<span class="req">*</span>{% endif %}</div>
+          <div class="fg-input">
+            <div class="tablewrap"><table class="tbl small evtable items">
+              <thead><tr><th>#</th>{% for sub in fd.item_fields %}<th>{{ sub.label }}{% if sub.required %}<span class="req">*</span>{% endif %}</th>{% endfor %}</tr></thead>
+              <tbody>
+              {% set rows = val if val is iterable and val is not string else [] %}
+              {% for i in range((rows|length) + 2) %}
+                {% set it = rows[i] if i < rows|length else {} %}
+                <tr><td class="muted">{{ i + 1 }}</td>{% for sub in fd.item_fields %}<td><input type="{{ 'date' if sub.type == 'date' else 'text' }}" name="it.{{ fd.key }}.{{ i }}.{{ sub.key }}" value="{{ it.get(sub.key) or '' }}" aria-label="{{ fd.label }} {{ i + 1 }} {{ sub.label }}"></td>{% endfor %}</tr>
+              {% endfor %}
+              </tbody></table></div>
+            <div class="help">항목마다 {% for sub in fd.item_fields if sub.required %}{{ sub.label }}{% if not loop.last %}·{% endif %}{% endfor %}을 모두 적어야 합니다. 빈 줄은 저장하지 않습니다.</div>
+          </div>
+        {% else %}
+          <label class="fg-label" for="f-{{ fd.key }}">{{ fd.label }}{% if fd.required or fd.required_if %}<span class="req" title="{{ '필수' if fd.required else '조건부 필수' }}">*</span>{% endif %}</label>
+          <div class="fg-input">
+          {% if fd.type == 'enum' %}
+            <select id="f-{{ fd.key }}" name="v.{{ fd.key }}" class="inp"><option value="">선택</option>{% for o in fd.options %}<option {{ 'selected' if val == o }}>{{ o }}</option>{% endfor %}</select>
+          {% elif fd.type == 'bool' %}
+            <select id="f-{{ fd.key }}" name="v.{{ fd.key }}" class="inp"><option value="">선택</option><option value="아니오" {{ 'selected' if val is sameas false }}>아니오</option><option value="예" {{ 'selected' if val is sameas true }}>예</option></select>
+          {% elif fd.type == 'room' %}
+            <select id="f-{{ fd.key }}" name="v.{{ fd.key }}" class="inp"><option value="">선택</option>{% for r in sp.rooms or [] %}<option value="{{ r.id }}" {{ 'selected' if val == r.id }}>{{ r.name }} · {{ r.capacity }}명{{ ' · 대회의실(합의 필요)' if r.kind == 'large' }}</option>{% endfor %}</select>
+          {% elif fd.type == 'date' %}
+            <input id="f-{{ fd.key }}" type="date" class="inp" name="v.{{ fd.key }}" value="{{ val or '' }}">
+          {% elif fd.type == 'time' %}
+            <input id="f-{{ fd.key }}" type="time" class="inp" name="v.{{ fd.key }}" value="{{ val or '' }}" step="600">
+          {% elif fd.type == 'int' %}
+            <input id="f-{{ fd.key }}" type="text" class="inp" inputmode="numeric" name="v.{{ fd.key }}" value="{{ val if val is not none else '' }}" placeholder="숫자 (예: 45000)">
+          {% elif fd.type == 'list' %}
+            <input id="f-{{ fd.key }}" type="text" class="inp" name="v.{{ fd.key }}" value="{{ val|join(', ') if val is iterable and val is not string else (val or '') }}" placeholder="쉼표로 구분 (예: 김지훈, 오세준)">
+          {% elif fd.key in ('result', 'schedule', 'purpose', 'reason') %}
+            <textarea id="f-{{ fd.key }}" class="inp" name="v.{{ fd.key }}" rows="2">{{ val or '' }}</textarea>
+          {% else %}
+            <input id="f-{{ fd.key }}" type="text" class="inp" name="v.{{ fd.key }}" value="{{ val or '' }}">
+          {% endif %}
+          {% if fd.help or fd.required_if %}<div class="help">{{ fd.help or '' }}{% if fd.required_if %}{% for k2, v2 in fd.required_if.items() %} · {{ v2 }}일 때 필수{% endfor %}{% endif %}</div>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+      </div>
+    </div>
+
+    {% if f.has_evidence %}
+    <div class="card">
+      <h3>{{ sp.evidence.label }} {% if sp.evidence.required %}<span class="req small">필수</span>{% else %}<span class="muted small">선택</span>{% endif %}</h3>
+      {% if sp.evidence.required %}
+      <p class="sub">시연용이라 파일은 올리지 않고 첨부 파일 이름만 기록합니다. 이름을 비우면 첨부 누락입니다(제20조).
+        판독 신뢰도는 AI가 영수증을 읽었을 때의 확신도(0~1)이고, {{ f.confidence_threshold }} 미만이면 확인 ② 때 원본 대조가 필요합니다(제22조).</p>
+      {% else %}
+      <p class="sub">선택 항목입니다. 붙일 자료가 있으면 파일 이름만 기록합니다(시연용).</p>
+      {% endif %}
+      <div class="tablewrap"><table class="tbl small evtable">
+        <thead><tr><th>#</th><th>날짜</th><th>상호</th><th>비목</th><th>금액(원)</th>{% if f.has_nights %}<th title="숙박비일 때">박 수</th>{% endif %}<th>첨부 파일</th><th>판독 신뢰도</th></tr></thead>
+        <tbody>
+        {% set evs = f.data.evidence or [] %}
+        {% for i in range((evs|length) + 3) %}
+          {% set e = evs[i] if i < evs|length else {} %}
+          <tr>
+            <td class="muted">{{ i + 1 }}</td>
+            <td><input type="date" name="ev.{{ i }}.date" value="{{ e.get('date') or '' }}" aria-label="증빙 {{ i + 1 }} 날짜"></td>
+            <td><input type="text" name="ev.{{ i }}.merchant" value="{{ e.get('merchant') or '' }}" aria-label="증빙 {{ i + 1 }} 상호"></td>
+            <td><select name="ev.{{ i }}.category" aria-label="증빙 {{ i + 1 }} 비목"><option value=""></option>{% for c in f.categories %}<option {{ 'selected' if e.get('category') == c }}>{{ c }}</option>{% endfor %}</select></td>
+            <td><input type="text" inputmode="numeric" name="ev.{{ i }}.amount" value="{{ e.get('amount') if e.get('amount') is not none else '' }}" aria-label="증빙 {{ i + 1 }} 금액"></td>
+            {% if f.has_nights %}<td><input type="text" inputmode="numeric" name="ev.{{ i }}.nights" value="{{ e.get('nights') or '' }}" placeholder="–" title="숙박비일 때 박 수" aria-label="증빙 {{ i + 1 }} 박 수"></td>{% endif %}
+            <td><input type="text" name="ev.{{ i }}.filename" value="{{ e.get('filename') or '' }}" placeholder="receipt.png" aria-label="증빙 {{ i + 1 }} 첨부 파일"></td>
+            <td><input type="text" inputmode="decimal" name="ev.{{ i }}.confidence" value="{{ e.get('confidence') if e.get('confidence') is not none else '' }}" placeholder="1.0" aria-label="증빙 {{ i + 1 }} 판독 신뢰도"></td>
+          </tr>
+        {% endfor %}
+        </tbody></table></div>
+      <p class="help">빈 줄은 저장하지 않습니다. 줄이 더 필요하면 저장한 뒤 다시 [고치기]를 누르면 빈 줄이 더 생깁니다.</p>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h3>사유</h3>
+      {% if f.reason_keys %}
+      <div class="form-grid">
+        {% for k in f.reason_keys %}
+        <label class="fg-label" for="rk-{{ loop.index }}">{{ k|rk }}</label>
+        <div class="fg-input"><input id="rk-{{ loop.index }}" type="text" class="inp" name="r.{{ k }}" value="{{ f.data.reasons.get(k, '') }}" placeholder="사유"></div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted">한도 초과·주말 사용처럼 사유가 필요한 항목은 저장하면 서버가 알려 줍니다. 그다음 초안 화면에서 사유를 적습니다.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h3>메모 <span class="muted small">선택</span></h3>
+      <textarea name="memo" class="inp" rows="2" aria-label="메모">{{ f.data.memo or '' }}</textarea>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn primary">저장하고 검증</button>
+      <a class="btn" href="{{ back_to }}">취소</a>
+    </div>
+  </div>
+  <aside class="col-side">
+    <div class="card">
+      <h3>전결 기준</h3>
+      <ul class="arts">{% for b in sp.approval.bands %}<li>{{ b.label }}{% if b.agreement %} + {{ b.agreement|join(', ') }} 합의{% endif %}</li>{% endfor %}</ul>
+      {% if sp.approval.agreement_if %}<p class="small"><b>합의</b>: {% for c in sp.approval.agreement_if %}{{ c.label }}{% if not loop.last %}, {% endif %}{% endfor %} → {{ sp.approval.agreement_if[0].dept }} 합의</p>{% endif %}
+      <p class="note">결재선은 저장하면 서버가 계산합니다(제3조).</p>
+    </div>
+    {% if sp.limits or sp.deadline %}
+    <div class="card">
+      <h3>한도·기한</h3>
+      {% set LL = {'per_person_meal': '회의비 1인당', 'lodging_per_night': '숙박비 1박', 'meal_per_day': '식비 1일'} %}
+      <ul class="arts">
+        {% for k, x in (sp.limits or {}).items() %}<li>{{ LL.get(k, k) }} {% if x is mapping %}{% for g, y in x.items() %}{{ g }} {{ y|won }}{% if not loop.last %} · {% endif %}{% endfor %}{% else %}{{ x|won }}{% endif %}</li>{% endfor %}
+        {% if sp.deadline %}{% set ff = sp.fields|selectattr('key', 'equalto', sp.deadline.from_field)|list %}<li>{{ ff[0].label if ff else sp.deadline.from_field }} 후 {{ sp.deadline.business_days }}영업일 안</li>{% endif %}
+      </ul>
+    </div>
+    {% endif %}
+    <div class="card">
+      <h3>적용 규정</h3>
+      {% for a in sp.articles %}<details class="artd"><summary><b>{{ a.id }}</b> {{ a.title }}</summary><p class="small">{{ a.body }}</p></details>{% endfor %}
+    </div>
+  </aside>
+</div>
+</form>
+{% endblock %}

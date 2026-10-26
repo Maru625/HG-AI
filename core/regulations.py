@@ -80,7 +80,9 @@ def spec(s: Session, pid: str) -> dict:
         "evidence_item_format": {
             "date": "YYYY-MM-DD", "merchant": "상호", "category": "비목 (" + ", ".join(
                 p.get("evidence", {}).get("categories") or com.get("evidence_categories", [])) + ")",
-            "amount": "정수(원)", "filename": "AI가 읽은 원본 파일 이름", "confidence": "판독 신뢰도 0~1 (AI가 판단)",
+            "amount": "정수(원)",
+            "filename": "첨부 파일 이름(모르면 '대화 첨부 이미지 3'처럼 어느 첨부인지). 증빙이 필수면 비우지 않는다(제20조)",
+            "confidence": "판독 신뢰도 0~1 (AI가 판단). 0.8 미만이면 확인 ② 때 원본 대조 여부를 사용자에게 묻는다(제22조)",
             "nights": "숙박비일 때 박 수"},
         "limits": p.get("limits", {}), "deadline": p.get("deadline"),
         "approval": {"bands": bands, "agreement_if": p["approval"].get("agreement_if", [])},

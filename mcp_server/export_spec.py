@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-from .server import INSTRUCTIONS, Api, build
+from .server import DETAILS, INSTRUCTIONS, Api, build
 
 ROLE_LABEL = {"drafter": "기안자용 연결", "approver": "결재자용 연결"}
 
@@ -28,7 +28,8 @@ def _type(p: dict, defs: dict) -> str:
     if t == "array":
         return f"{_type(p.get('items', {}), defs)} 목록"
     if t == "object":
-        return "객체"
+        ap = p.get("additionalProperties")
+        return f"객체 (키 → {_type(ap, defs)})" if isinstance(ap, dict) else "객체"
     return {"string": "문자열", "integer": "정수", "number": "숫자", "boolean": "참/거짓"}.get(t, t or "?")
 
 
@@ -49,6 +50,15 @@ async def collect() -> dict:
     return out
 
 
+def _conn_rows() -> list[str]:
+    from core.config import get_settings
+    try:
+        conns = json.loads((get_settings().seed_dir / "connections.json").read_text(encoding="utf-8"))
+    except OSError:
+        return []
+    return [f"| `{c.get('slug') or c['mode']}` | {c.get('label', '')} | {ROLE_LABEL[c['mode']]} |" for c in conns]
+
+
 def render(tools: dict) -> str:
     names = {m: [t["name"] for t in ts] for m, ts in tools.items()}
     common = [n for n in names["drafter"] if n in names["approver"]]
@@ -56,7 +66,12 @@ def render(tools: dict) -> str:
              "> 이 문서는 `uv run python -m mcp_server.export_spec`로 서버 코드에서 만든다. 손으로 고치지 않는다.", "",
              "## 서버 지침 (instructions)", "", f"> {INSTRUCTIONS}", "",
              f"- 글자 수: {len(INSTRUCTIONS)}자 (앞 512자 안에 핵심을 담는다, 설계서 6.1)",
+             "- 둘째 줄부터 세부 지침이 붙는다(10/23: 원본 대조 확인, 첨부 파일 이름, 고유명사 그대로 쓰기, TIMING):", "",
+             f"> {DETAILS}", "",
              "- 연결별로 끝에 연결 이름과 역할 안내 한 줄이 붙는다.", "",
+             "## 연결 (seed/connections.json)", "",
+             "연결마다 사용자와 역할이 고정된다. HTTP(ChatGPT)로는 `/mcp/<비밀값>/<slug>` 주소 하나가 연결 하나다. 시연 기본은 앞의 두 개다.", "",
+             "| slug | 사용자 | 역할 |", "|---|---|---|", *_conn_rows(), "",
              "## 연결별 툴 범위", "",
              "| 연결 | 툴 수 | 툴 |", "|---|---|---|"]
     for m in ("drafter", "approver"):
@@ -66,7 +81,8 @@ def render(tools: dict) -> str:
               "## 오류 응답", "",
               "툴이 실패하면 `isError: true`와 함께 아래 형식의 JSON 문자열을 돌려준다(앞에 SDK가 붙이는 `Error executing tool …:` 머리말이 있다).", "",
               "```json", '{"ok": false, "code": "PLAN_NOT_APPROVED", "message": "…", "fix_hint": "다음에 할 일", "details": {}}', "```", "",
-              "- 전결 서버 판정 오류: 설계서 6.4의 11개 + `ALREADY_SUBMITTED`, `NOT_FOUND`, `FORBIDDEN`, `BAD_REQUEST`, `UNAUTHORIZED`",
+              "- 전결 서버 판정 오류: 설계서 6.4의 11개 + `ALREADY_SUBMITTED`, `NOT_FOUND`, `FORBIDDEN`, `BAD_REQUEST`, `UNAUTHORIZED`, `ORIGINAL_CHECK_REQUIRED`(확인 ② 때 원본 대조 표시 없음, 제22조)",
+              "- 저장(save_drafts) 결과의 오류·경고 코드: 02 문서 2장(10/23에 `ATTACHMENT_MISSING`, `TIMING` 추가)",
               "- MCP 서버가 붙이는 오류: `SERVER_UNAVAILABLE`(전결 서버에 연결할 수 없음), `SERVER_ERROR`(알 수 없는 응답)",
               "- 입력 형식이 스키마와 다르면 SDK가 필드 이름과 함께 검증 오류를 돌려준다.", "",
               "## 툴 상세", ""]

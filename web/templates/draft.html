@@ -2,30 +2,86 @@
 {% from "_macros.html" import status, ai, issues %}
 {% block title %}{{ d.doc_id }} 초안{% endblock %}
 {% block content %}
+{% set web = d.created_via == 'WEB' %}
 <div class="pagehead">
   <a class="backlink" href="/drafts">← 임시저장함</a>
-  <h1><span class="mono">{{ d.doc_id }}</span> {{ d.title }} {{ status(d.status, d.status_label) }} {{ ai(d.ai_written) }}</h1>
-  <p class="sub">{{ d.process_name }} · 기안자 {{ d.drafter.name }}{% if d.plan_id %} · <a href="/plans/{{ d.plan_id }}">{{ d.plan_id }} {{ d.item_no }}번 항목</a>{% endif %}{% if d.original_doc_id %} · 반려된 {{ d.original.doc_no if d.original else d.original_doc_id }}을 고친 재기안{% endif %}</p>
+  <h1><span class="mono">{{ d.doc_id }}</span> {{ d.title }} {{ status(d.status, d.status_label) }} {{ ai(d.ai_written) }}{% if web %} <span class="badge">화면 작성</span>{% endif %}</h1>
+  <p class="sub">{{ d.process_name }} · 기안자 {{ d.drafter.name }} · v{{ d.version }}{% if d.reservation and d.reservation.status == 'HOLD' %} · <b>회의실 가예약</b> ⚔️ {{ d.reservation.note or '' }}{% endif %}{% if d.plan_id %} · <a href="/plans/{{ d.plan_id }}">{{ d.plan_id }} {{ d.item_no }}번 항목</a>{% endif %}{% if d.original_doc_id %} · 반려된 <a href="/docs/{{ d.original_doc_id }}">{{ d.original.doc_no if d.original else d.original_doc_id }}</a>을 고친 재기안{% endif %}</p>
 </div>
 
 {% set confirmed = d.status == 'CONFIRMED' %}
 <ol class="stepper" aria-label="진행 단계">
+  {% if d.plan_id %}
   <li class="done"><span class="dot">✓</span><span>작업 계획 승인 <span class="by">확인 ①</span></span></li>
+  {% else %}
+  <li class="done"><span class="dot">✓</span><span>초안 작성 <span class="by">{{ '사람 · 화면' if web else 'AI' }}</span></span></li>
+  {% endif %}
   <li class="{{ 'done' if confirmed else 'now' }}"><span class="dot">{{ '✓' if confirmed else '2' }}</span><span>초안 확인 <span class="by">확인 ②{% if not confirmed %} · 지금, 사람이 확인{% endif %}</span></span></li>
-  <li class="{{ 'now' if confirmed }}"><span class="dot">3</span><span>상신 <span class="by">확인 ③{% if confirmed %} · 지금, AI가 대화에서 허락받아 올림{% endif %}</span></span></li>
+  <li class="{{ 'now' if confirmed }}"><span class="dot">3</span><span>상신 <span class="by">확인 ③{% if confirmed %} · 지금, {{ '화면에서 [상신]' if d.can_submit else 'AI가 대화에서 허락받아 올림' }}{% endif %}</span></span></li>
 </ol>
 
+{% macro reason_form() -%}
+  <form method="post" action="/drafts/{{ d.doc_id }}/reasons" class="inlineform">
+    {% for k in d.missing_reasons %}
+    <div class="field"><label for="r-{{ loop.index }}">{{ k|rk }}</label>
+      <input id="r-{{ loop.index }}" type="text" name="r.{{ k }}" placeholder="사유를 적어 주세요" autocomplete="off"></div>
+    {% endfor %}
+    <button class="btn primary">사유 저장</button>
+  </form>
+{%- endmacro %}
 {% if d.status == 'INVALID' %}
-<div class="actionbar bad"><span><b>검증 오류가 있어 확인할 수 없습니다.</b> AI가 고쳐 다시 저장하면 이 화면이 바로 바뀝니다.</span></div>
+<div class="actionbar bad">
+  <span><b>검증 오류가 있어 확인할 수 없습니다.</b> {% if d.ai_written %}AI가 고쳐 다시 저장하면 이 화면이 바로 바뀝니다. 직접 고쳐도 됩니다.{% else %}[고치기]에서 값을 바로잡아 다시 저장하세요.{% endif %}
+    {% if d.missing_reasons %}사유가 없어서 난 오류는 아래에 사유를 적으면 풀립니다.{% endif %}</span>
+  {% if d.can_edit %}<a class="btn primary" href="/drafts/{{ d.doc_id }}/edit">고치기</a>{% endif %}
+  {% if d.can_edit and d.missing_reasons %}{{ reason_form() }}{% endif %}
+</div>
 {% elif d.missing_reasons %}
-<div class="actionbar warn"><span><b>사유가 필요합니다:</b> {{ d.missing_reasons|map('rk')|join(', ') }}. 사람이 정해야 하는 값이라 AI가 묻습니다. 대화에서 답하면 AI가 저장합니다.</span></div>
+<div class="actionbar warn">
+  <span><b>사유가 필요합니다.</b> 사람이 정해야 하는 값이라 AI가 지어내지 않습니다. {{ '대화에서 답하면 AI가 저장합니다. 여기에 바로 적어도 됩니다.' if d.ai_written else '아래에 적고 저장하세요.' }}</span>
+  {% if d.can_edit %}{{ reason_form() }}{% endif %}
+</div>
 {% elif d.can_confirm %}
 <div class="actionbar">
-  <span>내용이 맞으면 확인하세요 <b>(확인 ②)</b>. 확인해야 AI가 상신할 수 있습니다{% if demo.confirm_mode == 'B' %} · 지금은 화면 확인형(B)이라 여기서만 확인됩니다{% endif %}.</span>
-  <form method="post" action="/drafts/{{ d.doc_id }}/confirm"><button class="btn primary">내용 확인</button></form>
+  <form method="post" action="/drafts/{{ d.doc_id }}/confirm" class="inlineform">
+    <span>내용이 맞으면 확인하세요 <b>(확인 ②)</b>. {% if d.can_submit or web %}확인한 뒤 화면에서 상신합니다{% else %}확인해야 AI가 상신할 수 있습니다{% endif %}{% if demo.confirm_mode == 'B' %} · 지금은 화면 확인형(B)이라 여기서만 확인됩니다{% endif %}.</span>
+    {% if d.low_confidence %}
+    <fieldset class="origcheck">
+      <legend>판독이 불확실한 증빙 {{ d.low_confidence|length }}건 · 원본과 대조했나요? <span class="art">제22조</span></legend>
+      {% for e in d.low_confidence %}
+      <label class="check"><input type="checkbox" name="original_checked" value="{{ e.seq }}">
+        <span><b>증빙 {{ e.seq }}번</b> {{ e.date }} · {{ e.merchant }} · {{ e.amount|won }} <span class="muted">(판독 신뢰도 {{ '%.2f'|format(e.confidence) if e.confidence is number else '—' }})</span><br>
+        원본(종이 영수증·카드 사용 내역)과 날짜·금액을 대조했고 값이 맞습니다.</span></label>
+      {% endfor %}
+      <p class="note">값이 다르면 확인하지 말고 [고치기]로 바로잡으세요. 원본을 다시 올릴 필요는 없습니다.</p>
+    </fieldset>
+    {% endif %}
+    <button class="btn primary">내용 확인</button>
+  </form>
 </div>
 {% elif d.status == 'CONFIRMED' %}
-<div class="actionbar ok"><span><b>확인완료</b> {{ d.confirmed_at|hm }} · AI가 상신할 수 있습니다(확인 ③은 대화에서). 내용을 고치면 확인이 풀립니다.</span></div>
+<div class="actionbar ok">
+  <span><b>확인완료</b> {{ d.confirmed_at|hm }}{% if d.original_checked %} · 증빙 {{ d.original_checked|join(', ') }}번 원본 대조 확인(제22조){% endif %}
+    · {% if d.can_submit %}[상신]을 누르면 결재선으로 올라갑니다(확인 ③).{% else %}AI가 상신할 수 있습니다(확인 ③은 대화에서).{% endif %} 내용을 고치면 확인이 풀립니다.</span>
+  {% if d.can_submit %}<form method="post" action="/drafts/{{ d.doc_id }}/submit"><button class="btn primary">상신</button></form>{% endif %}
+</div>
+{% endif %}
+
+{% if d.conflicts and d.duel_enabled %}
+<section class="duel-call" aria-label="회의실 가위바위보">
+  <div class="duel-call-head"><span class="duel-hands" aria-hidden="true">✊✌️✋</span>
+    <div><b>이 시간을 꼭 써야 한다면? 기존 예약자와 가위바위보로 붙어 보세요.</b>
+    <p>이기면 그 예약을 치우고 내 초안에 가예약이 잡힙니다. 지면 예약은 그대로입니다. 상대 화면에도 대결 창이 뜹니다. <span class="duel-tag">재미 기능 · 규정 밖</span></p></div></div>
+  {% for c in d.conflicts %}
+  <div class="duel-row">
+    <div class="duel-target"><b>{{ c.room_name }} {{ c.date[5:] }} {{ c.start }}~{{ c.end }}</b> ‘{{ c.title }}’ · {{ c.holder_name }} · {{ c.status_label }}{% if c.note %} · {{ c.note }}{% endif %}</div>
+    {% if c.duel and c.duel.status == 'WAITING' %}<button type="button" class="btn duel-btn" onclick="window.duelPoll && window.duelPoll(true)">⚔️ 대결 진행 중 · 대결 창 열기</button>
+    {% elif c.can_challenge %}
+    <form method="post" action="/duel/start"><input type="hidden" name="doc_id" value="{{ d.doc_id }}"><input type="hidden" name="res_id" value="{{ c.res_id }}"><button class="btn duel-btn">⚔️ 가위바위보로 도전</button></form>
+    {% else %}<span class="muted small">{{ c.why_not }}</span>{% endif %}
+  </div>
+  {% endfor %}
+</section>
 {% endif %}
 
 <div class="cols">
@@ -33,13 +89,20 @@
     {{ issues(d.errors, '오류') }}
     {{ issues(d.warnings, '경고') }}
     {% include "_docbody.html" %}
+    {% if d.can_edit %}
+    <div class="btnrow">
+      <a class="btn" href="/drafts/{{ d.doc_id }}/edit">고치기</a>
+      <form method="post" action="/drafts/{{ d.doc_id }}/cancel" onsubmit="return confirm('이 초안을 취소할까요?')"><button class="btn reject">초안 취소</button></form>
+    </div>
+    {% endif %}
   </div>
   <aside class="col-side">
     <div class="card">
       <h3>결재선 미리보기</h3>
-      {% if d.line_preview %}
+      {% if d.line_preview and d.line_preview.steps %}
         <p class="muted small">{{ d.line_preview.band }}</p>
         <ol class="steps">{% for s in d.line_preview.steps %}<li class="step step-waiting"><span class="step-who">{{ s.name }} {{ s.title }}</span><span class="step-kind">{{ s.kind }}{% if s.level != '합의' %} · {{ s.level }}{% endif %}</span><span class="step-basis">{{ s.basis }}</span></li>{% endfor %}</ol>
+      {% elif d.line_preview %}<p class="err-text">결재할 사람이 없습니다. 기안자 위로 결재할 직책자가 조직도에 없습니다(제3조).</p>
       {% else %}<p class="muted">오류를 고치면 결재선이 계산됩니다.</p>{% endif %}
     </div>
     <div class="card">

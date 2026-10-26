@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from . import approval_line, clock, dashboard, db, notify, regulations, review, validation
+from . import approval_line, cases, clock, dashboard, db, notify, regulations, review, validation
 from .config import get_settings
 from .errors import ServiceError
 from .models import (ApprovalStep, Article, AuditLog, Connection, Department, Document, Employee, Notification,
@@ -22,7 +22,11 @@ STATUS_LABEL = {"INVALID": "작성중 (검증 오류)", "VALID": "작성완료",
                 "APPROVED": "승인", "REJECTED": "반려", "CANCELED": "취소"}
 PLAN_LABEL = {"PENDING": "승인대기", "APPROVED": "승인됨", "CANCELED": "취소"}
 STEP_LABEL = {"WAITING": "대기 전", "PENDING": "결재 차례", "APPROVED": "승인", "REJECTED": "반려", "SKIPPED": "중단"}
+AGREE_LABEL = {"PENDING": "합의 차례", "APPROVED": "합의", "REJECTED": "합의 안 함"}
 RES_LABEL = {"HOLD": "가예약", "CONFIRMED": "확정", "RELEASED": "해제"}
+NOTE_LABEL = {"IMMEDIATE": "즉시", "DIGEST": "정기", "RESULT": "결재 결과", "DELAY": "처리 지연"}
+DRAFT_STATES = ("INVALID", "VALID", "CONFIRMED")
+APPROVER_TITLES = ("팀장", "실장", "본부장")
 
 
 @dataclass(frozen=True)
@@ -99,12 +103,25 @@ def doc_title(s: Session, d: Document) -> str:
 
 
 def steps_view(s: Session, doc_id: str) -> list[dict]:
+    d = s.get(Document, doc_id)
+    now = clock.now(s)
     out = []
     for st in s.scalars(select(ApprovalStep).where(ApprovalStep.doc_id == doc_id).order_by(ApprovalStep.seq)):
-        out.append({"seq": st.seq, "approver": st.approver, "name": _name(s, st.approver), "kind": st.kind,
-                    "level": st.level, "status": st.status, "status_label": STEP_LABEL[st.status],
-                    "basis": st.basis, "comment": st.comment, "started_at": st.started_at, "acted_at": st.acted_at})
+        label = AGREE_LABEL.get(st.status, STEP_LABEL[st.status]) if st.kind == "합의" else STEP_LABEL[st.status]
+        row = {"seq": st.seq, "approver": st.approver, "name": _name(s, st.approver), "kind": st.kind,
+               "level": st.level, "status": st.status, "status_label": label,
+               "basis": st.basis, "comment": st.comment, "started_at": st.started_at, "acted_at": st.acted_at,
+               "delay_reason": st.delay_reason, "delay_until": st.delay_until, "delay_at": st.delay_at}
+        if st.status == "PENDING" and d is not None and d.status == "SUBMITTED":
+            row["due"] = review.step_due(s, d, st, now)      # 제4조 처리 기한
+        out.append(row)
     return out
+
+
+def _low_conf_seqs(d: Document) -> list[int]:
+    """판독 신뢰도가 낮다고 서버가 판정한 증빙 번호 (제22조)."""
+    return sorted({w["evidence_seq"] for w in (d.validation or {}).get("warnings", [])
+                   if w.get("code") == "LOW_CONFIDENCE" and w.get("evidence_seq")})
 
 
 def doc_view(s: Session, d: Document, *, full: bool = True) -> dict:
@@ -113,21 +130,31 @@ def doc_view(s: Session, d: Document, *, full: bool = True) -> dict:
          "process_name": p["name"], "title": doc_title(s, d), "drafter": {"emp_no": d.drafter, "name": _name(s, d.drafter)},
          "status": d.status, "status_label": STATUS_LABEL[d.status], "version": d.version,
          "ai_written": d.created_via == "MCP" or d.updated_via == "MCP",
+         "created_via": d.created_via, "updated_via": d.updated_via,
          "submitted_at": d.submitted_at, "final_at": d.final_at, "link": link(_doc_path(d))}
     if full:
+        low = _low_conf_seqs(d)
+        checked = list(d.original_checked or [])
         v.update({"values": d.values, "evidence": d.evidence, "reasons": d.reasons, "memo": d.memo,
                   "errors": (d.validation or {}).get("errors", []), "warnings": (d.validation or {}).get("warnings", []),
                   "missing_reasons": (d.validation or {}).get("missing_reasons", []),
+                  "low_confidence": [{"seq": e.get("seq"), "date": e.get("date"), "merchant": e.get("merchant"),
+                                      "amount": e.get("amount"), "confidence": e.get("confidence"),
+                                      "checked": e.get("seq") in checked}
+                                     for e in d.evidence or [] if e.get("seq") in low],
+                  "original_checked": checked, "original_checked_at": d.original_checked_at,
                   "confirmed_at": d.confirmed_at, "original_doc_id": d.original_doc_id,
                   "reject_comment": d.reject_comment, "approval_line": steps_view(s, d.id) if d.submitted_at else None})
+        if d.status == "SUBMITTED":
+            v["due"] = review.step_due(s, d, review.current_step(s, d), clock.now(s))
         if d.process_id == "MTG-01":
             res = s.scalars(select(Reservation).where(Reservation.doc_id == d.id)).first()
-            v["reservation"] = {"status": res.status, "status_label": RES_LABEL[res.status]} if res else None
+            v["reservation"] = {"status": res.status, "status_label": RES_LABEL[res.status], "note": res.note} if res else None
     return v
 
 
 def _doc_path(d: Document) -> str:
-    return f"/drafts/{d.id}" if d.status in ("INVALID", "VALID", "CONFIRMED") else f"/docs/{d.id}"
+    return f"/drafts/{d.id}" if d.status in DRAFT_STATES else f"/docs/{d.id}"
 
 
 def _plan_view(s: Session, p: Plan) -> dict:
@@ -339,8 +366,10 @@ def cancel_plan(ctx: Ctx, plan_id: str, reason: str = "") -> dict:
             return _plan_view(s, p)
         now = clock.now(s)
         canceled = []
+        from . import duel
         for d in s.scalars(select(Document).where(Document.plan_id == p.id, Document.status.in_(("INVALID", "VALID", "CONFIRMED")))):
             d.status, d.updated_at, d.updated_via = "CANCELED", clock.iso(now), ctx.channel
+            duel.release_for_doc(s, d, "계획 취소로 가위바위보 승리 가예약을 풂")
             canceled.append(d.id)
         p.status, p.canceled_at, p.cancel_reason = "CANCELED", clock.iso(now), reason
         audit(s, ctx, "cancel_plan", p.id, f"사유: {reason} / 함께 취소: {', '.join(canceled) or '없음'}")
@@ -391,49 +420,78 @@ def _save_one(s: Session, ctx: Ctx, plan: Plan, drafter: Employee, dr: dict, now
                 "message": "이미 상신된 문서는 고칠 수 없습니다."}
     if existing and existing.status == "REJECTED":
         original, existing = existing, None
+    d, res, note = _write_doc(s, ctx, drafter, p, dr, now, existing=existing, original=original,
+                              plan_id=plan.id, item_no=item.item_no)
+    return _save_result(s, p, drafter, d, res, note)
+
+
+def _write_doc(s: Session, ctx: Ctx, drafter: Employee, p: dict, dr: dict, now: dt.datetime, *,
+               existing: Document | None = None, original: Document | None = None,
+               plan_id: str | None = None, item_no: int | None = None) -> tuple[Document, dict, str]:
+    """초안을 검증해 새로 만들거나(existing 없음) 고친다. AI(save_drafts)와 화면(save_draft_ui)이 같이 쓴다."""
+    orig_id = original.id if original else (existing.original_doc_id if existing else None)
     res = validation.validate(s, p, drafter, dr.get("values") or {}, dr.get("evidence") or [], dr.get("reasons") or {},
-                              now=now, doc_id=existing.id if existing else None,
-                              original_doc_id=original.id if original else None)
+                              now=now, doc_id=existing.id if existing else None, original_doc_id=orig_id)
     status = "INVALID" if res["errors"] else "VALID"
+    state = {k: res[k] for k in ("errors", "warnings", "missing_reasons")}
+    reasons = {str(k): str(v) for k, v in (dr.get("reasons") or {}).items() if str(v or "").strip()}
     note = ""
     if existing:
         d = existing
         if d.status == "CONFIRMED":
             note = "확인완료였던 문서를 고쳐 확인이 해제되었습니다. 다시 확인(②)을 받아야 합니다."
-        d.values, d.evidence, d.reasons = res["values"], res["evidence"], dict(dr.get("reasons") or {})
+        d.values, d.evidence, d.reasons = res["values"], res["evidence"], reasons
         d.memo = dr.get("memo", d.memo)
         d.version += 1
         d.status, d.confirmed_at = status, None
-        d.validation = {k: res[k] for k in ("errors", "warnings", "missing_reasons")}
+        d.original_checked, d.original_checked_at = [], None      # 원본 대조(제22조)도 확인 ②와 함께 다시 받는다
+        d.validation = state
         d.updated_at, d.updated_via = clock.iso(now), ctx.channel
     else:
-        d = Document(id=_next_id(s, Document, "DOC-", 4), plan_id=plan.id, item_no=item.item_no, process_id=p["id"],
-                     drafter=drafter.emp_no, values=res["values"], evidence=res["evidence"], reasons=dict(dr.get("reasons") or {}),
-                     memo=dr.get("memo", ""), status=status, validation={k: res[k] for k in ("errors", "warnings", "missing_reasons")},
-                     version=1, original_doc_id=original.id if original else None, created_via=ctx.channel,
-                     updated_via=ctx.channel, created_at=clock.iso(now), updated_at=clock.iso(now))
+        d = Document(id=_next_id(s, Document, "DOC-", 4), plan_id=plan_id, item_no=item_no, process_id=p["id"],
+                     drafter=drafter.emp_no, values=res["values"], evidence=res["evidence"], reasons=reasons,
+                     memo=dr.get("memo", "") or "", status=status, validation=state, version=1,
+                     original_doc_id=original.id if original else None, original_checked=[],
+                     created_via=ctx.channel, updated_via=ctx.channel, created_at=clock.iso(now), updated_at=clock.iso(now))
         s.add(d)
         s.flush()
         if original:
             note = f"반려된 {original.doc_no}을 고쳐 새 문서로 다시 기안했습니다."
     if p["id"] == "MTG-01":
         _sync_room_hold(s, d)
-    preview = None
+    return d, res, note
+
+
+def _save_result(s: Session, p: dict, drafter: Employee, d: Document, res: dict, note: str) -> dict:
+    preview, line_note = None, ""
     if not res["errors"]:
         preview = [{"seq": x["seq"], "name": x["name"], "kind": x["kind"], "level": x["level"]}
                    for x in approval_line.compute(s, p, drafter, d.values)["steps"]]
-    return {"item_no": item.item_no, "doc_id": d.id, "ok": not res["errors"], "status": d.status,
+        if not preview:
+            line_note = "결재할 사람이 없습니다. 기안자 위로 결재할 직책자가 조직도에 없어 상신할 수 없습니다(제3조)."
+    low = _low_conf_seqs(d)
+    return {"item_no": d.item_no, "doc_id": d.id, "ok": not res["errors"], "status": d.status,
             "status_label": STATUS_LABEL[d.status], "version": d.version, "errors": res["errors"],
             "warnings": res["warnings"], "missing_reasons": res["missing_reasons"], "approval_line_preview": preview,
-            "note": note, "link": link(f"/drafts/{d.id}")}
+            "approval_line_note": line_note,
+            "original_check_needed": low,
+            "note": " ".join(x for x in (note, (f"증빙 {', '.join(map(str, low))}번은 판독이 불확실합니다. 확인(②) 때 기안자가 원본과 "
+                                                 "대조했는지 확인합니다(제22조)." if low else "")) if x),
+            "link": link(f"/drafts/{d.id}")}
 
 
 def _sync_room_hold(s: Session, d: Document) -> None:
-    """초안 단계에서는 예약을 잡지 않는다. 상신 때 가예약한다(설계서 5.3)."""
-    return None
+    """초안 단계에서는 예약을 잡지 않는다. 상신 때 가예약한다(설계서 5.3).
+    예외: 회의실 가위바위보에서 이긴 초안은 상신 전에도 가예약이 있다(재미 기능). 날짜·시간·회의실을 바꾸면 그 가예약을 푼다."""
+    v = d.values or {}
+    for r in s.scalars(select(Reservation).where(Reservation.doc_id == d.id, Reservation.status == "HOLD")):
+        if (r.room_id, r.date, r.start, r.end) != (v.get("room"), v.get("date"), v.get("start"), v.get("end")):
+            r.status, r.note = "RELEASED", "초안의 날짜·시간·회의실을 바꿔 가위바위보 승리 가예약을 풂"
 
 
-def confirm_drafts(ctx: Ctx, doc_ids: list[str]) -> dict:
+def confirm_drafts(ctx: Ctx, doc_ids: list[str], original_checked: dict | None = None) -> dict:
+    """확인 ②. original_checked: {문서 ID: [기안자가 원본과 대조했다고 답한 증빙 번호]} (제22조)."""
+    checked_map = {str(k): v for k, v in (original_checked or {}).items()}
     with db.session() as s:
         if ctx.channel == "MCP":
             _require_mode(ctx, "drafter")
@@ -445,20 +503,37 @@ def confirm_drafts(ctx: Ctx, doc_ids: list[str]) -> dict:
         for did in doc_ids or []:
             try:
                 d = _own_doc(s, ctx, did)
-                results.append(_confirm_one(s, ctx, d, now))
+                results.append(_confirm_one(s, ctx, d, now, checked_map.get(did, checked_map.get(d.doc_no or ""))))
             except ServiceError as e:
                 results.append({"doc_id": did, **e.to_dict()})
                 audit(s, ctx, "confirm_draft", did, e.message, result=e.code)
-        return {"results": results, "next": "확인완료 문서는 submit_drafts로 상신할 수 있습니다(확인 ③)."}
+        return {"results": results, "next": "확인완료 문서는 submit_drafts로 상신할 수 있습니다(확인 ③). "
+                                            "ORIGINAL_CHECK_REQUIRED가 온 문서는 사용자에게 원본 대조 여부를 물은 뒤 다시 부르세요."}
 
 
-def _confirm_one(s: Session, ctx: Ctx, d: Document, now: dt.datetime) -> dict:
+def _as_seqs(v) -> set[int]:
+    if v is None:
+        return set()
+    if isinstance(v, (int, str)):
+        v = [v]
+    out = set()
+    for x in v:
+        try:
+            out.add(int(x))
+        except (TypeError, ValueError):
+            pass
+    return out
+
+
+def _confirm_one(s: Session, ctx: Ctx, d: Document, now: dt.datetime, checked=None) -> dict:
     if d.status in ("SUBMITTED", "APPROVED"):
         raise ServiceError("ALREADY_SUBMITTED")
     if d.status == "CANCELED":
-        raise ServiceError("PLAN_CANCELED")
+        raise ServiceError("PLAN_CANCELED", "취소된 문서입니다.")
+    if d.status == "REJECTED":
+        raise ServiceError("ALREADY_SUBMITTED", "반려된 문서입니다. 다시 기안한 새 문서를 확인하세요.")
     if d.status == "INVALID":
-        raise ServiceError("VALIDATION_FAILED", fix_hint="오류를 고쳐 save_drafts로 다시 저장하세요.",
+        raise ServiceError("VALIDATION_FAILED", fix_hint="오류를 고쳐 다시 저장하세요.",
                            details={"errors": (d.validation or {}).get("errors", [])})
     missing = (d.validation or {}).get("missing_reasons", [])
     if missing:
@@ -466,15 +541,42 @@ def _confirm_one(s: Session, ctx: Ctx, d: Document, now: dt.datetime) -> dict:
                            details={"missing_reasons": missing})
     if d.status == "CONFIRMED" and d.confirmed_version == d.version:
         return {"doc_id": d.id, "ok": True, "status": d.status, "message": "이미 확인완료입니다."}
+    need = _low_conf_seqs(d)
+    got = _as_seqs(checked)
+    lacking = [x for x in need if x not in got]
+    if lacking:
+        evs = [{"seq": e.get("seq"), "date": e.get("date"), "merchant": e.get("merchant"), "amount": e.get("amount"),
+                "confidence": e.get("confidence")} for e in d.evidence or [] if e.get("seq") in lacking]
+        hint = ("사용자에게 이 영수증의 원본(종이 영수증·카드 사용 내역)과 날짜·금액이 맞는지 물으세요. 맞다고 하면 "
+                f"original_checked에 {{\"{d.id}\": {lacking}}}를 넣어 confirm_drafts를 다시 부르세요. 값이 다르면 고쳐서 save_drafts로 다시 저장하세요."
+                if ctx.channel == "MCP" else
+                "원본(종이 영수증·카드 사용 내역)과 날짜·금액을 대조한 뒤 '원본과 대조했습니다'에 표시하고 다시 확인하세요.")
+        raise ServiceError("ORIGINAL_CHECK_REQUIRED",
+                           f"판독이 불확실한 증빙 {', '.join(map(str, lacking))}번을 기안자가 원본과 대조했는지 확인이 필요합니다(제22조).",
+                           fix_hint=hint, details={"doc_id": d.id, "evidence": evs})
+    d.original_checked = [x for x in need if x in got]
+    d.original_checked_at = clock.iso(now) if need else None
     d.status, d.confirmed_version, d.confirmed_at = "CONFIRMED", d.version, clock.iso(now)
-    audit(s, ctx, "confirm_draft", d.id, f"확인 ② v{d.version}")
-    return {"doc_id": d.id, "ok": True, "status": d.status, "status_label": STATUS_LABEL[d.status]}
+    audit(s, ctx, "confirm_draft", d.id, f"확인 ② v{d.version}"
+          + (f" · 증빙 {', '.join(map(str, need))}번 원본 대조 확인(제22조)" if need else ""))
+    return {"doc_id": d.id, "ok": True, "status": d.status, "status_label": STATUS_LABEL[d.status],
+            "original_checked": d.original_checked}
 
 
-def confirm_draft_ui(ctx: Ctx, doc_id: str) -> dict:
+def confirm_draft_ui(ctx: Ctx, doc_id: str, original_checked: list | None = None) -> dict:
     with db.session() as s:
         d = _own_doc(s, ctx, doc_id)
-        return _confirm_one(s, ctx, d, clock.now(s))
+        try:
+            return _confirm_one(s, ctx, d, clock.now(s), original_checked)
+        except ServiceError as e:
+            audit_web_failure(ctx, "confirm_draft", doc_id, e)
+            raise
+
+
+def audit_web_failure(ctx: Ctx, action: str, target: str, exc: ServiceError) -> None:
+    """화면에서 막힌 시도도 작업 기록에 남긴다. 실패한 요청의 세션은 되돌려지므로 따로 쓴다."""
+    with db.session() as s2:
+        audit(s2, ctx, action, target, f"{exc.message} {exc.fix_hint}".strip(), result=exc.code)
 
 
 def submit_drafts(ctx: Ctx, doc_ids: list[str]) -> dict:
@@ -506,6 +608,8 @@ def _submit_one(s: Session, ctx: Ctx, d: Document, now: dt.datetime) -> dict:
     plan = s.get(Plan, d.plan_id) if d.plan_id else None
     if plan and plan.status == "CANCELED":
         raise ServiceError("PLAN_CANCELED")
+    if d.status == "REJECTED":
+        raise ServiceError("ALREADY_SUBMITTED", "반려된 문서는 다시 올릴 수 없습니다. 고쳐서 다시 기안한 새 문서를 상신하세요.")
     if d.status != "CONFIRMED":
         if d.confirmed_version and d.confirmed_version != d.version:
             raise ServiceError("MODIFIED_AFTER_CONFIRM", fix_hint="확인 뒤 고친 내용(v%d → v%d)을 사용자에게 다시 확인받으세요."
@@ -524,7 +628,8 @@ def _submit_one(s: Session, ctx: Ctx, d: Document, now: dt.datetime) -> dict:
                            details={"errors": res["errors"]})
     line = approval_line.compute(s, p, drafter, d.values)
     if not line["steps"]:
-        raise ServiceError("BAD_REQUEST", "결재선을 만들 수 없습니다(결재자가 없음).")
+        raise ServiceError("BAD_REQUEST", "결재선을 만들 수 없습니다. 기안자 위로 결재할 직책자가 조직도에 없습니다(제3조).",
+                           fix_hint="이 시연 조직도에서 본부장은 최상위 직책이라 결재받을 사람이 없습니다. 다른 사용자로 기안하세요.")
     d.doc_no = _next_doc_no(s, now)
     d.status, d.submitted_at = "SUBMITTED", clock.iso(now)
     d.validation = {k: res[k] for k in ("errors", "warnings", "missing_reasons")}
@@ -535,8 +640,16 @@ def _submit_one(s: Session, ctx: Ctx, d: Document, now: dt.datetime) -> dict:
     hold = None
     if d.process_id == "MTG-01":
         v = d.values
-        s.add(Reservation(room_id=v["room"], date=v["date"], start=v["start"], end=v["end"], title=v.get("title", ""),
-                          emp_no=d.drafter, doc_id=d.id, status="HOLD"))
+        mine = s.scalars(select(Reservation).where(Reservation.doc_id == d.id)).first()   # 가위바위보 승리 가예약이 있으면 그대로 쓴다
+        if mine:
+            from .duel import WIN_NOTE
+            won = mine.status == "HOLD" and mine.note == WIN_NOTE
+            mine.room_id, mine.date, mine.start, mine.end = v["room"], v["date"], v["start"], v["end"]
+            mine.title, mine.emp_no, mine.status = v.get("title", ""), d.drafter, "HOLD"
+            mine.note = "가위바위보 승리 자리" if won else None
+        else:
+            s.add(Reservation(room_id=v["room"], date=v["date"], start=v["start"], end=v["end"], title=v.get("title", ""),
+                              emp_no=d.drafter, doc_id=d.id, status="HOLD"))
         hold = "가예약"
     s.flush()
     audit(s, ctx, "submit_draft", d.id, f"확인 ③ 상신 {d.doc_no} → {line['steps'][0]['name']}" + (" / 회의실 가예약" if hold else ""))
@@ -560,17 +673,205 @@ def doc_detail(ctx: Ctx, doc_id: str) -> dict:
         if d.drafter != ctx.emp_no and not in_line:
             raise ServiceError("FORBIDDEN", "기안자나 결재선에 있는 사람만 볼 수 있습니다.")
         v = doc_view(s, d)
-        v["can_confirm"] = d.drafter == ctx.emp_no and d.status == "VALID" and not v["missing_reasons"]
+        own = d.drafter == ctx.emp_no
+        v["is_own"] = own
+        v["can_confirm"] = own and d.status == "VALID" and not v["missing_reasons"]
+        v["can_edit"] = own and d.status in DRAFT_STATES
+        v["can_cancel"] = own and d.status in DRAFT_STATES
+        # 화면에서 쓴 문서는 화면에서 상신한다. AI가 쓴 문서의 상신(확인 ③)은 대화에서 한다(설계서 4장).
+        v["can_submit"] = own and d.status == "CONFIRMED" and d.confirmed_version == d.version and d.created_via == "WEB"
+        v["plan_status"] = (s.get(Plan, d.plan_id).status if d.plan_id and s.get(Plan, d.plan_id) else None)
+        if d.status == "REJECTED":
+            again = s.scalars(select(Document).where(Document.original_doc_id == d.id, Document.status != "CANCELED")
+                              .order_by(Document.id.desc())).first()
+            v["redraft"] = doc_view(s, again, full=False) if again else None
+            v["can_redraft"] = own and not again
         if d.status == "SUBMITTED":
             st = review.current_step(s, d)
             v["can_decide"] = bool(st and st.approver == ctx.emp_no)
+            v["current_step"] = ({"seq": st.seq, "kind": st.kind, "level": st.level, "name": _name(s, st.approver),
+                                  "delay_reason": st.delay_reason, "delay_until": st.delay_until, "delay_at": st.delay_at}
+                                 if st else None)
             lvl, why = review.importance(s, d, clock.now(s))
             v["importance"], v["importance_reasons"] = lvl, why
         v["cautions"] = review.cautions(s, d) if d.status in ("SUBMITTED", "APPROVED", "REJECTED") else []
         if d.original_doc_id:
             o = s.get(Document, d.original_doc_id)
             v["original"] = doc_view(s, o, full=True) if o else None
+        if d.process_id == "MTG-01" and d.status in DRAFT_STATES:
+            from . import duel
+            v["conflicts"] = duel.conflicts_for(s, d, ctx.emp_no)
+            v["duel_enabled"] = duel.enabled(s)
         return v
+
+
+# ───────────────────────── 화면에서 직접 기안 (AI 없이) ─────────────────────────
+def case_list(ctx: Ctx) -> dict:
+    """'새 기안' 화면: 프로세스별 빈 양식과 조항별 사례."""
+    with db.session() as s:
+        me = _emp(s, ctx.emp_no)
+        byp = cases.by_process(s)
+        arts = {a.id: a.title for a in regulations.articles(s)}
+        procs = []
+        for pid, p in regulations.processes(s).items():
+            sp = regulations.spec(s, pid)
+            line = approval_line.compute(s, p, me, (p.get("example") or {}).get("values"))
+            procs.append({"process_id": pid, "name": p["name"], "when": p["when"],
+                          "articles": [{"id": a, "title": arts.get(a, "")} for a in p["articles"]],
+                          "bands": [b["label"] + (" + " + ", ".join(b["agreement"]) + " 합의" if b["agreement"] else "")
+                                    for b in sp["approval"]["bands"]],
+                          "agreement_if": [c["label"] for c in sp["approval"]["agreement_if"]],
+                          "my_line_example": [f"{x['name']} {x['level'] if x['kind'] == '결재' else '합의'}" for x in line["steps"]],
+                          "cases": [{k: v for k, v in c.items() if k != "data"} | {"user_label": _name(s, c["user"]) if c["user"] else None}
+                                    for c in byp.get(pid, [])]})
+        return {"me": {"emp_no": me.emp_no, "label": _name(s, me.emp_no), "grade": me.grade}, "processes": procs,
+                "today": clock.iso(clock.now(s))}
+
+
+def draft_form(ctx: Ctx, *, process_id: str | None = None, doc_id: str | None = None, case_id: str | None = None) -> dict:
+    """작성 양식에 채울 값. doc_id면 그 초안의 값, case_id면 사례 값, 둘 다 없으면 빈 양식."""
+    with db.session() as s:
+        d = None
+        if doc_id:
+            d = _own_doc(s, ctx, doc_id)
+            if d.status not in DRAFT_STATES:
+                raise ServiceError("ALREADY_SUBMITTED", "상신 전 초안만 고칠 수 있습니다.")
+            process_id = d.process_id
+        sp = regulations.spec(s, process_id or "")
+        case = cases.get(s, case_id) if case_id else None
+        if case and case["process_id"] != sp["process_id"]:
+            case = None
+        if d:
+            data = {"values": dict(d.values or {}), "evidence": list(d.evidence or []), "reasons": dict(d.reasons or {}),
+                    "memo": d.memo or ""}
+            vstate = d.validation or {}
+            keys = set(data["reasons"]) | set(vstate.get("missing_reasons", [])) | {
+                x["reason_key"] for x in vstate.get("errors", []) + vstate.get("warnings", []) if x.get("reason_key")}
+        elif case:
+            data = {**case["data"], "memo": ""}
+            keys = set(data.get("reasons") or {})
+        else:
+            data = {"values": {}, "evidence": [], "reasons": {}, "memo": ""}
+            keys = set()
+        com = regulations.common(s)
+        cats = (sp.get("evidence") or {}).get("categories") or com.get("evidence_categories", [])
+        case_view = ({k: v for k, v in case.items() if k != "data"} | {"user_label": _name(s, case["user"]) if case["user"] else None}
+                     if case else None)
+        return {"spec": sp, "doc": doc_view(s, d) if d else None, "case": case_view,
+                "data": data, "reason_keys": sorted(keys), "categories": cats,
+                "has_evidence": bool((sp.get("evidence") or {}).get("label")) and (sp.get("evidence") or {}).get("label") != "없음",
+                "has_nights": "lodging_per_night" in (sp.get("limits") or {}),
+                "confidence_threshold": com.get("confidence_threshold", 0.8), "today": clock.now(s).date().isoformat(),
+                "me": _name(s, ctx.emp_no)}
+
+
+def update_reasons_ui(ctx: Ctx, doc_id: str, reasons: dict) -> dict:
+    """초안 화면에서 사유만 채운다(사람이 정해야 하는 값). 나머지 값은 그대로 두고 다시 검증한다."""
+    with db.session() as s:
+        d = _own_doc(s, ctx, doc_id)
+        merged = {**(d.reasons or {}), **{k: v.strip() for k, v in (reasons or {}).items() if str(v or "").strip()}}
+        dr = {"values": dict(d.values or {}), "reasons": merged, "memo": d.memo or "",
+              "evidence": [{k: v for k, v in e.items() if k != "seq"} for e in d.evidence or []]}
+    return save_draft_ui(ctx, dr, doc_id=doc_id)
+
+
+def save_draft_ui(ctx: Ctx, dr: dict, *, process_id: str | None = None, doc_id: str | None = None) -> dict:
+    """화면의 작성 양식으로 초안을 새로 쓰거나(doc_id 없음) 고친다. AI가 쓴 초안과 같은 검증을 거친다."""
+    with db.session() as s:
+        drafter = _emp(s, ctx.emp_no)
+        now = clock.now(s)
+        existing = None
+        if doc_id:
+            existing = _own_doc(s, ctx, doc_id)
+            if existing.status not in DRAFT_STATES:
+                raise ServiceError("ALREADY_SUBMITTED", "상신 전 초안만 고칠 수 있습니다.",
+                                   fix_hint="반려된 문서는 [고쳐서 다시 기안]으로 새 문서를 만드세요." if existing.status == "REJECTED" else "")
+            p = regulations.get(s, existing.process_id)
+        else:
+            p = regulations.get(s, process_id or "")
+        d, res, note = _write_doc(s, ctx, drafter, p, dr, now, existing=existing)
+        audit(s, ctx, "save_draft", d.id, f"화면에서 {'고침' if existing else '작성'} v{d.version} → {STATUS_LABEL[d.status]}"
+              + (f" (오류 {len(res['errors'])})" if res["errors"] else "")
+              + (f" · {note}" if note else ""))
+        return _save_result(s, p, drafter, d, res, note)
+
+
+def redraft_ui(ctx: Ctx, doc_id: str) -> dict:
+    """반려된 문서를 원본으로 잇는 새 초안을 만든다(값·증빙·사유를 그대로 옮긴다). 이미 있으면 그것을 돌려준다."""
+    with db.session() as s:
+        o = _own_doc(s, ctx, doc_id)
+        if o.status != "REJECTED":
+            raise ServiceError("BAD_REQUEST", "반려된 문서만 다시 기안할 수 있습니다.")
+        again = s.scalars(select(Document).where(Document.original_doc_id == o.id, Document.status != "CANCELED")
+                          .order_by(Document.id.desc())).first()
+        if again:
+            return {"doc_id": again.id, "status": again.status, "existing": True}
+        p = regulations.get(s, o.process_id)
+        dr = {"values": dict(o.values or {}), "reasons": dict(o.reasons or {}), "memo": o.memo or "",
+              "evidence": [{k: v for k, v in e.items() if k != "seq"} for e in o.evidence or []]}
+        d, res, _ = _write_doc(s, ctx, _emp(s, ctx.emp_no), p, dr, clock.now(s), original=o,
+                               plan_id=o.plan_id, item_no=o.item_no)
+        audit(s, ctx, "redraft", d.id, f"반려된 {o.doc_no}을 원본으로 잇는 새 초안 (화면) → {STATUS_LABEL[d.status]}")
+        return {"doc_id": d.id, "status": d.status, "existing": False}
+
+
+def submit_draft_ui(ctx: Ctx, doc_id: str) -> dict:
+    """화면에서 쓴 초안의 상신(확인 ③). AI가 쓴 초안은 대화에서 submit_drafts로 올린다."""
+    with db.session() as s:
+        d = _own_doc(s, ctx, doc_id)
+        now = clock.now(s)
+        try:
+            if d.created_via != "WEB":
+                raise ServiceError("FORBIDDEN", "AI가 쓴 초안은 대화에서 AI에게 올려 달라고 하면 상신됩니다(확인 ③).")
+            r = _submit_one(s, ctx, d, now)
+        except ServiceError as e:
+            audit_web_failure(ctx, "submit_draft", doc_id, e)
+            raise
+        first = r.pop("_first_approver")
+        s.flush()
+        notified = notify.check_urgent(s, {first}, now, "상신")
+        return {**r, "notified": [{"recipient": _name(s, n.recipient), "kind": n.kind} for n in notified]}
+
+
+def cancel_draft_ui(ctx: Ctx, doc_id: str, reason: str = "") -> dict:
+    with db.session() as s:
+        d = _own_doc(s, ctx, doc_id)
+        if d.status not in DRAFT_STATES:
+            raise ServiceError("ALREADY_SUBMITTED", "상신 전 초안만 취소할 수 있습니다.")
+        now = clock.now(s)
+        d.status, d.updated_at, d.updated_via = "CANCELED", clock.iso(now), ctx.channel
+        from . import duel
+        duel.release_for_doc(s, d, "초안을 취소해 가위바위보 승리 가예약을 풂")
+        audit(s, ctx, "cancel_draft", d.id, "초안 취소 (화면)" + (f": {reason}" if reason else ""))
+        return doc_view(s, d, full=False)
+
+
+def notify_delay(ctx: Ctx, doc_id: str, reason: str, until: str | None = None) -> dict:
+    """제4조: 처리 기한 안에 처리할 수 없으면 결재자가 기안자에게 사유를 알린다. 웹 화면에서만 한다."""
+    if ctx.channel != "WEB":
+        raise ServiceError("FORBIDDEN", "처리 지연 알림은 웹 화면에서만 보낼 수 있습니다.")
+    if not (reason or "").strip():
+        raise ServiceError("BAD_REQUEST", "지연 사유를 적어 주세요.")
+    with db.session() as s:
+        d = s.get(Document, doc_id)
+        if not d or d.status != "SUBMITTED":
+            raise ServiceError("NOT_FOUND", "결재대기 문서가 아닙니다.")
+        st = review.current_step(s, d)
+        if not st or st.approver != ctx.emp_no:
+            raise ServiceError("NOT_IN_APPROVAL_LINE", "지금 결재할 차례인 결재자만 지연 사유를 알릴 수 있습니다.")
+        u = None
+        if until:
+            try:
+                u = validation._to_date(until)
+            except (TypeError, ValueError):
+                raise ServiceError("BAD_REQUEST", "처리 예정일은 YYYY-MM-DD로 적어 주세요.")
+        now = clock.now(s)
+        st.delay_reason, st.delay_until, st.delay_at = reason.strip(), u, clock.iso(now)
+        notify.notify_drafter(s, d, "DELAY", f"{_name(s, ctx.emp_no)} · 처리 지연 사유 (제4조)", now,
+                              comment=reason.strip(), until=u)
+        audit(s, ctx, "delay_notice", d.id, f"{d.doc_no} 처리 지연 사유를 기안자에게 알림: {reason.strip()}"
+              + (f" (처리 예정 {u})" if u else ""))
+        return doc_view(s, d)
 
 
 # ───────────────────────── 상태 조회 ─────────────────────────
@@ -634,6 +935,7 @@ def get_review_brief(ctx: Ctx, doc_id: str) -> dict:
         v = doc_view(s, d)
         return {"doc_id": d.id, "doc_no": d.doc_no, "title": v["title"], "process_name": p["name"], "drafter": v["drafter"],
                 "status_label": v["status_label"], "importance": lvl, "importance_reasons": why,
+                "due": v.get("due"),
                 "summary": {"values": d.values, "evidence": d.evidence, "reasons": d.reasons},
                 "cautions": cs, "approval_line": v["approval_line"],
                 "resubmit_of": d.original_doc_id, "link": link(f"/review/{d.id}"),
@@ -655,16 +957,20 @@ def decide(ctx: Ctx, doc_id: str, decision: str, comment: str = "") -> dict:
         st.acted_at, st.comment = clock.iso(now), comment or None
         res = s.scalars(select(Reservation).where(Reservation.doc_id == d.id)).first()
         nxt_approver = None
+        if decision not in ("approve", "reject"):
+            raise ServiceError("BAD_REQUEST", "결정은 approve 또는 reject입니다.")
         if decision == "reject":
             if not comment.strip():
-                raise ServiceError("BAD_REQUEST", "반려 사유를 적어 주세요.")
+                raise ServiceError("BAD_REQUEST", "반려 사유를 적어 주세요." if st.kind != "합의" else "합의하지 않는 사유를 적어 주세요.")
             st.status = "REJECTED"
             for w in s.scalars(select(ApprovalStep).where(ApprovalStep.doc_id == d.id, ApprovalStep.status == "WAITING")):
                 w.status = "SKIPPED"
             d.status, d.final_at, d.reject_comment = "REJECTED", clock.iso(now), comment
-            if res:
+            if res and res.status != "RELEASED":
                 res.status = "RELEASED"
             audit(s, ctx, "reject", d.id, f"{d.doc_no} 반려: {comment}" + (" / 가예약 해제" if res else ""))
+            notify.notify_drafter(s, d, "RESULT", f"{_name(s, ctx.emp_no)} · {'합의 거부' if st.kind == '합의' else '반려'}",
+                                  now, comment=comment)
         else:
             st.status = "APPROVED"
             nxt = s.scalars(select(ApprovalStep).where(ApprovalStep.doc_id == d.id, ApprovalStep.status == "WAITING")
@@ -672,12 +978,14 @@ def decide(ctx: Ctx, doc_id: str, decision: str, comment: str = "") -> dict:
             if nxt:
                 nxt.status, nxt.started_at = "PENDING", clock.iso(now)
                 nxt_approver = nxt.approver
-                audit(s, ctx, "approve_step", d.id, f"{d.doc_no} {st.level} 승인 → {_name(s, nxt.approver)}")
+                audit(s, ctx, "approve_step", d.id, f"{d.doc_no} {st.level} {'합의' if st.kind == '합의' else '승인'} → {_name(s, nxt.approver)}")
             else:
                 d.status, d.final_at = "APPROVED", clock.iso(now)
-                if res:
+                if res and res.status == "HOLD":
                     res.status = "CONFIRMED"
                 audit(s, ctx, "approve", d.id, f"{d.doc_no} 최종 승인" + (" / 회의실 확정" if res else ""))
+                notify.notify_drafter(s, d, "RESULT", f"{_name(s, ctx.emp_no)} · 최종 승인" + (" · 회의실 확정" if res else ""),
+                                      now, comment=comment or None)
         s.flush()
         if nxt_approver:
             notify.check_urgent(s, {nxt_approver}, now, "앞 단계 승인")
@@ -701,7 +1009,8 @@ def notifications(ctx: Ctx, limit: int = 20) -> dict:
     with db.session() as s:
         rows = list(s.scalars(select(Notification).where(Notification.recipient == ctx.emp_no).order_by(Notification.id.desc()).limit(limit)))
         unread = s.scalar(select(func.count()).select_from(Notification).where(Notification.recipient == ctx.emp_no, Notification.read.is_(False)))
-        return {"unread": unread or 0, "items": [{"id": n.id, "kind": n.kind, "kind_label": "즉시" if n.kind == "IMMEDIATE" else "정기",
+        return {"unread": unread or 0, "items": [{"id": n.id, "kind": n.kind, "kind_label": NOTE_LABEL.get(n.kind, n.kind),
+                                                  "for_drafter": n.kind in ("RESULT", "DELAY"),
                                                   "created_at": n.created_at, "trigger": n.trigger, "docs": n.docs, "read": n.read} for n in rows]}
 
 
@@ -715,10 +1024,23 @@ def mark_notifications_read(ctx: Ctx, nid: int | None = None) -> None:
 
 
 # ───────────────────────── 화면용 조회 ─────────────────────────
+SWITCH_DRAFTERS = ["E3001", "E3002", "E3003", "E4017"]           # 김지훈 선임(시연), 정하늘 책임, 오세준 사원, 송서준 선임(경영지원팀)
+SWITCH_APPROVERS = ["E2001", "E1101", "E1001", "E2004", "E1102", "E1002", "E2002", "E2003"]
+
+
 def employees_for_switch() -> list[dict]:
+    """화면 상단 사용자 전환 목록. 기안자 묶음과 결재자(직책자) 묶음. 직책자도 화면에서 기안할 수 있다."""
     with db.session() as s:
-        people = ["E3001", "E2001", "E1101", "E2004", "E3002"]
-        return [{"emp_no": e, "label": _name(s, e)} for e in people if s.get(Employee, e)]
+        out = []
+        for group, people in (("기안자", SWITCH_DRAFTERS), ("결재자", SWITCH_APPROVERS)):
+            for e in people:
+                emp = s.get(Employee, e)
+                if not emp:
+                    continue
+                dept = s.get(Department, emp.dept)
+                out.append({"emp_no": e, "label": _name(s, e), "group": group, "dept": dept.name if dept else emp.dept,
+                            "role": "approver" if emp.title in APPROVER_TITLES else "drafter", "title": emp.title})
+        return out
 
 
 def rooms_schedule(start: str | None = None, days: int = 7) -> dict:
@@ -732,7 +1054,7 @@ def rooms_schedule(start: str | None = None, days: int = 7) -> dict:
         released = list(s.scalars(select(Reservation).where(Reservation.date.in_(dates), Reservation.status == "RELEASED")))
         def row(r):
             doc = s.get(Document, r.doc_id) if r.doc_id else None
-            return {"room": r.room_id, "date": r.date, "start": r.start, "end": r.end, "title": r.title,
+            return {"room": r.room_id, "date": r.date, "start": r.start, "end": r.end, "title": r.title, "note": r.note,
                     "who": _name(s, r.emp_no), "status": r.status, "status_label": RES_LABEL[r.status],
                     "doc": {"doc_id": doc.id, "doc_no": doc.doc_no} if doc else None}
         hol = clock.holidays(s)
@@ -746,7 +1068,15 @@ def rooms_schedule(start: str | None = None, days: int = 7) -> dict:
 def rules_page() -> dict:
     with db.session() as s:
         procs = regulations.processes(s)
-        return {"articles": [{"id": a.id, "title": a.title, "body": a.body,
+        allc = {c["id"]: c for c in cases.presets(s)}
+
+        def feats(aid):
+            return [{"text": f["text"], "how": f["how"],
+                     "cases": [{"id": cid, "label": allc[cid]["label"], "process_id": allc[cid]["process_id"],
+                                "user": allc[cid]["user"], "user_label": _name(s, allc[cid]["user"]) if allc[cid]["user"] else None}
+                               for cid in f["cases"] if cid in allc]}
+                    for f in cases.ARTICLE_FEATURES.get(aid, [])]
+        return {"articles": [{"id": a.id, "title": a.title, "body": a.body, "features": feats(a.id),
                               "processes": [pid for pid, p in procs.items() if a.id in p["articles"]]} for a in regulations.articles(s)],
                 "processes": [regulations.spec(s, pid) for pid in procs]}
 
@@ -767,8 +1097,9 @@ def home_dashboard() -> dict:
 
 # ───────────────────────── 시연 운영 ─────────────────────────
 def demo_state() -> dict:
+    from . import duel
     with db.session() as s:
-        return {"now": clock.iso(clock.now(s)), "confirm_mode": confirm_mode(s),
+        return {"now": clock.iso(clock.now(s)), "confirm_mode": confirm_mode(s), "duel_on": duel.enabled(s),
                 "start": (clock._state(s, "demo_start", {}) or {}).get("start"),
                 "digest": clock._state(s, "digest", {}), "clock": clock._state(s, "clock", {})}
 

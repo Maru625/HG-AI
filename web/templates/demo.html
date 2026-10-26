@@ -2,7 +2,11 @@
 {% block title %}시연 제어 패널{% endblock %}
 {% block content %}
 <div class="pagehead"><h1>시연 제어 패널</h1>
-  <p class="sub">발표자용입니다. 시연 시계, 정기 알림, 확인 방식, 초기화를 다룹니다. 시연 시계는 실제 시간과 함께 흐릅니다.</p></div>
+  <p class="sub">발표자용입니다. 시연 시계, 정기 알림, 확인 방식, 초기화를 다룹니다. {{ '시연 시계는 실제 시간과 함께 흐릅니다.' if flowing else '시연 시계는 멈춰 있습니다(배포 설정). 아래에서 맞추거나 옮길 때만 바뀝니다.' }}</p></div>
+{% if locked and not admin_ok %}
+<div class="actionbar warn"><span><b>운영자 키가 필요한 서버입니다.</b> 여러 사람이 함께 쓰는 서버라 초기화·시계·확인 방식 같은 조작은 운영자만 합니다. 보기와 결재 같은 일반 기능은 그대로 됩니다.</span>
+  <form method="post" action="/demo/unlock" class="row"><label for="admin-key" class="sr">운영자 키</label><input id="admin-key" type="text" name="key" placeholder="운영자 키" autocomplete="off"><button class="btn">확인</button></form></div>
+{% endif %}
 
 <div class="grid2">
   <div class="card">
@@ -40,6 +44,16 @@
   </div>
 
   <div class="card">
+    <h2>회의실 가위바위보 <span class="muted small">재미 기능 · 규정 밖</span></h2>
+    <p>지금: <b>{{ '켜짐' if demo.duel_on else '꺼짐' }}</b> · 겹치는 시간에 회의실을 신청하면 초안 화면에 [가위바위보로 도전]이 나옵니다. 두 사람 화면에 각각 대결 창이 뜨고 이긴 쪽이 자리를 갖습니다.</p>
+    <div class="row">
+      <form method="post" action="/demo/duel"><input type="hidden" name="on" value="1"><button class="btn {{ 'primary' if demo.duel_on }}">켜기</button></form>
+      <form method="post" action="/demo/duel"><input type="hidden" name="on" value="0"><button class="btn {{ 'primary' if not demo.duel_on }}">끄기</button></form>
+    </div>
+    <p class="note">규정 시연 중에는 꺼 두면 겹침이 그대로 오류로만 보입니다. AI 연결로는 대결할 수 없습니다.</p>
+  </div>
+
+  <div class="card">
     <h2>초기화</h2>
     <p>DB를 비우고 시드를 다시 적재합니다. 시연 시계는 {{ demo.start|hm if demo.start else '시작 시각' }}으로 돌아갑니다.</p>
     <form method="post" action="/demo/reset" onsubmit="return confirm('시연 데이터를 모두 지우고 처음 상태로 되돌릴까요?')"><button class="btn reject">처음 상태로 초기화</button></form>
@@ -48,20 +62,40 @@
 
 <div class="card">
   <h2>AI 연결 (MCP)</h2>
-  <p class="sub">연결마다 사용자가 고정됩니다. 기안자용 연결에는 쓰기 툴이, 결재자용 연결에는 읽기 툴만 있습니다.</p>
-  <table class="tbl"><thead><tr><th>연결</th><th>역할</th><th>토큰</th></tr></thead>
-    <tbody>{% for c in conns %}<tr><td>{{ c.label }}</td><td>{{ '기안자용 · 툴 14개' if c.mode == 'drafter' else '결재자용 · 읽기 툴 8개' }}</td><td class="mono">{{ c.token }}</td></tr>{% endfor %}</tbody></table>
-  {% if gpt %}
-  <div class="actionbar {{ 'ok' if gpt.public else 'warn' }} mt"><span><b>ChatGPT 연결 주소</b> ({{ gpt.tunnel or '터널 없음' }}, {{ gpt.created }})
-    {% for c in gpt.connections %}<br>{{ c.label }}: <span class="mono">{{ c.url }}</span>{% endfor %}
-    {% if not gpt.public %}<br>공개 주소가 아니라 ChatGPT에서 연결할 수 없습니다. 터널을 설치하고 다시 실행하세요.{% endif %}</span></div>
-  {% else %}
-  <p class="note mt">ChatGPT로 시연하려면 <span class="mono">uv run approval-server gpt</span>로 실행하세요. 등록할 주소가 여기에 보입니다.</p>
+  <p class="sub">연결마다 사용자가 고정됩니다. 기안자용 연결에는 쓰기 툴이, 결재자용 연결에는 읽기 툴만 있습니다. 시연 기본은 앞의 두 개이고,
+    나머지는 여러 사례(직급별 한도, 팀장 기안, 다른 팀, 실장·본부장·합의 결재)를 AI로 해 볼 때 필요한 것만 등록합니다. 대화마다 연결은 하나만 켭니다.
+    참가자에게는 <a href="/connect">AI 연결</a> 화면(복사 버튼, 등록 순서)을 안내하세요.</p>
+  {% set bsrc = (mcp.connections if mcp else (gpt.connections if gpt else [])) %}
+  {% set show_rest = not mcp or mcp.api_public %}
+  <div class="tablewrap"><table class="tbl small"><thead><tr><th>연결</th><th>이름(등록용)</th><th>역할</th>
+    {% if bsrc %}<th>헤더 토큰 <span class="muted">(/mcp + Bearer)</span></th>{% endif %}{% if show_rest %}<th>REST 토큰 <span class="muted">(Claude Desktop용)</span></th>{% endif %}</tr></thead>
+    <tbody>{% for c in conns %}{% set b = (bsrc|selectattr('slug', 'equalto', c.slug or c.mode)|first) if bsrc else none %}
+      <tr><td>{{ c.label }}{% if loop.index <= 2 %} <span class="badge">시연 기본</span>{% endif %}</td>
+      <td class="mono">approval_{{ (c.slug or c.mode)|replace('-', '_') }}</td>
+      <td class="nowrap">{{ '기안자용 · 툴 14개' if c.mode == 'drafter' else '결재자용 · 읽기 툴 8개' }}</td>
+      {% if bsrc %}<td class="mono small">{{ b.bearer if b and b.bearer else '— (gpt 다시 실행)' }}</td>{% endif %}
+      {% if show_rest %}<td class="mono small">{{ c.token }}</td>{% endif %}</tr>{% endfor %}</tbody></table></div>
+  {% if mcp %}
+  <div class="actionbar ok mt"><span><b>이 서버의 MCP 연결 주소</b> (배포 모드 · 웹 화면과 같은 주소·포트)
+    {% for c in mcp.connections %}<br>· {{ c.name }}{% if c.default %} [시연 기본]{% endif %} ({{ c.label }}) — <span class="mono">{{ c.url }}</span>{% endfor %}
+    <br>주소에 비밀값을 넣지 않으려면 <span class="mono">{{ mcp.token_url }}</span> 하나에 헤더 <span class="mono">Authorization: Bearer &lt;헤더 토큰&gt;</span>을 넣습니다(토큰은 위 표).
+    {% if not mcp.api_public %}<br>REST API(/api)는 이 서버 안의 MCP 툴만 부를 수 있습니다(밖에서 직접 부르면 401).{% endif %}</span></div>
   {% endif %}
+  {% if gpt %}
+  <div class="actionbar ok mt"><span><b>ChatGPT 연결 주소</b> ({{ gpt.created }})
+    <br>데스크톱 앱(설정 › 플러그인 › 추가 › MCP 서버 추가 › 스트리밍 가능한 HTTP):
+    {% for c in gpt.connections %}<br>· {{ c.name or ('approval_' ~ c.mode) }}{% if c.label %} ({{ c.label }}){% endif %} — <span class="mono">{{ c.local_url }}</span>{% endfor %}
+    {% if gpt.token_url %}<br>헤더 토큰 방식: <span class="mono">{{ gpt.token_url }}</span> + 헤더 <span class="mono">Authorization: Bearer &lt;헤더 토큰&gt;</span>{% endif %}
+    {% if gpt.public %}<br>웹(공개 주소, {{ gpt.tunnel }}):{% for c in gpt.connections %}<br>· {{ c.label }} — <span class="mono">{{ c.url }}</span>{% endfor %}{% endif %}</span></div>
+  {% elif not mcp %}
+  <p class="note mt">ChatGPT로 시연하려면 <span class="mono">uv run approval-server gpt</span>로 실행하세요. 등록할 주소가 여기에 보입니다.
+    서버에 배포할 때는 <span class="mono">uv run approval-server deploy</span>(웹·MCP를 한 포트로)를 씁니다.</p>
+  {% endif %}
+  {% if show_rest %}
   <details class="mt"><summary>Claude Desktop 설정 예 (claude_desktop_config.json)</summary>
 <pre class="code">{
   "mcpServers": {
-{% for c in conns %}    "{{ 'approval-drafter' if c.mode == 'drafter' else 'approval-approver' }}": {
+{% for c in conns %}    "approval-{{ c.slug or c.mode }}": {
       "command": "uv",
       "args": ["--directory", "{{ settings.home|string|replace('\\', '\\\\') }}", "run", "approval-mcp"],
       "env": {"APPROVAL_TOKEN": "{{ c.token }}", "APPROVAL_SERVER": "{{ settings.base_url }}", "APPROVAL_ROLE": "{{ c.mode }}"}
@@ -70,5 +104,6 @@
 }</pre>
     <p class="note">같은 내용을 <span class="mono">uv run approval-server connections</span>로도 볼 수 있습니다.</p>
   </details>
+  {% endif %}
 </div>
 {% endblock %}

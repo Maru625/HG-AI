@@ -42,6 +42,25 @@ def engine() -> Engine:
     return _engine or init_engine()
 
 
+def ensure_schema(eng: Engine | None = None) -> list[str]:
+    """예전 DB 파일에 새 표·열을 더한다(가벼운 이전). 열을 지우거나 형식을 바꾸지는 않는다.
+    초기화(reset) 없이 새 코드로 서버를 켜도 동작하게 하려는 것이다. 더한 열 이름을 돌려준다."""
+    from sqlalchemy import inspect, text
+    from . import models  # noqa: F401  (표 정의를 Base에 올린다)
+    eng = eng or engine()
+    Base.metadata.create_all(eng)           # 없는 표만 만든다
+    insp = inspect(eng)
+    added = []
+    with eng.begin() as conn:
+        for t in Base.metadata.sorted_tables:
+            have = {c["name"] for c in insp.get_columns(t.name)}
+            for col in t.columns:
+                if col.name not in have:
+                    conn.execute(text(f'ALTER TABLE "{t.name}" ADD COLUMN "{col.name}" {col.type.compile(dialect=eng.dialect)}'))
+                    added.append(f"{t.name}.{col.name}")
+    return added
+
+
 @contextmanager
 def session() -> Iterator[Session]:
     if _Session is None:

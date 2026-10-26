@@ -34,7 +34,15 @@ INSTRUCTIONS = (
     "사용자가 확인하지 않은 단계는 진행하지 않는다. 결재자가 결재할 문서를 물으면 list_pending_approvals와 get_review_brief로 "
     "중요도순 목록과 주의 항목을 전달하되, 서버 판정과 AI 의견을 구분하고 승인·반려는 하지 않는다(웹 화면에서만 가능). "
     "모든 데이터는 시연용 더미다. 날짜는 실제 오늘이 아닌 whoami의 today 기준이다. "
-    "흐린 증빙도 원본을 다시 요구하지 말고 읽은 값과 낮은 confidence로 넣는다."
+    "흐린 증빙은 읽은 값과 낮은 confidence로 넣고, 원본 대조 여부는 확인 ② 때 사용자에게 묻는다."
+)
+DETAILS = (
+    "세부 지침: 흐린 영수증을 다시 올려 달라고 하지 않는다. confirm_drafts가 ORIGINAL_CHECK_REQUIRED를 돌려주면 "
+    "그 증빙의 날짜·상호·금액을 보여주며 원본(종이 영수증·카드 사용 내역)과 맞는지 묻고, 맞다고 하면 original_checked에 "
+    "{문서 ID: [증빙 번호]}를 넣어 다시 부른다. 증빙의 filename에는 첨부 파일 이름을 넣고, 이름을 알 수 없으면 "
+    "'대화 첨부 이미지 3'처럼 어느 첨부인지 적는다(제20조, 비우면 ATTACHMENT_MISSING). 사유·담당자·기한처럼 사람이 정할 값은 "
+    "지어내지 않는다. 자료에 적힌 기관·상호·사람 이름은 그대로 쓰고 실제 이름으로 바꾸지 않는다. "
+    "TIMING 오류(사용 전 정산, 지난 시각의 회의실 등)는 날짜를 사용자에게 다시 확인한다."
 )
 
 READ = ToolAnnotations(readOnlyHint=True, openWorldHint=False)
@@ -51,7 +59,9 @@ class EvidenceItem(BaseModel):
     merchant: str = Field(description="상호")
     category: str = Field(description="비목. get_process_spec의 evidence.categories 중 하나 (예: 교통비, 숙박비, 식비, 회의비, 견적서)")
     amount: int = Field(description="금액(원, 정수)")
-    filename: str | None = Field(default=None, description="AI가 읽은 원본 파일 이름")
+    filename: str | None = Field(default=None, description=(
+        "첨부한 영수증·견적서 파일 이름. 이름을 알 수 없으면 '대화 첨부 이미지 3'처럼 어느 첨부인지 적는다. "
+        "증빙이 필수인 프로세스에서 비우면 ATTACHMENT_MISSING 오류(제20조)"))
     confidence: float | None = Field(default=None, ge=0, le=1, description="판독 신뢰도 0~1. 흐리거나 확실하지 않으면 낮게 적는다")
     nights: int | None = Field(default=None, description="숙박비일 때 박 수")
 
@@ -74,9 +84,10 @@ class Draft(BaseModel):
 
 # ───────────────────────── 전결 서버 호출 ─────────────────────────
 class Api:
-    def __init__(self, base: str, token: str):
+    def __init__(self, base: str, token: str, internal_key: str | None = None):
         self.base = base.rstrip("/")
         self.token = token
+        self.headers = {"X-Approval-Token": token, **({"X-Approval-Internal": internal_key} if internal_key else {})}
 
     def _fail(self, code: str, message: str, fix_hint: str = "", details: dict | None = None) -> ToolError:
         return ToolError(json.dumps({"ok": False, "code": code, "message": message, "fix_hint": fix_hint,
@@ -86,7 +97,7 @@ class Api:
         try:
             async with httpx.AsyncClient(base_url=self.base, timeout=20) as c:
                 r = await c.request(method, path, params={k: v for k, v in (params or {}).items() if v is not None},
-                                    json=body, headers={"X-Approval-Token": self.token})
+                                    json=body, headers=self.headers)
         except httpx.HTTPError as e:
             raise self._fail("SERVER_UNAVAILABLE", f"전결 서버({self.base})에 연결할 수 없습니다.",
                              "사용자에게 전결 서버(uv run approval-server)가 켜져 있는지 확인해 달라고 하세요.",
@@ -103,7 +114,7 @@ class Api:
 
     def connection(self) -> dict | None:
         try:
-            r = httpx.get(self.base + "/api/connection", headers={"X-Approval-Token": self.token}, timeout=5)
+            r = httpx.get(self.base + "/api/connection", headers=self.headers, timeout=5)
             d = r.json()
             return d if d.get("ok") else {"error": d}
         except (httpx.HTTPError, ValueError):
@@ -112,7 +123,7 @@ class Api:
 
 # ───────────────────────── 툴 등록 ─────────────────────────
 def build(api: Api, mode: str, label: str = "") -> MCPServer:
-    instructions = INSTRUCTIONS + (f"\n\n이 연결: {label}." if label else "") + (
+    instructions = INSTRUCTIONS + "\n" + DETAILS + (f"\n\n이 연결: {label}." if label else "") + (
         "\n기안자용 연결이다. 결재 대기 조회 툴은 없다." if mode == "drafter" else
         "\n결재자용 연결이다. 읽기 툴만 있고 기안·상신·승인·반려는 할 수 없다.")
     mcp = MCPServer(name="approval-demo", title="샘플테크 목업 전결", instructions=instructions, version="1.0.0",
@@ -155,7 +166,7 @@ def build(api: Api, mode: str, label: str = "") -> MCPServer:
         plan_id: Annotated[str | None, Field(description="작업 계획 ID (예: PLAN-001)")] = None,
         doc_id: Annotated[str | None, Field(description="문서 ID(DOC-…) 또는 문서번호(ST-…)")] = None,
     ) -> dict:
-        """이럴 때 쓴다: 진행 상황이나 반려 사유를 확인할 때. 계획 ID를 주면 계획과 문서들의 상태를, 문서 ID를 주면 그 문서의 상태·결재 진행·반려 사유를, 둘 다 비우면 최근 계획을 돌려준다. 화면 링크가 함께 온다."""
+        """이럴 때 쓴다: 진행 상황이나 반려 사유를 확인할 때. 계획 ID를 주면 계획과 문서들의 상태를, 문서 ID를 주면 그 문서의 상태·결재 진행(단계별 처리 기한, 결재자가 알린 처리 지연 사유)·반려 사유를, 둘 다 비우면 최근 계획을 돌려준다. 화면 링크가 함께 온다."""
         return await api.call("GET", "/api/status", params={"plan_id": plan_id, "doc_id": doc_id})
 
     if mode == "drafter":
@@ -207,14 +218,22 @@ def build(api: Api, mode: str, label: str = "") -> MCPServer:
             plan_id: Annotated[str, Field(description="승인된 작업 계획 ID")],
             drafts: Annotated[list[Draft], Field(description="항목별 초안. 여러 건을 한 번에 넣는다")],
         ) -> dict:
-            """이럴 때 쓴다: 작업 계획이 승인된 뒤 항목별 초안을 쓰거나 고칠 때(같은 항목 번호로 다시 부르면 고친다). 반려된 문서의 항목을 다시 저장하면 원문서를 잇는 재기안이 된다. 문서별 상태, 오류·경고, 필요한 사유(missing_reasons), 결재선 미리보기, 화면 링크를 돌려준다. 담당자·사유처럼 사람이 정해야 하는 값은 지어내지 말고 사용자에게 묻는다."""
+            """이럴 때 쓴다: 작업 계획이 승인된 뒤 항목별 초안을 쓰거나 고칠 때(같은 항목 번호로 다시 부르면 고친다). 반려된 문서의 항목을 다시 저장하면 원문서를 잇는 재기안이 된다. 문서별 상태, 오류·경고, 필요한 사유(missing_reasons), 원본 대조가 필요한 증빙(original_check_needed), 결재선 미리보기, 화면 링크를 돌려준다. 담당자·사유처럼 사람이 정해야 하는 값은 지어내지 말고 사용자에게 묻는다. TIMING 오류는 규정이 정한 시점(사용 후 정산, 출장 종료 후, 구매 전, 사용 전 신청)과 날짜가 맞지 않는다는 뜻이다."""
             return await api.call("POST", f"/api/plans/{plan_id}/drafts",
                                   body={"drafts": [d.model_dump(exclude_none=True) for d in drafts]})
 
         @mcp.tool(annotations=WRITE_IDEMPOTENT, title="초안 확인 (확인 ②)")
-        async def confirm_drafts(doc_ids: Annotated[list[str], Field(description="확인할 문서 ID 목록")]) -> dict:
-            """이럴 때 쓴다: 사용자가 초안 내용(화면 링크 또는 대화에서 보여준 요약)을 보고 맞다고 분명히 말했을 때만. 확인 방식이 B면 CONFIRM_IN_UI_REQUIRED를 돌려주므로 임시저장함 화면에서 확인해 달라고 안내한다."""
-            return await api.call("POST", "/api/drafts/confirm", body={"doc_ids": doc_ids})
+        async def confirm_drafts(
+            doc_ids: Annotated[list[str], Field(description="확인할 문서 ID 목록")],
+            original_checked: Annotated[dict[str, list[int]] | None, Field(description=(
+                "판독이 불확실한 증빙을 사용자가 원본과 대조해 맞다고 답한 경우에만: {문서 ID: [증빙 번호]} (제22조). "
+                "사용자에게 묻지 않고 채우지 않는다"))] = None,
+        ) -> dict:
+            """이럴 때 쓴다: 사용자가 초안 내용(화면 링크 또는 대화에서 보여준 요약)을 보고 맞다고 분명히 말했을 때만. 판독 신뢰도가 낮은 증빙이 있는 문서는 ORIGINAL_CHECK_REQUIRED를 돌려준다. 그때는 그 증빙의 값을 보여주며 원본과 맞는지 사용자에게 묻고, 맞다고 하면 original_checked를 넣어 다시 부른다. 확인 방식이 B면 CONFIRM_IN_UI_REQUIRED를 돌려주므로 임시저장함 화면에서 확인해 달라고 안내한다."""
+            body: dict[str, Any] = {"doc_ids": doc_ids}
+            if original_checked:
+                body["original_checked"] = original_checked
+            return await api.call("POST", "/api/drafts/confirm", body=body)
 
         @mcp.tool(annotations=WRITE, title="상신 (확인 ③)")
         async def submit_drafts(doc_ids: Annotated[list[str], Field(description="상신할 문서 ID 목록 (확인완료 상태)")]) -> dict:
@@ -227,7 +246,7 @@ def build(api: Api, mode: str, label: str = "") -> MCPServer:
             sort: Annotated[Literal["importance", "submitted"], Field(description="정렬: importance(중요도순, 기본) 또는 submitted(상신순)")] = "importance",
             only: Annotated[Literal["긴급", "보통", "낮음"] | None, Field(description="이 중요도만 보기. 선택")] = None,
         ) -> dict:
-            """이럴 때 쓴다: 결재자가 결재할 문서를 묻거나 결재 알림을 받은 뒤. 연결된 사용자가 결재할 차례인 문서 전체를 중요도(긴급·보통·낮음)순으로, 중요도 이유·대기 기간·주의 항목 수·화면 링크와 함께 돌려준다. 승인·반려는 웹 화면에서만 할 수 있다."""
+            """이럴 때 쓴다: 결재자가 결재할 문서를 묻거나 결재 알림을 받은 뒤. 연결된 사용자가 결재할 차례인 문서 전체를 중요도(긴급·보통·낮음)순으로, 중요도 이유·대기 기간·처리 기한(제4조, 결재 차례가 온 날부터 3영업일)·결재/합의 구분·주의 항목 수·화면 링크와 함께 돌려준다. 승인·반려와 처리 지연 알림은 웹 화면에서만 할 수 있다."""
             return await api.call("GET", "/api/approvals/pending", params={"sort": sort, "only": only})
 
         @mcp.tool(annotations=READ, title="결재 검토 요약")

@@ -9,6 +9,7 @@
       <div class="c-detail">{{ c.detail }}</div>
       {% if c.reason %}<div class="c-reason">기안자 사유: “{{ c.reason }}”</div>{% endif %}
       {% if c.value %}<div class="c-value muted small">판독값: {{ c.value.date }} · {{ c.value.merchant }} · {{ c.value.amount|won }}</div>{% endif %}
+      {% if c.code == 'LOW_CONFIDENCE' %}<div class="c-reason">{% if c.original_checked %}✓ 기안자가 원본과 대조했다고 확인함 ({{ c.original_checked_at|hm }}, 확인 ②){% else %}<span class="err-text">기안자 원본 대조 기록 없음</span>{% endif %}</div>{% endif %}
     </li>
   {% endfor %}
   </ol>

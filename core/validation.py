@@ -2,9 +2,13 @@
 
 규칙 코드
 - REQUIRED_MISSING, INVALID_VALUE, EVIDENCE_REQUIRED, SUM_MISMATCH, DUPLICATE_EVIDENCE : 오류
+- ATTACHMENT_MISSING : 오류. 필수 증빙에 첨부 파일(원본 파일 이름)이 없다 (제20조)
+- TIMING : 오류. 시점이 규정과 맞지 않는다 (사용 전 정산 제10조, 출장 종료 전 정산·보고 제11·12조,
+           희망 납기 경과 제13조, 지난 시각 회의실 신청 제14조, 오늘 뒤 날짜의 증빙)
 - LIMIT_EXCEEDED : 경고. 사유(reasons)가 없으면 오류
 - HOLIDAY_USE    : 경고. 사유가 없으면 확인(confirm) 불가
-- DEADLINE_PASSED, LOW_CONFIDENCE : 경고
+- LOW_CONFIDENCE : 경고. 확인(confirm) 때 기안자가 원본과 대조했다고 확인해야 한다 (제22조)
+- DEADLINE_PASSED : 경고
 - ROOM_CAPACITY, ROOM_CONFLICT : 오류
 중복 판정은 같은 기안자의 상신·승인 문서를 기준으로 한다(고속철도 요금처럼 남과 금액이 같을 수 있다).
 """
@@ -164,9 +168,11 @@ def evidence_rules(s: Session, process: dict, drafter: Employee, evidence: list[
     pid = process["id"]
     com = regulations.common(s)
     hol = clock.holidays(s)
+    today = clock.now(s).date().isoformat()
     threshold = com.get("confidence_threshold", 0.8)
     out: list[dict] = []
-    allowed = process.get("evidence", {}).get("categories")
+    ev_spec = process.get("evidence", {})
+    allowed = ev_spec.get("categories")
     others = _other_evidence(s, drafter.emp_no, exclude_doc_ids or set())
     seen: dict[tuple, int] = {}
     for e in evidence:
@@ -185,6 +191,14 @@ def evidence_rules(s: Session, process: dict, drafter: Employee, evidence: list[
             out.append(issue("DUPLICATE_EVIDENCE", "error", f"증빙 {i}이 증빙 {seen[key]}과 같습니다.", seq=i, article="제20조",
                              fix_hint="같은 영수증을 두 번 넣지 마세요."))
         seen.setdefault(key, i)
+        if ev_spec.get("required") and not str(e.get("filename") or "").strip():
+            out.append(issue("ATTACHMENT_MISSING", "error",
+                             f"증빙 {i}({e.get('merchant') or '상호 없음'})에 첨부 파일이 없습니다. {ev_spec.get('label', '증빙')} 원본 또는 사본을 첨부해야 합니다.",
+                             seq=i, article="제20조" if "제20조" in process["articles"] else process["articles"][0],
+                             fix_hint="자료에서 읽은 원본 파일 이름을 filename에 넣으세요(화면에서는 '첨부 파일' 칸)."))
+        if isinstance(e.get("date"), str) and len(e["date"]) == 10 and e["date"] > today:
+            out.append(issue("TIMING", "error", f"증빙 {i}의 날짜({e['date']})가 오늘({today})보다 뒤입니다.",
+                             seq=i, article=process["articles"][0], fix_hint="증빙 날짜를 다시 확인하세요."))
         if pid in EXPENSE and e.get("date"):
             try:
                 d = dt.date.fromisoformat(e["date"])
@@ -197,7 +211,8 @@ def evidence_rules(s: Session, process: dict, drafter: Employee, evidence: list[
         if float(e.get("confidence", 1.0)) < threshold:
             out.append(issue("LOW_CONFIDENCE", "warning",
                              f"증빙 {i}의 판독 신뢰도가 낮습니다({e.get('confidence')}). 원본의 날짜·금액을 확인하세요.",
-                             seq=i, article="제22조"))
+                             seq=i, article="제22조", needs_original_check=True,
+                             fix_hint="확인(②) 때 기안자가 원본과 대조했는지 확인합니다. 원본을 다시 받을 필요는 없습니다."))
     limits = process.get("limits", {})
     if "lodging_per_night" in limits:
         cap = limits["lodging_per_night"].get(drafter.grade)
@@ -297,6 +312,7 @@ def validate(s: Session, process: dict, drafter: Employee, values: dict, evidenc
         if dl and now.date() > dl:
             issues.append(issue("DEADLINE_PASSED", "warning", f"처리 기한({dl})이 지났습니다.", field=process["deadline"]["from_field"],
                                 article=process["articles"][0]))
+    issues += timing_rules(process, vals, now)
     if pid == "MTG-01":
         issues += room_rules(s, vals, doc_id)
 
@@ -304,6 +320,34 @@ def validate(s: Session, process: dict, drafter: Employee, values: dict, evidenc
     warnings = [x for x in issues if x["level"] == "warning"]
     missing = sorted({x["reason_key"] for x in issues if x.get("needs_reason") and not x.get("reason")})
     return {"values": vals, "evidence": evs, "errors": errors, "warnings": warnings, "missing_reasons": missing}
+
+
+def timing_rules(process: dict, vals: dict, now: dt.datetime) -> list[dict]:
+    """규정이 정한 시점과 맞는지 본다. 날짜 판단은 시연 시계(now) 기준이다."""
+    checks = set(process.get("checks", []))
+    today, hm = now.date().isoformat(), now.strftime("%H:%M")
+    art = process["articles"][0]
+    out = []
+
+    def _d(k):
+        v = vals.get(k)
+        return v if isinstance(v, str) and len(v) == 10 else None
+    if "use_after" in checks and _d("use_date") and vals["use_date"] > today:
+        out.append(issue("TIMING", "error", f"사용일({vals['use_date']})이 오늘({today})보다 뒤입니다. 일반경비는 사용한 뒤에 정산합니다.",
+                         field="use_date", article=art, fix_hint="사용일을 확인하거나, 사용한 뒤에 정산하세요."))
+    if "trip_ended" in checks and _d("trip_end") and vals["trip_end"] > today:
+        what = "출장비는 출장을 마친 뒤 정산합니다" if process["id"] == "EXP-02" else "출장결과보고는 출장을 마친 뒤 올립니다"
+        out.append(issue("TIMING", "error", f"출장 종료일({vals['trip_end']})이 오늘({today})보다 뒤입니다. {what}.",
+                         field="trip_end", article=art, fix_hint="출장 종료일을 확인하세요."))
+    if "due_not_past" in checks and _d("due_date") and vals["due_date"] < today:
+        out.append(issue("TIMING", "error", f"희망 납기({vals['due_date']})가 이미 지났습니다. 물품은 구매 전에 요청합니다.",
+                         field="due_date", article=art, fix_hint="희망 납기를 오늘 이후로 고치세요."))
+    if "not_past" in checks and _d("date"):
+        st = vals.get("start") if isinstance(vals.get("start"), str) else ""
+        if vals["date"] < today or (vals["date"] == today and st and st <= hm):
+            out.append(issue("TIMING", "error", f"지난 시각({vals['date']} {st})은 신청할 수 없습니다. 회의실은 사용 전에 신청해 결재를 받습니다.",
+                             field="date", article=art, fix_hint="check_room_availability로 앞으로의 시간을 찾으세요."))
+    return out
 
 
 def deadline_of(s: Session, process: dict, values: dict) -> dt.date | None:

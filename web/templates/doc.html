@@ -1,20 +1,33 @@
 {% extends "base.html" %}
-{% from "_macros.html" import status, ai, steps, imp %}
+{% from "_macros.html" import status, ai, steps, imp, due %}
 {% block title %}{{ d.doc_no or d.doc_id }}{% endblock %}
 {% block content %}
+{% set cs = d.current_step %}
 <div class="pagehead">
   <a class="backlink" href="/inbox?view=drafter">← 결재함</a>
-  <h1><span class="mono">{{ d.doc_no or d.doc_id }}</span> {{ d.title }} {{ status(d.status, d.status_label) }} {{ ai(d.ai_written) }}</h1>
+  <h1><span class="mono">{{ d.doc_no or d.doc_id }}</span> {{ d.title }} {{ status(d.status, d.status_label) }} {{ ai(d.ai_written) }}{% if d.created_via == 'WEB' %} <span class="badge">화면 작성</span>{% endif %}</h1>
   <p class="sub">{{ d.process_name }} · 기안자 {{ d.drafter.name }}{% if d.submitted_at %} · 상신 {{ d.submitted_at|hm }}{% endif %}{% if d.final_at %} · 완료 {{ d.final_at|hm }}{% endif %}
-    {% if d.reservation %} · 회의실 {{ status(d.reservation.status, d.reservation.status_label) }}{% endif %}</p>
+    {% if d.reservation %} · 회의실 {{ status(d.reservation.status, d.reservation.status_label) }}{% if d.reservation.note %} <span class="small">⚔️ {{ d.reservation.note }}</span>{% endif %}{% endif %}
+    {% if d.original_doc_id %} · 반려된 <a href="/docs/{{ d.original_doc_id }}">{{ d.original.doc_no if d.original else d.original_doc_id }}</a>을 고친 재기안{% endif %}</p>
 </div>
 
-{% if d.status == 'REJECTED' %}
-<div class="actionbar bad"><span><b>반려</b> · “{{ d.reject_comment }}”{% if d.drafter.emp_no == user %}<br>AI 대화에서 “반려된 문서 고쳐서 다시 올려 줘”라고 하면, 이 문서를 원본으로 잇는 새 문서로 다시 기안합니다.{% endif %}</span></div>
+{% if d.status == 'SUBMITTED' and cs %}
+  {% if cs.delay_reason %}
+  <div class="actionbar warn"><span><b>{{ cs.name }}이 처리 지연을 알렸습니다</b> ({{ cs.delay_at|hm }}, 제4조) · “{{ cs.delay_reason }}”{% if cs.delay_until %} · 처리 예정 {{ cs.delay_until }}{% endif %}</span></div>
+  {% else %}
+  <div class="actionbar"><span><b>결재 진행 중</b> · 지금 차례: {{ cs.name }} ({{ cs.kind }}{% if cs.kind == '결재' %} · {{ cs.level }}{% endif %}){% if d.due %} · {{ due(d.due) }}{% endif %}</span></div>
+  {% endif %}
+{% elif d.status == 'REJECTED' %}
+<div class="actionbar bad">
+  <span><b>반려</b> · “{{ d.reject_comment }}”
+    {% if d.redraft %}<br>다시 기안한 문서: <a href="{{ ('/drafts/' if d.redraft.status in ('INVALID', 'VALID', 'CONFIRMED') else '/docs/') ~ d.redraft.doc_id }}">{{ d.redraft.doc_no or d.redraft.doc_id }} {{ d.redraft.status_label }}</a>
+    {% elif d.drafter.emp_no == user %}<br>[고쳐서 다시 기안]을 누르면 이 문서를 원본으로 잇는 새 초안이 생깁니다.{% if d.plan_id %} AI 대화에서 “반려된 문서 고쳐서 다시 올려 줘”라고 해도 됩니다.{% endif %}{% endif %}</span>
+  {% if d.can_redraft %}<form method="post" action="/docs/{{ d.doc_id }}/redraft"><button class="btn primary">고쳐서 다시 기안</button></form>{% endif %}
+</div>
 {% elif d.status == 'APPROVED' %}
 <div class="actionbar ok"><span><b>최종 승인</b> {{ d.final_at|hm }}{% if d.reservation %} · 회의실 예약이 확정되었습니다{% endif %}</span></div>
 {% elif d.status == 'CANCELED' %}
-<div class="actionbar bad"><span>작업 계획이 취소되어 함께 취소된 문서입니다.</span></div>
+<div class="actionbar bad"><span>{{ d.reject_comment if d.reject_comment else ('작업 계획이 취소되어 함께 취소된 문서입니다.' if d.plan_status == 'CANCELED' else '취소된 초안입니다.') }}</span></div>
 {% endif %}
 
 <div class="cols">
@@ -23,7 +36,7 @@
     {% if d.cautions %}<details class="card"><summary>결재자에게 보이는 주의 항목 {{ d.cautions|length }}개</summary>{% include "_cautions.html" %}</details>{% endif %}
   </div>
   <aside class="col-side">
-    <div class="card"><h3>결재선</h3>{{ steps(d.approval_line) if d.approval_line else '<p class="muted">상신 전입니다.</p>'|safe }}</div>
+    <div class="card"><h3>결재선</h3>{{ steps(d.approval_line, basis=true) if d.approval_line else '<p class="muted">상신 전입니다.</p>'|safe }}</div>
   </aside>
 </div>
 {% endblock %}

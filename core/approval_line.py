@@ -1,10 +1,12 @@
 """결재선 계산 (설계서 7.5). 결재선은 서버가 계산하고 근거 조항을 함께 돌려준다."""
 from __future__ import annotations
 
+import datetime as dt
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from . import regulations
+from . import clock, regulations
 from .models import Department, Employee, Room
 
 LEVELS = ["팀장", "실장", "본부장"]
@@ -41,8 +43,16 @@ def _chain(s: Session, dept_code: str) -> dict[str, Department]:
     return out
 
 
+def is_off_day(s: Session, day) -> bool:
+    """주말·공휴일이면 True (제14조 '업무시간 밖'에 넣는다)."""
+    try:
+        return not clock.is_bday(dt.date.fromisoformat(str(day)[:10]), clock.holidays(s))
+    except (TypeError, ValueError):
+        return False
+
+
 def agreement_conditions(s: Session, process: dict, values: dict | None) -> list[dict]:
-    """MTG-01의 합의 조건(대회의실, 외부인, 업무시간 외)."""
+    """MTG-01의 합의 조건(대회의실, 외부인, 업무시간 외). 주말·공휴일 사용도 업무시간 외로 본다(제14조)."""
     conds = process["approval"].get("agreement_if", [])
     if not conds or not values:
         return []
@@ -57,7 +67,11 @@ def agreement_conditions(s: Session, process: dict, values: dict | None) -> list
             ok = values.get("external") in (True, "true", "True", 1, "예")
         elif cond == "outside_hours":
             st, en = str(values.get("start", "")), str(values.get("end", ""))
-            ok = bool(st and en and (st < bh["start"] or en > bh["end"]))
+            by_time = bool(st and en and (st < bh["start"] or en > bh["end"]))
+            off = bool(values.get("date")) and is_off_day(s, values.get("date"))
+            ok = by_time or off
+            if off and not by_time:
+                c = {**c, "label": c["label"] + "(주말·공휴일)"}
         else:
             ok = False
         if ok:
@@ -81,6 +95,18 @@ def compute(s: Session, process: dict, drafter: Employee, values: dict | None = 
         steps.append({"approver": d.head, "name": e.name if e else d.head, "title": e.title if e else "",
                       "kind": "결재", "level": level, "dept": d.name, "article": article,
                       "basis": f"{band_label(band)} → {band['level']}까지 결재 ({article}, 제3조)"})
+    if not steps:
+        # 제3조: 기안자가 전결권자 본인이어서 결재할 사람이 없으면 바로 위 직책자가 결재한다.
+        for level in LEVELS[LEVELS.index(band["level"]) + 1:]:
+            d = chain.get(LEVEL_TYPE[level])
+            if not d or not d.head or d.head in seen:
+                continue
+            seen.add(d.head)
+            e = s.get(Employee, d.head)
+            steps.append({"approver": d.head, "name": e.name if e else d.head, "title": e.title if e else "",
+                          "kind": "결재", "level": level, "dept": d.name, "article": article, "escalated": True,
+                          "basis": f"기안자가 전결권자({band['level']}) 본인 → 바로 위 {level} 결재 (제3조)"})
+            break
     agree_depts = list(band.get("agreement", []))
     reasons = {}
     for c in agreement_conditions(s, process, values):

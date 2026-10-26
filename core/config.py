@@ -15,7 +15,10 @@ def _load_dotenv(path: Path) -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, v = line.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+        v = v.strip()
+        if not v.startswith(('"', "'")):
+            v = v.split(" #", 1)[0].split("\t#", 1)[0].strip()      # 줄 끝 설명(공백 뒤 #)은 값이 아니다
+        os.environ.setdefault(k.strip(), v.strip('"').strip("'"))
 
 
 @dataclass(frozen=True)

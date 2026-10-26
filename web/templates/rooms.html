@@ -14,7 +14,8 @@
     {% for d in sch.dates %}
       <td class="{{ 'today' if d == sch.today }} {{ 'off' if d in sch.offdays }}">
       {% for x in sch.reservations if x.room == r.id and x.date == d %}
-        <div class="slot slot-{{ x.status|lower }}"><b>{{ x.start }}~{{ x.end }}</b> {{ x.title }}<div class="small">{{ x.who }} · {{ x.status_label }}{% if x.doc %} · <a href="/docs/{{ x.doc.doc_id }}">{{ x.doc.doc_no }}</a>{% endif %}</div></div>
+        <div class="slot slot-{{ x.status|lower }}"><b>{{ x.start }}~{{ x.end }}</b> {{ x.title }}<div class="small">{{ x.who }} · {{ x.status_label }}{% if x.doc %} · <a href="/docs/{{ x.doc.doc_id }}">{{ x.doc.doc_no or x.doc.doc_id }}</a>{% endif %}</div>
+          {% if x.note %}<div class="slot-note">⚔️ {{ x.note }}</div>{% endif %}</div>
       {% endfor %}
       </td>
     {% endfor %}</tr>
@@ -24,6 +25,6 @@
 </div>
 {% if sch.released %}
 <h2 class="mt">해제된 가예약</h2>
-<ul class="plain">{% for x in sch.released %}<li>{{ x.date }} {{ x.start }}~{{ x.end }} {{ x.title }} · {{ x.who }}{% if x.doc %} · <a href="/docs/{{ x.doc.doc_id }}">{{ x.doc.doc_no }}</a> 반려{% endif %}</li>{% endfor %}</ul>
+<ul class="plain">{% for x in sch.released %}<li>{{ x.date }} {{ x.start }}~{{ x.end }} {{ x.title }} · {{ x.who }}{% if x.doc %} · <a href="/docs/{{ x.doc.doc_id }}">{{ x.doc.doc_no or x.doc.doc_id }}</a>{% endif %} · {{ ('⚔️ ' ~ x.note) if x.note else ('반려' if x.doc else '해제') }}</li>{% endfor %}</ul>
 {% endif %}
 {% endblock %}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>입장 코드 · 샘플테크 전결 DEMO</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <style>
+    body { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+    .enter { width: min(400px, 100%); }
+    .enter .brandline { display: flex; align-items: baseline; gap: 8px; margin-bottom: 18px; }
+    .enter .logo { font-weight: 800; font-size: 20px; color: var(--brand-ink); }
+    .enter h1 { font-size: 22px; margin: 0 0 6px; }
+    .enter label { display: block; font-size: 14px; font-weight: 700; margin: 18px 0 6px; }
+    .enter input { width: 100%; height: 46px; font: inherit; font-size: 17px; padding: 0 14px; border: 1px solid var(--line-strong);
+      border-radius: var(--r); background: var(--surface); letter-spacing: .04em; }
+    .enter input:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: var(--brand); }
+    .enter .btn { width: 100%; margin-top: 14px; height: 46px; }
+    .enter .err { margin-top: 12px; color: var(--critical-ink); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main class="card enter">
+    <div class="brandline"><span class="logo">샘플테크</span><span>전결 시스템</span><span class="demo-tag">DEMO · 더미 데이터</span></div>
+    <h1>입장 코드를 넣으세요</h1>
+    <p class="sub">시연용 서버입니다. 진행자에게 받은 입장 코드를 넣으면 이 브라우저는 30일 동안 다시 묻지 않습니다.
+      들어간 뒤에는 화면 오른쪽 위에서 시연할 사용자를 고릅니다.</p>
+    <form method="post" action="/enter">
+      <input type="hidden" name="next" value="{{ next }}">
+      <label for="code">입장 코드</label>
+      <input id="code" name="code" autocomplete="off" autocapitalize="off" spellcheck="false" required autofocus>
+      {% if err %}<p class="err" role="alert">입장 코드가 맞지 않습니다. 진행자에게 받은 코드를 다시 확인하세요.</p>{% endif %}
+      <button class="btn primary">들어가기</button>
+    </form>
+  </main>
+</body>
+</html>

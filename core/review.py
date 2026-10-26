@@ -10,11 +10,25 @@ from . import approval_line, clock, regulations, validation
 from .models import ApprovalStep, Document
 
 LEVEL_ORDER = {"긴급": 0, "보통": 1, "낮음": 2}
+DUE_BDAYS = 3          # 제4조: 결재 차례가 온 날부터 3영업일 안에 처리
 
 
 def current_step(s: Session, doc: Document) -> ApprovalStep | None:
     return s.scalars(select(ApprovalStep).where(ApprovalStep.doc_id == doc.id, ApprovalStep.status == "PENDING")
                      .order_by(ApprovalStep.seq)).first()
+
+
+def step_due(s: Session, doc: Document, step: ApprovalStep | None, now: dt.datetime) -> dict | None:
+    """제4조 처리 기한. 결재 차례가 온 날(첫 단계는 상신일)부터 3영업일. 지났으면 overdue."""
+    started = (step.started_at if step and step.started_at else doc.submitted_at)
+    if not started:
+        return None
+    hol = clock.holidays(s)
+    due = clock.add_bdays(dt.datetime.fromisoformat(started).date(), DUE_BDAYS, hol)
+    left = clock.bdays_until(now.date(), due, hol)
+    return {"due": due.isoformat(), "overdue": now.date() > due, "bdays_left": left,
+            "label": (f"처리 기한 {due:%m-%d} 경과" if now.date() > due else
+                      f"처리 기한 {due:%m-%d}" + (" (오늘)" if left == 0 else f" (D-{left})"))}
 
 
 def importance(s: Session, doc: Document, now: dt.datetime) -> tuple[str, list[str]]:
@@ -36,8 +50,8 @@ def importance(s: Session, doc: Document, now: dt.datetime) -> tuple[str, list[s
     started = (st.started_at if st and st.started_at else doc.submitted_at)
     if started:
         waited = clock.bdays_until(dt.datetime.fromisoformat(started).date(), today, hol)
-        if waited > 3:
-            urgent.append(f"상신 후 {waited}영업일 대기")
+        if waited > DUE_BDAYS:
+            urgent.append(f"{waited}영업일째 대기 (처리 기한 {DUE_BDAYS}영업일 초과, 제4조)")
     if urgent:
         return "긴급", urgent
     c = cautions(s, doc)
@@ -58,8 +72,10 @@ def cautions(s: Session, doc: Document) -> list[dict]:
         elif w["code"] == "LOW_CONFIDENCE":
             seq = w.get("evidence_seq")
             ev = next((e for e in doc.evidence or [] if e.get("seq") == seq), {})
+            checked = seq in (doc.original_checked or [])
             out.append({"code": "LOW_CONFIDENCE", "label": "판독 신뢰도가 낮은 값", "detail": w["message"],
                         "evidence_seq": seq, "value": {"date": ev.get("date"), "merchant": ev.get("merchant"), "amount": ev.get("amount")},
+                        "original_checked": checked, "original_checked_at": doc.original_checked_at if checked else None,
                         "article": w.get("article")})
         elif w["code"] == "DEADLINE_PASSED":
             out.append({"code": "DEADLINE_PASSED", "label": "기한 경과", "detail": w["message"], "article": w.get("article")})
