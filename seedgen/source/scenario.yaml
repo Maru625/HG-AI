@@ -51,6 +51,7 @@ room_reservations:   # 시연 초기 확정 예약
   - {room: RM-L, date: "2026-11-17", start: "10:00", end: "12:00", title: 기술본부 월간회의, emp_no: E1001}
   - {room: RM-B, date: "2026-11-13", start: "15:00", end: "16:00", title: 시험평가팀 점검, emp_no: E2003}
   - {room: RM-A, date: "2026-11-16", start: "09:30", end: "10:30", title: 연구1팀 주간회의, emp_no: E2001}
+  - {room: RM-B, date: "2026-11-18", start: "14:00", end: "15:00", title: 연구1팀 과제 점검, emp_no: E2001}   # 시나리오 B: 김지훈이 겹치게 신청 → 박서연과 가위바위보
 
 # 중복 영수증의 근거가 되는 기존 정산 (과거 결재 이력에 승인으로 들어간다)
 history_fixed:
