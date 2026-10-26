@@ -131,6 +131,8 @@ uv run approval-server           # 전결 서버 + 웹 화면: http://localhost:
 | `start_gpt_demo.bat` (더블클릭) | ChatGPT 시연: 초기화 + 전결 서버 + MCP(HTTP, 연결 8개), 등록할 주소 출력 |
 | `uv run approval-server gpt [--tunnel cloudflared]` | 위와 같고 초기화 없음. `--tunnel`이면 ChatGPT 웹용 공개 주소도 |
 | `start_lan_demo.bat` (더블클릭) | 위와 같고 **같은 와이파이의 다른 PC**도 접속(`gpt --lan`). 웹 `http://<이 PC IP>:8000`, 연결 주소는 'AI 연결' 메뉴 |
+| `start_lead_pc.bat` (더블클릭, 팀장 PC) | 서버를 켜고(이미 켜져 있으면 그대로) 화면을 **사이트 왼쪽 2/3 + ChatGPT 앱 오른쪽 1/3**로 배치. 사이트는 시연 전용 브라우저 창으로 박서연 팀장(E2001). `-User E2003`, `-WebShare 0.6`로 바꿀 수 있다 (`demo_layout.ps1`) |
+| `start_staff_pc.bat` (더블클릭, 사원 PC) | 팀장 PC IP를 한 번 물어(`server_ip.txt`에 기억) 같은 배치로 김지훈 선임(E3001). 사원 PC에는 이 파일과 `demo_layout.ps1`만 있으면 된다 |
 | `uv run approval-server deploy [--port 8000]` | 서버 배포용: 웹·REST·MCP를 포트 하나로 (11장) |
 | `uv run approval-mcp` | MCP 서버(stdio). 보통 Claude Desktop이 직접 띄운다 |
 | `uv run approval-seed build` | 시드와 시연 자료를 다시 만든다 (seed 고정: 같은 결과) |
