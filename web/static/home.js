@@ -98,10 +98,11 @@
     rank.forEach(function (r, i) { if (r.option === st) ri = i; });
     var r = ri >= 0 ? rank[ri] : null;
     $('#jr-detail').innerHTML =
-      '<div><p class="k">' + (stageI + 1) + '단계</p><h3>' + st + '</h3><p class="v"><b>' + fmt(h, 1) + '</b>시간 / 주 <span class="muted">(' + grade + ')</span></p></div>' +
+      '<div><p class="k">' + (stageI + 1) + '단계</p><h3>' + st + '</h3><p class="v"><b>' + fmt(h, 1) + '</b>시간 / 주 <span class="muted">(' + grade + ')</span></p>' +
+        (al.desc ? '<p class="v muted small">하는 일: ' + al.desc[stageI] + '</p>' : '') + '</div>' +
       '<div><p class="k">하기 싫은 업무 설문 (' + D.survey.n + '명)</p><p class="v">' +
         (r ? '<b>' + (ri + 1) + '위</b> · 1순위로 꼽은 사람 ' + r.first + '명' : '설문 항목 아님') + '</p></div>' +
-      '<div><p class="k">이 시스템에서는</p><p class="v fix">' + (s.feature || '') + '</p>' +
+      '<div><p class="k">이 시스템이 맡는 부분</p><p class="v fix">' + (s.feature || '') + '</p>' +
         (s.rate ? '<p class="v muted small">' + fmt(s.rate * 100) + '% 절감 가정</p>' : '') + '</div>';
   }
   gradeBtns.forEach(function (b) {

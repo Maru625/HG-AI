@@ -12,6 +12,15 @@ from .models import (ApprovalStep, AutomationAssumption, Department, Document, E
                      SurveyResponse, WorkAllocation)
 
 STAGES = ["처리 파악", "증빙 준비", "문서 작성", "반려 후 재작성", "진행 확인·문의", "결재 검토"]
+# 단계마다 실제로 하는 일 (과제 엑셀의 단계 정의와 같다, seedgen/workbook.py STAGE_DESC)
+STAGE_DESC = {
+    "처리 파악": "어떤 결재를 올려야 하는지, 양식·전결권자가 무엇인지 찾는 시간",
+    "증빙 준비": "영수증 정리·옮겨 적기, 합계 대조, 중복·한도 확인",
+    "문서 작성": "양식 항목 채우기, 메모 내용 옮기기",
+    "반려 후 재작성": "누락·한도 초과·증빙 문제로 반려되어 다시 쓰는 시간",
+    "진행 확인·문의": "결재가 어디까지 갔는지 확인하고 결재자에게 묻는 시간",
+    "결재 검토": "결재자가 대기 결재를 고르고 문서마다 규정·증빙을 확인하는 시간",
+}
 TOP = ["본업", "회의", "전결 처리", "기타 사무"]
 GRADE_GROUPS = ["사원", "선임", "책임", "수석", "팀장 이상"]
 
@@ -50,7 +59,7 @@ def build(s: Session) -> dict:
         total_by_grade[a.grade_group] += a.hours_per_week
         if a.category == "전결 처리" and a.stage in STAGES:
             stage_by_grade[a.grade_group][STAGES.index(a.stage)] = a.hours_per_week
-    allocation = {"grades": GRADE_GROUPS, "stages": STAGES, "hours": stage_by_grade,
+    allocation = {"grades": GRADE_GROUPS, "stages": STAGES, "desc": [STAGE_DESC[st] for st in STAGES], "hours": stage_by_grade,
                   "jeongyeol_total": {g: round(sum(v), 1) for g, v in stage_by_grade.items()},
                   "week_total": {g: round(total_by_grade[g], 1) for g in GRADE_GROUPS}}
 

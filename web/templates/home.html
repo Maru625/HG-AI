@@ -43,7 +43,7 @@
 <!-- 2. 결재 하나가 거치는 단계 (직급별 주당 시간) -->
 <section class="sx" id="journey" aria-labelledby="jr-title">
   <h2 id="jr-title" class="sx-title">결재 한 건이 거치는 여섯 단계</h2>
-  <p class="sx-sub">직급을 고르면 주당 몇 시간을 쓰는지, 단계를 누르면 이 시스템이 무엇을 바꾸는지 보입니다.</p>
+  <p class="sx-sub">직급을 고르면 주당 몇 시간을 쓰는지, 단계를 누르면 그 단계에 하는 일과 이 시스템이 맡는 부분이 보입니다.</p>
   <div class="seg-pick" role="group" aria-label="직급 고르기">
     {% for g in al.grades %}<button type="button" class="pick" aria-pressed="{{ 'true' if g == '선임' else 'false' }}" data-grade="{{ g }}">{{ g }}</button>{% endfor %}
   </div>
@@ -95,14 +95,14 @@
     </article>
 
     <article class="pb-card">
-      {% set top = dash.survey.ranking[0] %}
-      <p class="pb-big">{{ top.first }}<span>명</span></p>
-      <h3>{{ dash.survey.n }}명 중 {{ top.first }}명이 1순위로 꼽은 가장 하기 싫은 일, {{ top.option }}</h3>
-      <p class="pb-note">설문 점수 (1순위 3점, 2순위 2점, 3순위 1점)</p>
+      {% set top3 = dash.survey.ranking[:3] %}
+      <p class="pb-big">{{ top3|sum(attribute='first') }}<span>명</span></p>
+      <h3>가장 하기 싫은 일 1~3위는 모두 자료를 전결 양식에 맞추는 일입니다</h3>
+      <p class="pb-note">{{ dash.survey.n }}명 중 {{ top3|sum(attribute='first') }}명이 {{ top3|map(attribute='option')|join('·') }} 중 하나를 1순위로 꼽았습니다. 설문 점수(1순위 3점, 2순위 2점, 3순위 1점)</p>
       <ul class="bars">
         {% set smx = dash.survey.ranking[0].score %}
         {% for r in dash.survey.ranking[:5] %}
-        <li class="{{ 'me' if loop.first }}"><span class="b-l">{{ r.option }}</span>
+        <li class="{{ 'me' if loop.index <= 3 }}"><span class="b-l">{{ r.option }}</span>
           <span class="b-t"><i style="--w: {{ '%.1f'|format(r.score / smx * 100) }}%"></i></span>
           <span class="b-v">{{ r.score }}점</span></li>
         {% endfor %}
@@ -111,16 +111,17 @@
   </div>
 </section>
 
-<!-- 4. 해결: 말로 기안, 서버가 검증, 웹에서 결재 + GPT로 시연하는 두 사람 -->
+<!-- 4. 해결: 가진 자료 그대로 → 양식은 AI가 맞추고 서버가 확인 → 결재는 웹에서 + GPT로 시연하는 두 사람 -->
 <section class="fx bleed" aria-labelledby="fx-title">
   <div class="fx-in">
-    <h2 id="fx-title" class="sx-title">말로 기안하고, 결재는 화면에서</h2>
+    <h2 id="fx-title" class="sx-title">자료는 그대로, 양식은 AI가 맞춥니다</h2>
+    <p class="sx-sub">영수증과 메모는 이미 있습니다. 시간이 드는 건 그걸 전결 양식에 옮겨 적고, 규정에 맞추고, 반려되면 다시 쓰는 일입니다. 이 과정을 AI와 서버가 맡고, 결재는 사람이 합니다.</p>
     <ol class="flow">
-      <li><span class="flow-n">1</span><h3>ChatGPT에 말합니다</h3>
+      <li><span class="flow-n">1</span><h3>가진 자료를 그대로 넘깁니다</h3>
         <p class="bubble">“지난주 대전 출장 정산해 줘. 영수증은 이거.”</p>
-        <p>영수증을 읽고 초안을 만듭니다. 필요한 항목과 규정은 AI가 찾습니다.</p></li>
+        <p>어떤 양식인지, 어느 칸에 무엇을 쓰는지 몰라도 됩니다. AI가 영수증 값과 메모를 읽어 전결 양식 칸에 옮겨 적습니다.</p></li>
       <li><span class="flow-n">2</span><h3>서버가 규정대로 확인합니다</h3>
-        <p>한도, 증빙 중복, 필수 항목, 결재선을 서버가 계산합니다. 반려될 사유는 올리기 전에 잡습니다.</p></li>
+        <p>필수 항목, 한도, 합계, 증빙 중복, 결재선을 서버가 계산합니다. 반려될 부분은 올리기 전에 잡고, 사유처럼 사람이 정할 값은 AI가 묻습니다.</p></li>
       <li><span class="flow-n">3</span><h3>결재는 사람이 웹에서 합니다</h3>
         <p>AI는 검토를 돕기만 하고, 승인·반려 버튼은 결재함 화면에만 있습니다.</p></li>
     </ol>
