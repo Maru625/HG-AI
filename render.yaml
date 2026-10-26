@@ -1,0 +1,17 @@
+# Render 블루프린트: Render 대시보드 › New › Blueprint › 이 저장소를 고르면 아래대로 만든다.
+# 결과 주소: https://<서비스 이름>.onrender.com  (도메인·Cloudflare 없이 HTTPS)
+# 무료 플랜은 15분 동안 요청이 없으면 잠들고(깨는 데 약 1분), 잠들거나 재시작하면 시연 데이터가 처음 상태로 돌아간다.
+services:
+  - type: web
+    name: hg-approval-demo
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /healthz
+    envVars:
+      - key: APPROVAL_MCP_SECRET      # MCP 주소 비밀값. 한 번 만들어 계속 쓴다(재시작해도 등록 주소가 안 바뀜)
+        generateValue: true
+      - key: APPROVAL_ADMIN_KEY       # 시연 제어 패널 운영자 키 (대시보드 Environment에서 확인)
+        generateValue: true
+      - key: APPROVAL_SITE_KEY        # 웹 입장 코드. 대시보드에서 직접 넣는다(비우면 누구나 열람)
+        sync: false

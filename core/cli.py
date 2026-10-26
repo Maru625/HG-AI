@@ -28,6 +28,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--lan", action="store_true",
                     help="같은 와이파이·사내망의 다른 PC도 들어오게 연다(0.0.0.0, 화면 링크는 이 PC의 IP 주소)")
     a = ap.parse_args(argv)
+    if a.command == "deploy":
+        # 클라우드 플랫폼(Render 등)이 주는 값: 듣는 포트 PORT, 공개 주소 RENDER_EXTERNAL_URL
+        if os.environ.get("PORT") and not a.port:
+            a.port = int(os.environ["PORT"])
+            os.environ.setdefault("APPROVAL_PORT", os.environ["PORT"])
+        if os.environ.get("RENDER_EXTERNAL_URL"):
+            os.environ.setdefault("APPROVAL_BASE_URL", os.environ["RENDER_EXTERNAL_URL"])
     if a.lan:
         ip = lan_ip()
         port = a.port or int(os.environ.get("APPROVAL_PORT", "8000"))
