@@ -38,6 +38,9 @@ using System.Runtime.InteropServices;
 public static class DemoWin {
   [DllImport("user32.dll")] public static extern bool SetWindowPos(IntPtr h, IntPtr after, int x, int y, int cx, int cy, uint flags);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd);
+  [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
 }
 "@
 Add-Type -AssemblyName System.Windows.Forms
@@ -89,19 +92,32 @@ for ($i = 0; $i -lt 20; $i++) {
 }
 
 # 3. ChatGPT 데스크톱 앱: 오른쪽 1/3
-function Find-Gpt {
-  Get-Process -ErrorAction SilentlyContinue | Where-Object {
-    $_.MainWindowHandle -ne 0 -and (
-      ($_.Path -and $_.Path -like '*\WindowsApps\OpenAI*') -or $_.ProcessName -match '^(ChatGPT|Codex)$')
-  } | Select-Object -First 1
+$log = Join-Path $root 'data\layout.log'
+function Log([string]$m) { try { Add-Content -Path $log -Value ("{0:HH:mm:ss} {1}" -f (Get-Date), $m) -Encoding UTF8 } catch {} }
+function Gpt-Front {
+  # 앞에 나온 창이 ChatGPT(스토어판, 패키지 OpenAI.*) 창이면 그 창 핸들
+  $h = [DemoWin]::GetForegroundWindow(); [uint32]$procId = 0
+  [void][DemoWin]::GetWindowThreadProcessId($h, [ref]$procId)
+  $p = Get-Process -Id $procId -ErrorAction SilentlyContinue
+  if ($p -and $p.Path -and $p.Path -like '*\OpenAI.*' -and [DemoWin]::IsWindowVisible($h)) { return $h }
+  return [IntPtr]::Zero
 }
-$gpt = Find-Gpt
-if (-not $gpt) {
-  $app = Get-StartApps | Where-Object { $_.Name -eq 'ChatGPT' } | Select-Object -First 1
-  if ($app) { Start-Process "shell:AppsFolder\$($app.AppID)" } else { Write-Host 'ChatGPT 앱을 찾지 못했습니다. 설치되어 있는지 확인하세요.' }
-  for ($i = 0; $i -lt 30 -and -not $gpt; $i++) { Start-Sleep -Seconds 1; $gpt = Find-Gpt }
+Log "--- 시작 Role=$Role base=$base 화면=$($wa.Width)x$($wa.Height)"
+# 트레이로 닫혀 있어도 창이 다시 열리도록 늘 앱 바로가기로 연다(이미 열려 있으면 앞으로 나온다)
+$app = Get-StartApps | Where-Object { $_.Name -like '*ChatGPT*' -or $_.AppID -like 'OpenAI.*' } | Select-Object -First 1
+$appId = if ($app) { $app.AppID } else { 'OpenAI.Codex_2p2nqsd0c76g0!App' }
+Log "ChatGPT 열기: $appId ($($app.Name))"
+Start-Process "shell:AppsFolder\$appId"
+$h = [IntPtr]::Zero
+for ($i = 0; $i -lt 60 -and $h -eq [IntPtr]::Zero; $i++) { Start-Sleep -Milliseconds 500; $h = Gpt-Front }
+if ($h -ne [IntPtr]::Zero) {
+  Start-Sleep -Milliseconds 600                                         # 처음 뜬 창이 자리를 잡은 뒤 옮긴다
+  Place $h ($wa.X + $webW) ($wa.Width - $webW)
+  Log "ChatGPT 창 배치 완료 ($h)"
+} else {
+  Write-Host 'ChatGPT 창을 찾지 못했습니다. ChatGPT 앱을 한 번 열어 두고 다시 실행하세요.'
+  Log "ChatGPT 창을 찾지 못함 (앞 창: $([DemoWin]::GetForegroundWindow()))"
 }
-if ($gpt) { Place $gpt.MainWindowHandle ($wa.X + $webW) ($wa.Width - $webW) }
 
 Write-Host "배치 완료: 사이트 $webW px | ChatGPT $($wa.Width - $webW) px (화면 $($wa.Width)x$($wa.Height))"
 Start-Sleep -Seconds 2
