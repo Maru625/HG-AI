@@ -239,7 +239,7 @@
       : '';
     var msg = mine
       ? '<div class="dl-msg"><b>' + HANDS[mine] + ' ' + NAMES[mine] + '</b>를 냈습니다. ' + (du.opp_picked ? '상대도 골랐습니다! 곧 공개합니다' : esc(du.opponent.name) + '이 고르는 중<span class="dots"></span>')
-        + '<br><span style="font-size:14px;opacity:.85">상대가 화면을 열면 대결 창이 뜹니다. 시연할 때는 오른쪽 위 사용자 전환에서 ' + esc(du.opponent.name) + '으로 바꾸세요.</span></div>'
+        + '<br><span style="font-size:14px;opacity:.85">' + esc(du.opponent.name) + '의 화면에 대결 창이 바로 뜹니다(이 사이트 아무 화면이나 열려 있으면 됨). PC 한 대로 할 때는 InPrivate 창에서 상대로 들어가세요.</span></div>'
       : '<div class="dl-msg">' + (du.round > 1 ? '비겼습니다! 한 판 더. ' : '') + '셋 중 하나를 고르세요. 고르면 바꿀 수 없습니다.</div>';
     var picks = mine ? '' : '<div class="dl-picks" role="group" aria-label="가위바위보 고르기">' + ORDER.map(function (k) {
       return '<button type="button" class="dl-pick" data-pick="' + k + '" aria-label="' + NAMES[k] + '">' + HANDS[k] + '<span>' + NAMES[k] + '</span></button>';
@@ -411,11 +411,13 @@
   root.addEventListener('click', act);
 
   function schedule(ms) { clearTimeout(timer); timer = setTimeout(poll, ms); }
+  // 두 PC가 따로 보는 시연이라 상대 화면 변화가 1초 안팎에 보이도록 자주 묻는다(대결 중 0.8초, 평소 1.5초).
   function poll(now) {
-    if (!now && (document.hidden || busy)) { schedule(1500); return; }
+    if (!now && (document.hidden || busy)) { schedule(1000); return; }
     call('/duel/state').then(function (st) { return apply(st); }).catch(function () { /* 다음 주기에 다시 본다 */ })
-      .then(function () { schedule(cur && cur.status === 'WAITING' ? 1500 : 3000); });
+      .then(function () { schedule(cur && cur.status === 'WAITING' ? 800 : 1500); });
   }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) poll(true); });
   window.duelPoll = poll;
   poll(true);
 })();
