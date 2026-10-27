@@ -374,7 +374,9 @@ def room_rules(s: Session, vals: dict, doc_id: str | None) -> list[dict]:
         for c in conflicts(s, room.id, day, st, en, doc_id):
             out.append(issue("ROOM_CONFLICT", "error",
                              f"{room.name} {day} {c.start}~{c.end}에 '{c.title}' 예약({'가예약' if c.status == 'HOLD' else '확정'})이 있습니다.",
-                             field="room", article="제14조", fix_hint="check_room_availability로 빈 회의실이나 시간을 찾으세요."))
+                             field="room", article="제14조",
+                             fix_hint="check_room_availability로 빈 회의실이나 시간을 찾으세요. 사용자가 이 회의실을 원하면 "
+                                      "초안을 그대로 저장하고 사이트 초안 화면의 가위바위보 버튼으로 겨룰 수 있습니다(재미 기능, 켜져 있을 때)."))
     return out
 
 
