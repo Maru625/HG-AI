@@ -4,7 +4,7 @@
 # 서버가 Render 같은 공개 주소에 있으면: 이 폴더의 server_url.txt에 https 주소 한 줄을 넣는다 → 두 PC 모두 서버를 켜지 않고 그 주소로 연다
 #   (한 번만: start_lead_pc.bat -Server https://hg-approval-demo.onrender.com)
 #   사원 PC는 질문에 IP 대신 https 주소를 넣으면 된다. 한 번 넣은 값은 server_ip.txt에 기억
-# 옵션: -User E2003(다른 사용자) -WebShare 0.6(사이트 폭 비율) -Server 172.x.x.x 또는 https://… -NoServer
+# 옵션: -User E2003(다른 사용자) -WebShare 0.6(사이트 폭 비율) -Server 192.168.x.x 또는 https://… -NoServer
 param(
   [ValidateSet('lead', 'staff')][string]$Role = 'lead',
   [string]$Server = '',
@@ -23,7 +23,7 @@ if (-not $Server) {
   if ($Role -eq 'lead') { $Server = 'localhost' }
   else {
     $saved = if (Test-Path $ipFile) { (Get-Content $ipFile -Raw).Trim() } else { '' }
-    $ans = Read-Host "서버 주소를 넣으세요 - 팀장 PC IP 또는 https 주소$(if ($saved) { " [Enter = $saved]" } else { ' (예: 172.26.37.141 / https://hg-approval-demo.onrender.com)' })"
+    $ans = Read-Host "서버 주소를 넣으세요 - 팀장 PC IP 또는 https 주소$(if ($saved) { " [Enter = $saved]" } else { ' (예: 192.168.0.10 / https://hg-approval-demo.onrender.com)' })"
     $Server = if ($ans) { $ans.Trim() } else { $saved }
     if (-not $Server) { Write-Host '주소가 없어 끝냅니다.'; Read-Host '닫으려면 Enter'; exit 1 }
     Set-Content -Path $ipFile -Value $Server -Encoding UTF8
